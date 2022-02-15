@@ -1,11 +1,11 @@
 # Cave
-A rewrite of pupilfirst (Learning management system) in golang for the purpose of learning a software development process.
+A Bible school seminary Learning management system (Adullam) in golang for the purpose of learning a software development process.
 
 
 <!--- ![Go-LMS Logo](https://github.com/cbrom/Go-LMS/blob/cbrom/docs/assets/log.png) --->
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-informational)](https://github.com/cbrom/Go-LMS/blob/master/LICENSE)
-[![Go](https://github.com/cbrom/Go-LMS/workflows/Go/badge.svg?branch=dev)](https://github.com/cbrom/Go-LMS/actions?query=workflow%3A%22Go%22)
+[![License: MIT](https://img.shields.io/badge/license-MIT-informational)](https://github.com/onos9/cave/blob/master/LICENSE)
+[![Go](https://github.com/onos9/cave/workflows/Go/badge.svg?branch=dev)](https://github.com/onos9/cave/actions?query=workflow%3A%22Go%22)
 
 ---
 
