@@ -1,5 +1,5 @@
 # Cave
-A Bible school seminary Learning management system (Adullam) in golang for the purpose of learning a software development process.
+A Bible school Seminary Learning Management System (Adullam) in golang for the purpose of learning a software development process.
 
 
 <!--- ![Go-LMS Logo](https://github.com/cbrom/Go-LMS/blob/cbrom/docs/assets/log.png) --->
