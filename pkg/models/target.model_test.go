@@ -1,7 +1,7 @@
 package models_test
 
 import (
-	"github.com/cave/cmd/models"
+	"github.com/cave/pkg/models"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

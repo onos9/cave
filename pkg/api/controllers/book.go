@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	validator "gofiber-boilerplate/api/common/validator"
-	"gofiber-boilerplate/api/models/book"
-	bookRepo "gofiber-boilerplate/api/repositories/book"
+	validator "github.com/cave/pkg/api/common/validator"
+	"github.com/cave/pkg/models/book"
+	bookRepo "github.com/cave/pkg/api/repositories/book"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"

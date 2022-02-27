@@ -3,8 +3,8 @@ package models_test
 import (
 	"testing"
 
-	"github.com/cave/cmd/models"
 	"github.com/cave/migrations"
+	"github.com/cave/pkg/models"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

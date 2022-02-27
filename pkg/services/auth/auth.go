@@ -3,9 +3,9 @@ package auth
 import (
 	"time"
 
-	"gofiber-boilerplate/api/models/user"
+	"github.com/cave/pkg/models/user"
 
-	cfg "gofiber-boilerplate/api/configs"
+	cfg "github.com/cave/configs"
 
 	jwt "github.com/form3tech-oss/jwt-go"
 	"github.com/google/uuid"

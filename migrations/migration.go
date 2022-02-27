@@ -1,7 +1,7 @@
 package migrations
 
 import (
-	"github.com/cave/cmd/models"
+	"github.com/cave/pkg/models"
 
 	"github.com/jinzhu/gorm"
 )

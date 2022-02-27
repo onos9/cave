@@ -1,7 +1,7 @@
 package main
 
 import (
-	app "gofiber-boilerplate/api"
+	app "github.com/cave/pkg/api"
 )
 
 func main() {

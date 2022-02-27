@@ -3,11 +3,11 @@ package controllers
 import (
 	"net/http"
 
-	passwordUtil "gofiber-boilerplate/api/common/passwordutil"
-	validator "gofiber-boilerplate/api/common/validator"
-	"gofiber-boilerplate/api/models/user"
-	userRepo "gofiber-boilerplate/api/repositories/user"
-	"gofiber-boilerplate/api/services/auth"
+	passwordUtil "github.com/cave/pkg/api/common/passwordutil"
+	validator "github.com/cave/pkg/api/common/validator"
+	"github.com/cave/pkg/models/user"
+	userRepo "github.com/cave/pkg/api/repositories/user"
+	"github.com/cave/pkg/services/auth"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"

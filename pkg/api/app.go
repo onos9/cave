@@ -4,19 +4,17 @@ import (
 	"fmt"
 
 	// Configs
-	cfg "gofiber-boilerplate/api/configs"
+	cfg "github.com/cave/configs"
 
-	// Swagger
-	docs "gofiber-boilerplate/api/docs" // Swagger Docs
 
 	// routes
-	"gofiber-boilerplate/api/routes"
+	"github.com/cave/pkg/api/routes"
 
 	// database
-	db "gofiber-boilerplate/api/database"
+	db "github.com/cave/pkg/database"
 
 	// models
-	"gofiber-boilerplate/api/models/user"
+	"github.com/cave/pkg/models/user"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -33,7 +31,7 @@ import (
 // @contact.url https://github.com/ItsCosmas
 // @contact.email devcosmas@gmail.com
 // @license.name MIT
-// @license.url https://github.com/ItsCosmas/gofiber-boilerplate/blob/master/LICENSE
+// @license.url https://github.com/ItsCosmas/github.com/cave/blob/master/LICENSE
 // @BasePath /api/v1
 func Run() {
 	app := fiber.New()
@@ -50,13 +48,13 @@ func Run() {
 	*/
 
 	// Connect to Postgres
-	db.ConnectPostgres()
+	//db.ConnectPostgres()
 
 	// Drop on serve restarts in dev
 	// db.PgDB.Migrator().DropTable(&user.User{})
 
 	// Migration
-	db.PgDB.AutoMigrate(&user.User{})
+	//db.PgDB.AutoMigrate(&user.User{})
 
 	// Connect to Mongo
 	db.ConnectMongo()
