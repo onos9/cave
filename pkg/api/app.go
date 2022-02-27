@@ -5,16 +5,15 @@ import (
 
 	// Configs
 	cfg "github.com/cave/configs"
-
+	"github.com/cave/pkg/api/routes"
+	"github.com/swaggo/swag/example/basic/docs"
 
 	// routes
-	"github.com/cave/pkg/api/routes"
 
 	// database
 	db "github.com/cave/pkg/database"
 
 	// models
-	"github.com/cave/pkg/models/user"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"

@@ -1,7 +1,7 @@
-package routers
+package routes
 
 import (
-	"github.com/firmanJS/boillerplate-fiber/api"
+	"github.com/cave/pkg/api/controllers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
