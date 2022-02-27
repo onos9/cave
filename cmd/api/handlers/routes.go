@@ -15,7 +15,11 @@ var (
 
 func pingHandler(c *gin.Context) {
 	c.JSON(200, gin.H{
-		"message": "pong",
+		"name": "Ade",
+		"date": "25/02/2022",
+		"recentMessage": "call him",
+		"avater": "http://wwww.adullam.ng/avater",
+		"delivered": true,
 	})
 }
 
