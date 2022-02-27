@@ -2,7 +2,7 @@ package role
 
 import (
 	"github.com/asaskevich/govalidator"
-	. "github.com/cave/configs"
+	. "github.com/cave/pkg/database"
 	"github.com/cave/pkg/helpers"
 	. "github.com/cave/pkg/models"
 	"github.com/cave/pkg/utils"

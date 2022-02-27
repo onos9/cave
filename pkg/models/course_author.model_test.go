@@ -1,9 +1,9 @@
 package models_test
 
 import (
+	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/pborman/uuid"
 
 	"github.com/cave/pkg/models"
 )
@@ -55,7 +55,7 @@ var _ = Describe("CourseAuthor.Model", func() {
 			})
 
 			It("should update an existing course author", func() {
-				newID := uuid.NewRandom().String()
+				newID := uuid.New().String()
 				courseAuthor.UserID = newID
 				courseAuthor.UpdateOne()
 				ca := models.CourseAuthor{}

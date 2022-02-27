@@ -1,9 +1,9 @@
 package models_test
 
 import (
+	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/pborman/uuid"
 
 	"github.com/cave/pkg/models"
 )
@@ -52,7 +52,7 @@ var _ = Describe("IssuedCertificate.Model", func() {
 			})
 
 			It("should update an existing issued certificate", func() {
-				issuedCertificate.SerialNumber = uuid.NewRandom().String()
+				issuedCertificate.SerialNumber = uuid.New().String()
 				issuedCertificate.UpdateOne()
 				ic := models.IssuedCertificate{}
 				ic.SetID(issuedCertificate.GetID())

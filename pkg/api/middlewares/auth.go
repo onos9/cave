@@ -3,7 +3,7 @@ package middlewares
 import (
 	"net/http"
 
-	cfg "github.com/cave/configs"
+	cfg "github.com/cave/pkg/database"
 
 	jwt "github.com/form3tech-oss/jwt-go"
 	"github.com/gofiber/fiber/v2"

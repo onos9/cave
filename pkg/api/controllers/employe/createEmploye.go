@@ -2,12 +2,12 @@ package employe
 
 import (
 	"github.com/asaskevich/govalidator"
-	//. "github.com/cave/configs"
+	. "github.com/cave/pkg/database"
 	"github.com/cave/pkg/helpers"
-	//. "github.com/cave/pkg/models"
+	. "github.com/cave/pkg/models"
 	"github.com/cave/pkg/utils"
 	"github.com/gofiber/fiber/v2"
-	"go.mongodb.org/mongo-driver/bson"s
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func CreateNew(ctx *fiber.Ctx) error {

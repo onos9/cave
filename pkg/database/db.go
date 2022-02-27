@@ -1,4 +1,4 @@
-package database
+package config
 
 import (
 	"context"
@@ -7,58 +7,24 @@ import (
 	"strings"
 	"time"
 
-	// Configs
 	cfg "github.com/cave/configs"
-
-	// Gorm
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-
-	// Redis
-	"github.com/go-redis/redis/v8"
-
-	// Mongo
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var (
-	// PgDB is the postgress connection handle
-	PgDB *gorm.DB
-	// MgDB is the mongodb connection handle
-	MgDB MongoInstance
-	// RdDB Connection Handle
-	RdDB *redis.Client
-)
-
-// MongoInstance contains the Mongo client and database objects
 type MongoInstance struct {
-	Client *mongo.Client
-	Db     *mongo.Database
+	Client   *mongo.Client
+	Database *mongo.Database
 }
 
-// ConnectPostgres Returns the Pg DB Instance
-func ConnectPostgres() {
-	dsn := cfg.GetConfig().Postgres.GetPostgresConnectionInfo()
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+var Instance MongoInstance
 
-	if err != nil {
-		fmt.Println(strings.Repeat("!", 40))
-		fmt.Println("☹️  Could Not Establish Postgres DB Connection")
-		fmt.Println(strings.Repeat("!", 40))
-		log.Fatal(err)
-	}
-
-	fmt.Println(strings.Repeat("-", 40))
-	fmt.Println("😀 Connected To Postgres DB")
-	fmt.Println(strings.Repeat("-", 40))
-
-	PgDB = db
-}
-
-// ConnectMongo Returns the Mongo DB Instance
-func ConnectMongo() {
+// Create database connection
+func Connect() error {
 	client, err := mongo.NewClient(options.Client().ApplyURI(cfg.GetConfig().Mongo.URI))
+	if err != nil {
+		return err
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -78,33 +44,10 @@ func ConnectMongo() {
 	fmt.Println("😀 Connected To Mongo DB")
 	fmt.Println(strings.Repeat("-", 40))
 
-	MgDB = MongoInstance{
-		Client: client,
-		Db:     db,
+	Instance = MongoInstance{
+		Client:   client,
+		Database: db,
 	}
 
-}
-
-// ConnectRedis returns the Redis Instance
-func ConnectRedis() {
-	client := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%s", cfg.GetConfig().Redis.HOST, cfg.GetConfig().Redis.PORT),
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
-
-	pong, err := client.Ping(client.Context()).Result()
-
-	if err != nil {
-		fmt.Println(strings.Repeat("!", 40))
-		fmt.Println("☹️  Could Not Establish Redis Connection")
-		fmt.Println(strings.Repeat("!", 40))
-		log.Fatal(err)
-	}
-
-	fmt.Println(strings.Repeat("-", 40))
-	fmt.Printf("😀 Connected To Redis: %s\n", pong)
-	fmt.Println(strings.Repeat("-", 40))
-
-	RdDB = client
+	return nil
 }

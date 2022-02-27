@@ -5,13 +5,12 @@ import (
 	"log"
 
 	"github.com/cave/configs"
-	"github.com/cave/pkg/database"
 	"github.com/cave/pkg/models"
 
+	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 	"github.com/jinzhu/gorm/dialects/postgres"
 	. "github.com/onsi/ginkgo"
-	"github.com/pborman/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -34,7 +33,7 @@ func ConnectToTestDatabase() *gorm.DB {
 // CreateUser creates a user mock for testing
 func CreateUser() models.User {
 	password := "password"
-	passwordSalt := uuid.NewRandom().String()
+	passwordSalt := uuid.New().String()
 	saltedPassword := password + passwordSalt
 	passwordHash, _ := bcrypt.GenerateFromPassword([]byte(saltedPassword), bcrypt.DefaultCost)
 
@@ -127,7 +126,7 @@ func CreateIssuedCertificate(certificate models.Certificate, user models.User) m
 	issuedCertificate := models.IssuedCertificate{
 		CertificateID: certificate.GetID(),
 		UserID:        user.GetID(),
-		SerialNumber:  uuid.NewRandom().String(),
+		SerialNumber:  uuid.New().String(),
 	}
 	if err := issuedCertificate.Create(); err != nil {
 		Fail("Couldn't create issued certificate")

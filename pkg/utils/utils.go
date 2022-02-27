@@ -4,12 +4,8 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
-	"github.com/pborman/uuid"
+	"github.com/google/uuid"
 )
-
-func MakeTimestamp() time.Time {
-	return time.Now()
-}
 
 // Base serves as a base model for other models
 type Base struct {
@@ -21,7 +17,7 @@ type Base struct {
 
 // BeforeCreate generates a uuid into the id before saving the model
 func (base *Base) BeforeCreate(scope *gorm.Scope) error {
-	uuid := uuid.NewRandom().String()
+	uuid := uuid.New().String()
 	return scope.SetColumn("ID", uuid)
 }
 
@@ -179,4 +175,8 @@ func (as *AdvancedSearch) GetSearchInQuery() []interface{} {
 // SetSearchInQuery sets search in query
 func (as *AdvancedSearch) SetSearchInQuery(query []interface{}) {
 	as.SearchInQuery = query
+}
+
+func MakeTimestamp() time.Time {
+	return time.Now()
 }

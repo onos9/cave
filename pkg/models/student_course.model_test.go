@@ -3,9 +3,9 @@ package models_test
 import (
 	"github.com/cave/pkg/models"
 
+	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/pborman/uuid"
 )
 
 var _ = Describe("StudentCourse.Model", func() {
@@ -48,7 +48,7 @@ var _ = Describe("StudentCourse.Model", func() {
 			})
 
 			It("should update an existing student course", func() {
-				newID := uuid.NewRandom().String()
+				newID := uuid.New().String()
 				studentCourse.UserID = newID
 				studentCourse.UpdateOne()
 				ca := models.StudentCourse{}

@@ -16,6 +16,7 @@ import (
 	// models
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -33,37 +34,21 @@ import (
 // @license.url https://github.com/ItsCosmas/github.com/cave/blob/master/LICENSE
 // @BasePath /api/v1
 func Run() {
-	app := fiber.New()
-
-	/*
-		====== Setup Configs ============
-	*/
-
+	// Setup Configs
 	cfg.LoadConfig()
 	config := cfg.GetConfig()
 
-	/*
-		====== Setup DB ============
-	*/
+	// connect to the database
+	dbError := db.Connect()
+	if dbError != nil {
+		log.Fatal(dbError)
+		return
+	}
 
-	// Connect to Postgres
-	//db.ConnectPostgres()
+	app := fiber.New()
 
-	// Drop on serve restarts in dev
-	// db.PgDB.Migrator().DropTable(&user.User{})
-
-	// Migration
-	//db.PgDB.AutoMigrate(&user.User{})
-
-	// Connect to Mongo
-	db.ConnectMongo()
-
-	// Connect to Redis
-	db.ConnectRedis()
-
-	/*
-		============ Set Up Middlewares ============
-	*/
+	// middlewares
+	app.Use(compress.New())
 
 	// Default Log Middleware
 	app.Use(logger.New())
@@ -77,16 +62,12 @@ func Run() {
 		AllowHeaders: "Origin, Content-Type, Accept",
 	}))
 
-	/*
-		============ Set Up Routes ============
-	*/
+	// routes setup
 	routes.SetupRoutes(app)
 
-	/*
-		============ Setup Swagger ===============
-	*/
-
-	// FIXME, In Production, Port Should not be added to the Swagger Host
+	
+	// Setup Swagger
+	// Todo: FIXME, In Production, Port Should not be added to the Swagger Host
 	docs.SwaggerInfo.Host = config.Host + ":" + config.Port
 
 	// Run the app and listen on given port

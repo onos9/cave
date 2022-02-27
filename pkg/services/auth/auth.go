@@ -5,7 +5,7 @@ import (
 
 	"github.com/cave/pkg/models/user"
 
-	cfg "github.com/cave/configs"
+	cfg "github.com/cave/pkg/database"
 
 	jwt "github.com/form3tech-oss/jwt-go"
 	"github.com/google/uuid"
