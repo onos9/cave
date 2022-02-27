@@ -1,14 +1,15 @@
 package employe
 
 import (
-	. "github.com/cave/pkg/database"
+	. "github.com/cave/pkg/api/controllers"
+	db "github.com/cave/pkg/database"
 	"github.com/cave/pkg/helpers"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func DeleteSingle(ctx *fiber.Ctx) error {
+func (c Controller) DeleteSingle(ctx *fiber.Ctx) error {
 	// check data
 	id := ctx.Params("id")
 
@@ -18,7 +19,7 @@ func DeleteSingle(ctx *fiber.Ctx) error {
 	}
 
 	// get collection
-	collection := Instance.Database.Collection("employe")
+	collection := db.Instance.Database.Collection("employe")
 
 	// check if the record is there
 	query := bson.D{{Key: "_id", Value: employeId}}
@@ -38,7 +39,7 @@ func DeleteSingle(ctx *fiber.Ctx) error {
 
 func DeleteAll(ctx *fiber.Ctx) error {
 	// get collection
-	collection := Instance.Database.Collection("employe")
+	collection := db.Instance.Database.Collection("employe")
 
 	// check if the record is there
 	deleteResult := collection.Drop(ctx.Context())

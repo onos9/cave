@@ -2,20 +2,20 @@ package employe
 
 import (
 	"github.com/asaskevich/govalidator"
-	. "github.com/cave/pkg/database"
+	db "github.com/cave/pkg/database"
 	"github.com/cave/pkg/helpers"
-	. "github.com/cave/pkg/models"
+	"github.com/cave/pkg/models"
 	"github.com/cave/pkg/utils"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func CreateNew(ctx *fiber.Ctx) error {
-	
-	collection := Instance.Database.Collection("employe")
+func (c *Controller) CreateNew(ctx *fiber.Ctx) error {
+
+	collection := db.Instance.Database.Collection("employe")
 
 	// create a new record
-	employe := new(Employe)
+	employe := new(models.Employe)
 	employe.CreatedAt = utils.MakeTimestamp()
 	employe.UpdatedAt = utils.MakeTimestamp()
 
@@ -33,7 +33,7 @@ func CreateNew(ctx *fiber.Ctx) error {
 		} else {
 			filter := bson.D{{Key: "_id", Value: result.InsertedID}}
 			createdRecord := collection.FindOne(ctx.Context(), filter)
-			createdemploye := &Employe{}
+			createdemploye := &models.Employe{}
 			createdRecord.Decode(createdemploye)
 
 			return helpers.CrudResponse(ctx, "Create", createdemploye)

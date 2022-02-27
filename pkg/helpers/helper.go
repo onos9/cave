@@ -1,11 +1,11 @@
-package controllers
+package helpers
 
 import (
 	"github.com/gofiber/fiber/v2"
 )
 
 // Stores Errors
-var errorList []*Response
+var ErrorList []*Response
 
 // Response object as HTTP response
 type Response struct {

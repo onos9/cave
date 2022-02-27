@@ -1,7 +1,7 @@
 package role
 
 import (
-	. "github.com/cave/pkg/database"
+	db "github.com/cave/pkg/database"
 	"github.com/cave/pkg/helpers"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -18,7 +18,7 @@ func DeleteSingle(ctx *fiber.Ctx) error {
 	}
 
 	// get collection
-	collection := Instance.Database.Collection("role")
+	collection := db.Instance.Database.Collection("role")
 
 	// check if the record is there
 	query := bson.D{{Key: "_id", Value: roleId}}
@@ -38,7 +38,7 @@ func DeleteSingle(ctx *fiber.Ctx) error {
 
 func DeleteAll(ctx *fiber.Ctx) error {
 	// get collection
-	collection := Instance.Database.Collection("role")
+	collection := db.Instance.Database.Collection("role")
 
 	// check if the record is there
 	deleteResult := collection.Drop(ctx.Context())

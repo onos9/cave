@@ -3,8 +3,11 @@ package role
 import (
 	"time"
 
-	. "github.com/cave/pkg/database"
+	
+    db "github.com/cave/pkg/database"
 	"github.com/cave/pkg/helpers"
+	"github.com/cave/pkg/models"
+
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,7 +16,7 @@ import (
 func UpdateSingle(ctx *fiber.Ctx) error {
 	// check data
 	id := ctx.Params("id")
-	role := new(Role)
+	role := new(models.Role)
 	roleId, parseError := primitive.ObjectIDFromHex(id)
 	if parseError != nil {
 		return helpers.BadResponse(ctx, "Bad Request", parseError.Error())
@@ -24,12 +27,12 @@ func UpdateSingle(ctx *fiber.Ctx) error {
 		helpers.ServerResponse(ctx, parsingError.Error(), parsingError.Error())
 	}
 
-	collection := Instance.Database.Collection("role")
+	collection := db.Instance.Database.Collection("role")
 
 	// check if the record is there
 	query := bson.D{{Key: "_id", Value: roleId}}
 	rawRecord := collection.FindOne(ctx.Context(), query)
-	record := &Role{}
+	record := &models.Role{}
 	rawRecord.Decode(record)
 
 	if rawRecord.Err() != nil {

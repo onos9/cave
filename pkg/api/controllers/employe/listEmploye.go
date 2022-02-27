@@ -1,19 +1,19 @@
 package employe
 
 import (
-	. "github.com/cave/pkg/database"
+	db "github.com/cave/pkg/database"
 	"github.com/cave/pkg/helpers"
-	. "github.com/cave/pkg/models"
+	"github.com/cave/pkg/models"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func GetAll(ctx *fiber.Ctx) error {
+func (c Controller) GetAll(ctx *fiber.Ctx) error {
 
-	var employe []Employe = make([]Employe, 0)
+	var employe []models.Employe = make([]models.Employe, 0)
 
 	query := bson.D{{}}
-	cursor, queryError := Instance.Database.Collection("employe").Find(ctx.Context(), query)
+	cursor, queryError := db.Instance.Database.Collection("employe").Find(ctx.Context(), query)
 
 	if queryError != nil {
 		return helpers.CrudResponse(ctx, "Get", queryError)

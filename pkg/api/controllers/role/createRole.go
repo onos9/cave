@@ -2,9 +2,9 @@ package role
 
 import (
 	"github.com/asaskevich/govalidator"
-	. "github.com/cave/pkg/database"
+	db "github.com/cave/pkg/database"
 	"github.com/cave/pkg/helpers"
-	. "github.com/cave/pkg/models"
+	"github.com/cave/pkg/models"
 	"github.com/cave/pkg/utils"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -12,10 +12,10 @@ import (
 
 func CreateNew(ctx *fiber.Ctx) error {
 
-	collection := Instance.Database.Collection("role")
+	collection := db.Instance.Database.Collection("role")
 
 	// create a new record
-	role := new(Role)
+	role := new(models.Role)
 	role.CreatedAt = utils.MakeTimestamp()
 	role.UpdatedAt = utils.MakeTimestamp()
 
@@ -33,7 +33,7 @@ func CreateNew(ctx *fiber.Ctx) error {
 		} else {
 			filter := bson.D{{Key: "_id", Value: result.InsertedID}}
 			createdRecord := collection.FindOne(ctx.Context(), filter)
-			createdRole := &Role{}
+			createdRole := &models.Role{}
 			createdRecord.Decode(createdRole)
 
 			return helpers.CrudResponse(ctx, "Create", createdRole)

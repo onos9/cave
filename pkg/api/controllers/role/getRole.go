@@ -1,9 +1,9 @@
 package role
 
 import (
-	. "github.com/cave/pkg/database"
+	db "github.com/cave/pkg/database"
 	"github.com/cave/pkg/helpers"
-	. "github.com/cave/pkg/models"
+	"github.com/cave/pkg/models"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -17,11 +17,11 @@ func GetSingle(ctx *fiber.Ctx) error {
 		return helpers.BadResponse(ctx, "Bad Request", parseError.Error())
 	}
 
-	collection := Instance.Database.Collection("role")
+	collection := db.Instance.Database.Collection("role")
 
 	query := bson.D{{Key: "_id", Value: roleId}}
 	rawRecord := collection.FindOne(ctx.Context(), query)
-	record := &Role{}
+	record := &models.Role{}
 	rawRecord.Decode(record)
 
 	if rawRecord.Err() != nil {

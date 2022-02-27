@@ -1,15 +1,15 @@
 package employe
 
 import (
-	. "github.com/cave/pkg/database"
+	db "github.com/cave/pkg/database"
 	"github.com/cave/pkg/helpers"
-	. "github.com/cave/pkg/models"
+	"github.com/cave/pkg/models"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func GetSingle(ctx *fiber.Ctx) error {
+func (c Controller) GetSingle(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 
 	employeId, parseError := primitive.ObjectIDFromHex(id)
@@ -17,11 +17,11 @@ func GetSingle(ctx *fiber.Ctx) error {
 		return helpers.BadResponse(ctx, "Bad Request", parseError.Error())
 	}
 
-	collection := Instance.Database.Collection("employe")
+	collection := db.Instance.Database.Collection("employe")
 
 	query := bson.D{{Key: "_id", Value: employeId}}
 	rawRecord := collection.FindOne(ctx.Context(), query)
-	record := &Employe{}
+	record := &models.Employe{}
 	rawRecord.Decode(record)
 
 	if rawRecord.Err() != nil {
