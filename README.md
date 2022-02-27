@@ -2,32 +2,134 @@
 A Bible school Seminary Learning Management System (Adullam) in golang for the purpose of learning a software development process.
 
 
-<!--- ![Go-LMS Logo](https://github.com/cbrom/Go-LMS/blob/cbrom/docs/assets/log.png) --->
+[![MIT Licence](https://badges.frapsoft.com/os/mit/mit.png?v=103)](https://opensource.org/licenses/mit-license.php)
+[![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-informational)](https://github.com/onos9/cave/blob/master/LICENSE)
-[![Go](https://github.com/onos9/cave/workflows/Go/badge.svg?branch=dev)](https://github.com/onos9/cave/actions?query=workflow%3A%22Go%22)
+## 🚧 WORK IN PROGRESS
+
+- Could be used to provide quick bootstrap functionality for your next go and gofiber app.
+- I will update(try) this regularly to add functionality and new features.
+- Well this is just one way of doing it, not the official or the best 😅.
+
+**Used libraries:**
+
+- [Gofiber](https://gofiber.io/)
+- [Gorm](https://gorm.io/)
+- [jwt-go](https://github.com/form3tech-oss/jwt-go)
+- [godotenv](https://pkg.go.dev/github.com/joho/godotenv?tab=doc)
+- [uuid](https://github.com/google/uuid)
+- [Go Mongo Driver](https://go.mongodb.org/mongo-driver)
+- [Go Playground Validator](https://github.com/go-playground/validator)
 
 ---
 
-## Features
+### Features
 
-* Coaches
-* Students
-* Live learning
-* Course curriculum 
+- [x] Gofiber Docker Dev Setup with Hot Reload
+- [x] User Auth functionality (Signup, Login, Forgot and Reset Password)
+- [x] JWT Authentication
+- [x] RESTful API
+- [x] Swagger REST API documentation
+- [x] Gorm (Golang SQL DB ORM) with Postgres implementation and auto migration
+- [x] MongoDB using the official mongo driver
+- [x] Configs via environmental variables
+- [x] Improved Input Validations(could be better)
+- [x] Custom Error messages
+- [ ] Email notification (Welcome email, Reset password email)
+- [ ] Redis
+- [ ] Casbin
+- [ ] WebSocket
+- [ ] gRPC
+- [ ] Improve MongoDB data integrity
 
-## Deploying to production
+---
 
-Have doubts? Talk to our development team on [our Discord server](https://discord.gg/fMBfuq).
+## Running and Developing locally
 
-## Setup for development
+1. Create `.env` at src, i.e.
+```sh
+cp src/.env.example src/.env
+```
 
-1. Install postgresql
-2. Install redis (optional)
-3. ```clone the repo```
-4. ```cd Go-LMS```
-5. ```go run cmd/api/main.go```
+2. Download Swag for generating docs
+```sh
+go get -u github.com/swaggo/swag/cmd/swag
+```
 
-### Note
-Any configuration goes to .env file.
-Do not run main program from outside the main directory.
+3. Run
+- NOTE: You have to generate swagger docs before running the app.
+```sh
+# Terminal 1
+swag init -g src/api/app.go --output ./src/api/docs # Generates Swagger
+
+# Terminal 2
+docker-compose --env-file ./src/.env up        # docker-compose up (Run App With AutoReload)
+docker-compose --env-file ./src/.env down      # docker-compose down (Shutdown App)
+```
+
+- API `http://localhost:8000/api/v1`
+- Swagger Doc `http://localhost:8000/api/v1/docs`
+
+---
+
+## Packaging For Production
+
+1. Create `.env` at src, i.e.
+```sh
+cp src/.env.example src/.env
+```
+
+2. Update your `.env` variables for production
+- Point to your prod database
+- Update JWT issuer, secret key , blah blah
+- Basically just follow good production practice
+
+3. Download Swag for generating docs
+```sh
+go get -u github.com/swaggo/swag/cmd/swag
+```
+
+- Generate Swagger Docs. You have to generate swagger docs before packaging the app.
+
+```sh
+swag init -g src/api/app.go --output ./src/api/docs # Generates Swagger
+```
+
+4. Build Your Image
+- Permission the build script to run.
+```
+chmod +x docker-build.sh
+```
+
+- You could set the image port on `Dockerfile.prod`
+- Run the build script. You must provide a version tag as shown below.
+```
+./docker-build.sh -v gofiber:1.0.0
+```
+---
+
+### Todo
+
+- [ ] Data Migrations ?
+- [ ] Logger
+- [ ] Unit tests
+
+maybe?
+
+- [ ] SMS notification (2FA ,Reset password code)
+- [ ] GraphQL
+- [ ] Deploy on Kubernetes
+- [ ] Write an article
+
+---
+
+### Gotcha's
+
+- Building Swago from source code - `go build -o swag.exe cmd/swag/main.go`
+
+### Contribution
+
+Open to Suggestions and Pull Requests
+
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+

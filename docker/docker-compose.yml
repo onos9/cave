@@ -1,0 +1,116 @@
+version: '3.5'
+services:
+  app:
+    container_name: gofiber_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: sh -c "cd src && go mod download && air"
+    environment:
+      - PORT=8000
+    ports:
+      - '8000:8000'
+    working_dir: /opt/gofiber-app
+    volumes:
+      - .:/opt/gofiber-app/:cached
+    depends_on:
+      - postgres
+      - mongo
+      - redis
+    networks:
+      - 'gofiber-net'
+
+  postgres:
+    image: postgres:12
+    container_name: gofiber_postgres
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - DATABASE_HOST=${DB_HOST}
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    logging:
+      driver: none
+    networks:
+      - 'gofiber-net'
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: gofiber_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    depends_on:
+      - postgres
+    ports:
+      - '5050:80'
+    restart: unless-stopped
+    logging:
+      driver: none
+    networks:
+      - 'gofiber-net'
+
+  # MongoDB
+  mongo:
+    image: 'mongo:4.2-bionic'
+    container_name: gofiber_mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./mongodata:/data/db
+    restart: always
+    logging:
+      driver: none
+    networks:
+      - 'gofiber-net'
+  # Mongo Express Web-based MongoDB admin interface
+  mongo_express:
+    image: mongo-express
+    container_name: gofiber_mongo-express
+    depends_on:
+      - 'mongo'
+    ports:
+      - '8081:8081'
+    restart: always
+    logging:
+      driver: none
+    networks:
+      - 'gofiber-net'
+      
+
+  # Redis
+  redis:
+    image: 'redis:6.2-buster'
+    container_name: gofiber_redis
+    ports:
+      - '6379:6379'
+    restart: always
+    logging:
+      driver: none
+    networks:
+      - 'gofiber-net'
+  
+  # Redis Commander
+  redis-commander:
+    container_name: gofiber_redis-commander
+    # hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    depends_on:
+      - redis
+    restart: always
+    environment:
+    - REDIS_HOSTS=local:redis:6379
+    ports:
+    - "8082:8081"
+    logging:
+      driver: none
+    networks:
+      - 'gofiber-net'
+    
+
+networks:
+  gofiber-net:
+    name: gofiber-net

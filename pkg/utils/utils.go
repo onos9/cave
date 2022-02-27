@@ -7,6 +7,10 @@ import (
 	"github.com/pborman/uuid"
 )
 
+func MakeTimestamp() time.Time {
+	return time.Now()
+}
+
 // Base serves as a base model for other models
 type Base struct {
 	ID        string     `sql:"type:uuid;primary_key;default:uuid_generate_v4()" validate:"omitempty,uuid,required"`
