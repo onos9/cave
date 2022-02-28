@@ -1,4 +1,4 @@
-package target_version
+package targetversion
 
 import (
 	"time"
@@ -14,32 +14,32 @@ import (
 func (c Controller) UpdateSingle(ctx *fiber.Ctx) error {
 
 	id := ctx.Params("id")
-	target_version := new(models.Target_version)
-	target_versionId, parseError := primitive.ObjectIDFromHex(id)
+	targetversion := new(models.TargetVersion)
+	targetversionId, parseError := primitive.ObjectIDFromHex(id)
 	if parseError != nil {
 		return helpers.BadResponse(ctx, "Bad Request", parseError.Error())
 	}
 
-	parsingError := ctx.BodyParser(target_version)
+	parsingError := ctx.BodyParser(targetversion)
 	if parsingError != nil {
 		helpers.ServerResponse(ctx, parsingError.Error(), parsingError.Error())
 	}
 
-	collection := db.Instance.Database.Collection("target_version")
+	collection := db.Instance.Database.Collection("targetversion")
 
 	// check if the record is there
-	query := bson.D{{Key: "_id", Value: target_versionId}}
+	query := bson.D{{Key: "_id", Value: targetversionId}}
 	rawRecord := collection.FindOne(ctx.Context(), query)
-	record := &models.Target_version{}
+	record := &models.TargetVersion{}
 	rawRecord.Decode(record)
 
 	// update the record
 	update := bson.D{
 		{Key: "$set",
 			Value: bson.D{
-				{Key: "name", Value: target_version.Name},
-				{Key: "salary", Value: target_version.Salary},
-				{Key: "age", Value: target_version.Age},
+				{Key: "name", Value: targetversion.Name},
+				{Key: "salary", Value: targetversion.Salary},
+				{Key: "age", Value: targetversion.Age},
 				{Key: "updatedAt", Value: time.Now()},
 			},
 		},
