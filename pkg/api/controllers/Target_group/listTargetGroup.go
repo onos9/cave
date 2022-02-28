@@ -1,4 +1,4 @@
-package target_group
+package targetgroup
 
 import (
 	db "github.com/cave/pkg/database"
@@ -10,10 +10,10 @@ import (
 
 func (c Controller) GetAll(ctx *fiber.Ctx) error {
 
-	var target_group []models.Target_group = make([]models.Target_group, 0)
+	var targetgroup []models.TargetGroup = make([]models.TargetGroup, 0)
 
 	query := bson.D{{}}
-	cursor, queryError := db.Instance.Database.Collection("target_group").Find(ctx.Context(), query)
+	cursor, queryError := db.Instance.Database.Collection("targetgroup").Find(ctx.Context(), query)
 
 	if queryError != nil {
 		return helpers.CrudResponse(ctx, "Get", queryError)
@@ -24,5 +24,5 @@ func (c Controller) GetAll(ctx *fiber.Ctx) error {
 		return helpers.MsgResponse(ctx, "get data unsuccesfully", err)
 	}
 
-	return helpers.CrudResponse(ctx, "Get", target_group)
+	return helpers.CrudResponse(ctx, "Get", targetgroup)
 }
