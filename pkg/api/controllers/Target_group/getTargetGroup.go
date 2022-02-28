@@ -1,4 +1,4 @@
-package target_group
+package targetgroup
 
 import (
 	db "github.com/cave/pkg/database"
@@ -12,16 +12,16 @@ import (
 func (c Controller) GetSingle(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 
-	target_groupId, parseError := primitive.ObjectIDFromHex(id)
+	targetgroupId, parseError := primitive.ObjectIDFromHex(id)
 	if parseError != nil {
 		return helpers.BadResponse(ctx, "Bad Request", parseError.Error())
 	}
 
-	collection := db.Instance.Database.Collection("target_group")
+	collection := db.Instance.Database.Collection("targetgroup")
 
-	query := bson.D{{Key: "_id", Value: target_groupId}}
+	query := bson.D{{Key: "_id", Value: targetgroupId}}
 	rawRecord := collection.FindOne(ctx.Context(), query)
-	record := &models.Target_group{}
+	record := &models.TargetGroup{}
 	rawRecord.Decode(record)
 
 	if rawRecord.Err() != nil {
