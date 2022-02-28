@@ -1,4 +1,4 @@
-package target_group
+package targetgroup
 
 import (
 	"time"
@@ -14,32 +14,32 @@ import (
 func (c Controller) UpdateSingle(ctx *fiber.Ctx) error {
 
 	id := ctx.Params("id")
-	target_group := new(models.Target_group)
-	target_groupId, parseError := primitive.ObjectIDFromHex(id)
+	targetgroup := new(models.TargetGroup)
+	targetgroupId, parseError := primitive.ObjectIDFromHex(id)
 	if parseError != nil {
 		return helpers.BadResponse(ctx, "Bad Request", parseError.Error())
 	}
 
-	parsingError := ctx.BodyParser(target_group)
+	parsingError := ctx.BodyParser(targetgroup)
 	if parsingError != nil {
 		helpers.ServerResponse(ctx, parsingError.Error(), parsingError.Error())
 	}
 
-	collection := db.Instance.Database.Collection("target_group")
+	collection := db.Instance.Database.Collection("targetgroup")
 
 	// check if the record is there
-	query := bson.D{{Key: "_id", Value: target_groupId}}
+	query := bson.D{{Key: "_id", Value: targetgroupId}}
 	rawRecord := collection.FindOne(ctx.Context(), query)
-	record := &models.Target_group{}
+	record := &models.TargetGroup{}
 	rawRecord.Decode(record)
 
 	// update the record
 	update := bson.D{
 		{Key: "$set",
 			Value: bson.D{
-				{Key: "name", Value: target_group.Name},
-				{Key: "salary", Value: target_group.Salary},
-				{Key: "age", Value: target_group.Age},
+				{Key: "name", Value: targetgroup.Name},
+				{Key: "salary", Value: targetgroup.Salary},
+				{Key: "age", Value: targetgroup.Age},
 				{Key: "updatedAt", Value: time.Now()},
 			},
 		},
