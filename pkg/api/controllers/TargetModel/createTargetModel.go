@@ -1,4 +1,4 @@
-package targetmodel
+package target
 
 import (
 	"github.com/asaskevich/govalidator"
@@ -12,15 +12,15 @@ import (
 
 func (c *Controller) CreateNew(ctx *fiber.Ctx) error {
 
-	collection := db.Instance.Database.Collection("targetmodel")
+	collection := db.Instance.Database.Collection("target")
 
 	// create a new record
-	targetmodel := new(models.TargetModel)
-	targetmodel.CreatedAt = utils.MakeTimestamp()
-	targetmodel.UpdatedAt = utils.MakeTimestamp()
+	target := new(models.Target)
+	target.CreatedAt = utils.MakeTimestamp()
+	target.UpdatedAt = utils.MakeTimestamp()
 
-	if errors := ctx.BodyParser(targetmodel); errors != nil {
-		_, err := govalidator.ValidateStruct(targetmodel)
+	if errors := ctx.BodyParser(target); errors != nil {
+		_, err := govalidator.ValidateStruct(target)
 
 		if err != nil {
 			return helpers.ServerResponse(ctx, err.Error(), err)
@@ -28,15 +28,15 @@ func (c *Controller) CreateNew(ctx *fiber.Ctx) error {
 
 		return helpers.ServerResponse(ctx, errors.Error(), errors)
 	} else {
-		if result, errs := collection.InsertOne(ctx.Context(), targetmodel); errs != nil {
+		if result, errs := collection.InsertOne(ctx.Context(), target); errs != nil {
 			return helpers.ServerResponse(ctx, errs.Error(), errs.Error())
 		} else {
 			filter := bson.D{{Key: "_id", Value: result.InsertedID}}
 			createdRecord := collection.FindOne(ctx.Context(), filter)
-			createdtargetmodel := &models.TargetModel{}
+			createdtarget := &models.Target{}
 			createdRecord.Decode(created)
 
-			return helpers.CrudResponse(ctx, "Create", createdtargetmodel)
+			return helpers.CrudResponse(ctx, "Create", createdtarget)
 		}
 	}
 }
