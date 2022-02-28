@@ -1,4 +1,4 @@
-package target_version
+package targetversion
 
 import (
 	db "github.com/cave/pkg/database"
@@ -10,10 +10,10 @@ import (
 
 func (c Controller) GetAll(ctx *fiber.Ctx) error {
 
-	var target_version []models.Target_version = make([]models.Target_version, 0)
+	var targetversion []models.TargetVersion = make([]models.TargetVersion, 0)
 
 	query := bson.D{{}}
-	cursor, queryError := db.Instance.Database.Collection("employe").Find(ctx.Context(), query)
+	cursor, queryError := db.Instance.Database.Collection("targetversion").Find(ctx.Context(), query)
 
 	if queryError != nil {
 		return helpers.CrudResponse(ctx, "Get", queryError)
@@ -24,5 +24,5 @@ func (c Controller) GetAll(ctx *fiber.Ctx) error {
 		return helpers.MsgResponse(ctx, "get data unsuccesfully", err)
 	}
 
-	return helpers.CrudResponse(ctx, "Get", target_version)
+	return helpers.CrudResponse(ctx, "Get", targetversion)
 }
