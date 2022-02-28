@@ -1,4 +1,4 @@
-package target_version
+package targetversion
 
 import (
 	db "github.com/cave/pkg/database"
@@ -12,16 +12,16 @@ import (
 func (c Controller) GetSingle(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 
-	target_versionId, parseError := primitive.ObjectIDFromHex(id)
+	targetversionId, parseError := primitive.ObjectIDFromHex(id)
 	if parseError != nil {
 		return helpers.BadResponse(ctx, "Bad Request", parseError.Error())
 	}
 
-	collection := db.Instance.Database.Collection("target_version")
+	collection := db.Instance.Database.Collection("targetversion")
 
-	query := bson.D{{Key: "_id", Value: target_versionId}}
+	query := bson.D{{Key: "_id", Value: targetversionId}}
 	rawRecord := collection.FindOne(ctx.Context(), query)
-	record := &models.Target_version{}
+	record := &models.TargetVersion{}
 	rawRecord.Decode(record)
 
 	if rawRecord.Err() != nil {
