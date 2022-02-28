@@ -1,4 +1,4 @@
-package target_version.go
+package targetversion
 
 import (
 	. "github.com/cave/pkg/api/controllers"
@@ -13,16 +13,16 @@ func (c Controller) DeleteSingle(ctx *fiber.Ctx) error {
 	// check data
 	id := ctx.Params("id")
 
-	target_versionId, parseError := primitive.ObjectIDFromHex(id)
+	targetversionId, parseError := primitive.ObjectIDFromHex(id)
 	if parseError != nil {
 		return helpers.BadResponse(ctx, "Bad Request", parseError.Error())
 	}
 
 	// get collection
-	collection := db.Instance.Database.Collection("target_version")
+	collection := db.Instance.Database.Collection("targetversion")
 
 	// check if the record is there
-	query := bson.D{{Key: "_id", Value: target_versionId}}
+	query := bson.D{{Key: "_id", Value: targetversionId}}
 	result, deleteError := collection.DeleteOne(ctx.Context(), &query)
 
 	if deleteError != nil {
@@ -39,7 +39,7 @@ func (c Controller) DeleteSingle(ctx *fiber.Ctx) error {
 
 func DeleteAll(ctx *fiber.Ctx) error {
 	// get collection
-	collection := db.Instance.Database.Collection("employe")
+	collection := db.Instance.Database.Collection("targetversion")
 
 	// check if the record is there
 	deleteResult := collection.Drop(ctx.Context())
