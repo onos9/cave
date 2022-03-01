@@ -11,7 +11,6 @@ var (
 // Channel is a model for Channels table
 type Channel struct {
 	utils.Base
-	ID       string `gorm:"type:varchar(100);unique" `
 	Name     string `gorm:"type:varchar(100);unique"`
 	Thumnail string
 	Banner   string

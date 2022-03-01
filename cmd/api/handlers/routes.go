@@ -26,9 +26,32 @@ func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *gorm.DB) {
 	models.SetRepoDB(db)
 	authenticator = auth
 	apiV1 := r.Group("/v1")
+	apiV1.GET("/ping", pingHandler)
+
+	userRouter := apiV1.Group("/user", user.SignUp)
 	{
-		apiV1.GET("/ping", pingHandler)
-		apiV1.GET("/user", user.SignUp)
-		apiV1.GET("/video", video.Upload)
+		userRouter.GET("/", user.SignUp)
 	}
+
+	videoRouter := apiV1.Group("/video")
+	{
+		videoRouter.GET("/", video.Upload)
+	}
+
+	categoryRouter := apiV1.Group("/category")
+	{
+		categoryRouter.GET("/", category.create)
+	}
+
+	channelRouter := apiV1.Group("/channel")
+	{
+		channelRouter.GET("/", channel.create)
+	}
+
+	commentRouter := apiV1.Group("/comment")
+	{
+		commentRouter.GET("/", comment.create)
+
+	}
+
 }
