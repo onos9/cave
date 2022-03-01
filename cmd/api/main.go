@@ -22,7 +22,7 @@ import (
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds | log.Lshortfile)
-	log.SetPrefix("cave-api" + " : ")
+	log.SetPrefix("go-lms-api" + " : ")
 	log := log.New(os.Stdout, log.Prefix(), log.Flags())
 
 	if err := envconfig.Process("go-lms-api", &configs.CFG); err != nil {
@@ -57,15 +57,10 @@ func main() {
 
 	dbConfig, err := configs.LoadConfig()
 	if err != nil {
-		log.Printf("main : Error loading database configuration %+v", err)
+		log.Printf("main : Error loading database %+v", err)
 	}
 	log.Printf("%+v", dbConfig)
-
 	db, err := database.Initialize(dbConfig.Storage)
-	if err != nil {
-		log.Printf("main : Error initializing database %+v", err)
-	}
-
 	defer db.Close()
 
 	if err != nil {
