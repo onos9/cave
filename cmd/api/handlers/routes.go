@@ -32,5 +32,5 @@ func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *gorm.DB) {
 		apiV1.GET("/video", video.Upload)
 		apiV1.GET("/category", category.create)
 		apiV1.GET("/channel", channel.create)
-	}
+	}   apiV1.GET("/comment", comment.create)
 }
