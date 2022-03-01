@@ -14,7 +14,7 @@ var (
 type Video struct {
 	utils.Base
 	Date        *time.Time
-	Title       bool
+	Title       string   `gorm:"type:varchar(100)"`
 	Thumnail    string
 	VideoID     string   `gorm:"type:varchar(100)"`
 	Ip          string   `gorm:"type:varchar(20)"`

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/cave/pkg/auth"
+	"github.com/pkg/errors"
 
 	"github.com/cave/cmd/models"
 
@@ -10,8 +11,8 @@ import (
 )
 
 var (
-	authenticator *auth.Authenticator
-	user *UserController
+	authenticator   *auth.Authenticator
+	ErrResetExpired = errors.New("Reset expired")
 )
 
 func pingHandler(c *gin.Context) {
@@ -28,5 +29,6 @@ func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *gorm.DB) {
 	{
 		apiV1.GET("/ping", pingHandler)
 		apiV1.GET("/user", user.SignUp)
+		apiV1.GET("/video", video.Upload)
 	}
 }
