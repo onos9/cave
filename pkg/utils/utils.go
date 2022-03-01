@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -175,4 +176,9 @@ func (as *AdvancedSearch) GetSearchInQuery() []interface{} {
 // SetSearchInQuery sets search in query
 func (as *AdvancedSearch) SetSearchInQuery(query []interface{}) {
 	as.SearchInQuery = query
+}
+
+func PrettyPrint(i interface{}) string {
+	s, _ := json.MarshalIndent(i, "", "\t")
+	return string(s)
 }

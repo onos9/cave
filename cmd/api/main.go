@@ -13,10 +13,7 @@ import (
 	"github.com/cave/pkg/database"
 	"github.com/cave/pkg/flag"
 
-	redistrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/go-redis/redis"
-
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis"
 	"github.com/kelseyhightower/envconfig"
 )
 
@@ -30,13 +27,13 @@ func main() {
 	}
 
 	log.Println("main : Initialize Redis")
-	redisClient := redistrace.NewClient(&redis.Options{
-		Addr:        configs.CFG.Redis.Host,
-		DB:          configs.CFG.Redis.DB,
-		DialTimeout: configs.CFG.Redis.DialTimeout,
-	})
+	// redisClient := redistrace.NewClient(&redis.Options{
+	// 	Addr:        configs.CFG.Redis.Host,
+	// 	DB:          configs.CFG.Redis.DB,
+	// 	DialTimeout: configs.CFG.Redis.DialTimeout,
+	// })
 
-	defer redisClient.Close()
+	//defer redisClient.Close()
 
 	if err := flag.Process(&configs.CFG); err != nil {
 		if err != flag.ErrHelp {
@@ -61,11 +58,12 @@ func main() {
 	}
 	log.Printf("%+v", dbConfig)
 	db, err := database.Initialize(dbConfig.Storage)
-	defer db.Close()
-
 	if err != nil {
 		log.Fatalf("main: Error initializing database %+v", err)
 	}
+	
+	defer db.Close()
+
 	authenticator, _ := auth.NewAuthenticatorFile("", time.Now().UTC(), configs.CFG.Auth.KeyExpiration)
 
 	migrations.Migrate(db)
