@@ -57,4 +57,8 @@ func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *gorm.DB) {
 	{
 		dislikeRouter.GET("/", dislike.create)
 	}
+	likeRouter := apiV1.Group("/like")
+	{
+		likeRouter.GET("/", like.create)
+	}
 }
