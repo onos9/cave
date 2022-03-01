@@ -58,7 +58,7 @@ type CommentLoginRequest struct {
 // CommentCreateRequest spec for signup request
 type CommentCreateRequest struct {
 	Described string     `json:"describe"`
-	Video     mods.Video `json:"describe"`
+	Video     mods.Video `json:"video"`
 	User      mods.User  `json:"user"`
 }
 
