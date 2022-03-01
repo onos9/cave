@@ -1,7 +1,7 @@
 package routers
 
 import (
-	c "github.com/cave/pkg/api/controllers"
+	"github.com/cave/pkg/api/controllers"
 	"github.com/cave/pkg/api/controllers/employe"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -10,20 +10,19 @@ import (
 type Route struct {
 	Name    string
 	Group   string
-	Controller *c.Controller
-	
-	// Create func(*fiber.Ctx)
+	Handler func(*fiber.Ctx)
 	// Get    func(*fiber.Ctx)
 	// Update func(*fiber.Ctx)
 	// Delete func(*fiber.Ctx)
 	// List   func(*fiber.Ctx)
 }
 
+
 type Routes []Route
 
+var c = controllers.Controller{}
 var routes = Routes{
-	Route{Name: "Employe",Group: "/employe",Controller: controller},
-	Route{"Role","/role",ImageCreate,},
+	Route{Name: c.Employe.Name, Group: c.Employe.Group Handler: },
 }
 
 // SetupRoutes func
