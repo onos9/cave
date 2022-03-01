@@ -11,6 +11,7 @@ import (
 
 var (
 	authenticator *auth.Authenticator
+	user *UserController
 )
 
 func pingHandler(c *gin.Context) {
@@ -26,5 +27,6 @@ func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *gorm.DB) {
 	apiV1 := r.Group("/v1")
 	{
 		apiV1.GET("/ping", pingHandler)
+		apiV1.GET("/user", user.SignUp)
 	}
 }
