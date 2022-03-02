@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/cave/cmd/api/mods"
@@ -11,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pborman/uuid"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -30,28 +29,29 @@ var (
 )
 
 // UserController is an anonymous struct for user controller
-type UserController struct{}
+type UserController struct{
+	Email string `json:"email"`
+	Password string `json:"password"`
+}
 
 // SignUp registers user
 func (ctrl *UserController) register(ctx *gin.Context) {
 
-	var userReq mods.User
-	ctx.BindJSON(&userReq)
+	var usr mods.User
+	ctx.BindJSON(&usr)
 
-	passwordSalt := uuid.NewRandom().String()
-	saltedPassword := userReq.Password + passwordSalt
+	passwordSalt := uuid.New().String()
+	saltedPassword := usr.Password + passwordSalt
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(saltedPassword), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error generating password hash")
+		errors.Wrap(err, "Error generating password hash")
 	}
 
-	usr{
-		passwordHash: passwordHash,
-		passwordSalt: passwordSalt,
-	}
+	usr.PasswordSalt = passwordSalt
+	usr.PasswordHash = passwordHash
 
 	value := usr.Create()
-	token, _ := authenticator.GenerateToken(auth.Claims{})
+	token, _ := auth.CreateToken(usr.ID)
 
 	ctx.JSON(200, gin.H{
 		"message": value,
@@ -62,33 +62,35 @@ func (ctrl *UserController) register(ctx *gin.Context) {
 // Login user
 func (ctrl *UserController) login(ctx *gin.Context) {
 
-	userReq := mods.User
+	var userReq mods.User
 	ctx.BindJSON(&userReq)
 
-	passwordSalt := uuid.NewRandom().String()
+	passwordSalt := uuid.New().String()
 	saltedPassword := userReq.Password + passwordSalt
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(saltedPassword), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error generating password hash")
+		errors.Wrap(err, "Error generating password hash")
 	}
 
-	usr := mods.User
+	var usr mods.User
 	err = usr.FetchByID()
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
-			"error": fmt.Sprintf("user %s not found", req.Username),
+			"error": fmt.Sprintf("user %s not found", userReq.Username),
 		})
 		return
 	}
 
-	if usr.PasswordHash != passwordHash {
+	if string(usr.PasswordHash) != string(passwordHash) {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
 			"error": "incorrect password",
 		})
 		return
 	}
 
-	token, err := authenticator.GenerateToken(auth.Claims{})
+	//claims := auth.Claims{}
+
+	t, err := auth.CreateToken(usr.ID)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
 			"error": err.Error(),
@@ -96,34 +98,27 @@ func (ctrl *UserController) login(ctx *gin.Context) {
 		return
 	}
 
+	// saveErr := authenticator.CreateAuth(usr.ID, ts, mods.RedisClient)
+	// if saveErr != nil {
+	// 	ctx.JSON(http.StatusUnprocessableEntity, saveErr.Error())
+	// }
+	// tokens := map[string]string{
+	// 	"access_token":  ts.AccessToken,
+	// 	"refresh_token": ts.RefreshToken,
+	// }
+
 	ctx.JSON(200, gin.H{
 		"message": err,
-		"token":   token,
+		"tokens":  t,
 	})
-}
-
-// UserLoginRequest spec for login request
-type UserLogoutRequest struct {
-	Email    string `json:"email" validate:"required,email,unique"`
-	Password string `json:"password" validate:"required"`
 }
 
 // SignUp registers user
 func (ctrl *UserController) logout(ctx *gin.Context) {
 	// get values
 	// build into struct
-
-	var signupBody UserCreateRequest
-	ctx.BindJSON(&signupBody)
-	usr, err := signupBody.ToUser()
-	if err != nil {
-		log.Printf("error in user get => %+v", err.Error())
-	}
-	value := usr.Create()
-	token, _ := authenticator.GenerateToken(auth.Claims{})
-
 	ctx.JSON(200, gin.H{
-		"message": value,
-		"token":   token,
+		"message": nil,
+		"token":   "logout",
 	})
 }

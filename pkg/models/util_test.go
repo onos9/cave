@@ -27,8 +27,11 @@ func ConnectToTestDatabase() *gorm.DB {
 	}
 	dbConfig.Storage.Database = "go_lms_test"
 	db, err := database.Initialize(dbConfig.Storage)
+	if err != nil {
+		log.Printf("main : Error initializing database %+v", err)
+	}
 	models.SetRepoDB(db)
-	return db
+	return db.DB
 }
 
 // CreateUser creates a user mock for testing

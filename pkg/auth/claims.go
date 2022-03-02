@@ -26,6 +26,9 @@ type Claims struct {
 	jwt.StandardClaims
 	Roles       []string `json:"roles"`
 	Permissions []string `json:"permission"`
+
+	AccessUuid   string
+	RefreshUuid  string
 }
 
 // ClaimPreferences defines preferences for the user
@@ -85,7 +88,7 @@ func (c Claims) Valid() error {
 
 // HasAuth returns true if the user is authenticated
 func (c Claims) HasAuth() bool {
-	return c.Subject != "" 
+	return c.Subject != ""
 }
 
 // HasRole returns true if the claims has atleast one of the provided roles.

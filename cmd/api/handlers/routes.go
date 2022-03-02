@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"github.com/cave/pkg/auth"
+	"github.com/cave/pkg/database"
 	"github.com/pkg/errors"
 
 	"github.com/cave/cmd/api/mods"
-                
+
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 var (
@@ -22,7 +22,7 @@ func pingHandler(c *gin.Context) {
 }
 
 // ApplyRoutes applies router to gin engine
-func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *gorm.DB) {
+func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *database.Database) {
 	mods.SetRepoDB(db)
 	authenticator = auth
 	apiV1 := r.Group("/v1")

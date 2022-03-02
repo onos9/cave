@@ -26,15 +26,6 @@ func main() {
 		log.Fatalf("main : Error Parsing Config file: %+v", err)
 	}
 
-	log.Println("main : Initialize Redis")
-	// redisClient := redistrace.NewClient(&redis.Options{
-	// 	Addr:        configs.CFG.Redis.Host,
-	// 	DB:          configs.CFG.Redis.DB,
-	// 	DialTimeout: configs.CFG.Redis.DialTimeout,
-	// })
-
-	//defer redisClient.Close()
-
 	if err := flag.Process(&configs.CFG); err != nil {
 		if err != flag.ErrHelp {
 			log.Fatalf("main : Error Parsing Command Line : %+v", err)
@@ -61,12 +52,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("main: Error initializing database %+v", err)
 	}
-	
-	defer db.Close()
+
+	defer db.DB.Close()
+	defer db.Redis.Close()
 
 	authenticator, _ := auth.NewAuthenticatorFile("", time.Now().UTC(), configs.CFG.Auth.KeyExpiration)
 
-	migrations.Migrate(db)
+	migrations.Migrate(db.DB)
 
 	app := gin.Default()
 	handlers.ApplyRoutes(app, authenticator, db)

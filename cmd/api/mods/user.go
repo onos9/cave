@@ -14,7 +14,7 @@ var (
 type User struct {
 	utils.Base
 	Email                  string     `gorm:"type:varchar(100);unique_index" json:"email" `
-	Password               string     `gorm:"migration" json:"password"`
+	Password               string     `gorm:"type:varchar(100)" json:"password"`
 	PasswordSalt           string     `json:"passwordsalt"`
 	PasswordHash           []byte     `json:"passwordhash"`
 	Role                   int        `jason:"role"`
@@ -26,10 +26,11 @@ type User struct {
 	RememberToken          string     `json:"rememberToken"`
 	ConfirmedAt            *time.Time `json:"confirmedAt"`
 	ConfirmationMailSentAt *time.Time `json:"confirmationMailSentAt"`
-	Name                   string     `jason:"name"`
-	Phone                  string     `jason:"phone"`
-	Title                  string     `jason:"phone"`
-	KeySkills              string     `jason:"keySkills"`
+	Name                   string     `json:"name"`
+	Username               string     `json:"username"`
+	Phone                  string     `json:"phone"`
+	Title                  string     `json:"title"`
+	KeySkills              string     `json:"keySkills"`
 	About                  string     `gorm:"type:text" json:"about" validate:"omitempty"`
 
 	TimeZone *time.Time `json:"timezone" validation:"omitempty"`
