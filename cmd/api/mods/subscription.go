@@ -11,9 +11,9 @@ var (
 // Subscription is a model for Subscriptions table
 type Subscription struct {
 	utils.Base
-	IsSubscribed bool
-	Channel      Channel `gorm:"foreignkey:UserID"`
-	User         User    `gorm:"foreignkey:UserID"`
+	IsSubscribed bool    `json:"IsSubscribed"`
+	Channel      Channel `gorm:"foreignkey:UserID" json:"Channel"`
+	User         User    `gorm:"foreignkey:UserID" json:"User"`
 }
 
 // TableName gorm standard table name

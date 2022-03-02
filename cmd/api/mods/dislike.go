@@ -11,9 +11,9 @@ var (
 // Dislike is a model for Dislikes table
 type Dislike struct {
 	utils.Base
-	IsDisliked bool
-	Video      Video `gorm:"foreignkey:VideoID"`
-	User       User  `gorm:"foreignkey:UserID"`
+	IsDisliked bool  `json:"IsDisliked"`
+	Video      Video `gorm:"foreignkey:VideoID" json:"Video"`
+	User       User  `gorm:"foreignkey:UserID" json:"User"`
 }
 
 // TableName gorm standard table name

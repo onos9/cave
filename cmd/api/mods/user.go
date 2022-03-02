@@ -13,23 +13,24 @@ var (
 // User is a model for Users table
 type User struct {
 	utils.Base
-	Email                  string `gorm:"type:varchar(100);unique_index" `
-	PasswordSalt           string
-	PasswordHash           []byte
-	Role                   int
-	SiginInCount           int
-	CurrentSignInAt        *time.Time
-	LastSignInAt           *time.Time
-	CurrentSignInIP        string
-	LastSignInIP           string
-	RememberToken          string
-	ConfirmedAt            *time.Time
-	ConfirmationMailSentAt *time.Time
-	Name                   string
-	Phone                  string
-	Title                  string
-	KeySkills              string
-	About                  string `gorm:"type:text" json:"about" validate:"omitempty"`
+	Email                  string     `gorm:"type:varchar(100);unique_index" json:"Email"`
+	Password               string     `gorm:"migration" json:"Password"`
+	PasswordSalt           string     `json:"PasswordSalt"`
+	PasswordHash           []byte     `json:"PasswordHash"`
+	Role                   int        `json:"Role"`
+	SignInCount            int        `json:"SignInCount"`
+	CurrentSignInAt        *time.Time `json:"CurrentSignInAt"`
+	LastSignInAt           *time.Time `json:"LastSignInAt"`
+	CurrentSignInIP        string     `json:"CurrentSignInIP"`
+	LastSignInIP           string     `json:"LastSignInIP"`
+	RememberToken          string     `json:"RememberToken"`
+	ConfirmedAt            *time.Time `json:"ConfirmedAt"`
+	ConfirmationMailSentAt *time.Time `json:"ConfirmationMailSentAt"`
+	Name                   string     `json:"Name"`
+	Phone                  string     `json:"Phone"`
+	Title                  string     `json:"Title"`
+	KeySkills              string     `json:"KeySkills"`
+	About                  string     `gorm:"type:text" json:"about" validate:"omitempty"`
 
 	TimeZone *time.Time `json:"timezone" validation:"omitempty"`
 }
