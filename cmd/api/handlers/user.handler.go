@@ -35,7 +35,7 @@ type UserController struct{}
 // SignUp registers user
 func (ctrl *UserController) register(ctx *gin.Context) {
 
-	var usr mods.User
+	var userReq mods.User
 	ctx.BindJSON(&userReq)
 
 	passwordSalt := uuid.NewRandom().String()

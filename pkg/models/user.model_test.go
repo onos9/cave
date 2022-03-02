@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/cave/cmd/models"
+	"github.com/cave/pkg/models"
 
 	_ "github.com/go-sql-driver/mysql"
 )

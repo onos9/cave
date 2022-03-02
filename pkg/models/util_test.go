@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/cave/cmd/models"
 	"github.com/cave/configs"
 	"github.com/cave/pkg/database"
+	"github.com/cave/pkg/models"
 
 	"github.com/jinzhu/gorm"
 	"github.com/jinzhu/gorm/dialects/postgres"

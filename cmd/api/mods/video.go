@@ -19,7 +19,7 @@ type Video struct {
 	VideoID     string     `gorm:"type:varchar(100)" json:"VideoID"`
 	Ip          string     `gorm:"type:varchar(20)" json:"Ip"`
 	Description string     `gorm:"type:varchar(100)" json:"Description"`
-	Channel     Channel    `gorm:"foreignkey:ChannelID" json:"Channel"`
+	Channel     Channels   `gorm:"foreignkey:ChannelID" json:"Channel"`
 	Category    Category   `gorm:"foreignkey:CategoryID" json:"Category"`
 }
 

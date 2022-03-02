@@ -3,7 +3,7 @@ package models_test
 import (
 	"encoding/json"
 
-	"github.com/cave/cmd/models"
+	"github.com/cave/pkg/models"
 
 	"github.com/jinzhu/gorm/dialects/postgres"
 	. "github.com/onsi/ginkgo"

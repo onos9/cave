@@ -5,7 +5,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/pborman/uuid"
 
-	"github.com/cave/cmd/models"
+	"github.com/cave/pkg/models"
 )
 
 var _ = Describe("IssuedCertificate.Model", func() {
