@@ -51,8 +51,8 @@ func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *gorm.DB) {
 	commentRouter := apiV1.Group("/comment")
 	{
 		commentRouter.GET("/", comment.create)
-
 	}
+
 	dislikeRouter := apiV1.Group("/dislike")
 	{
 		dislikeRouter.GET("/", dislike.create)
