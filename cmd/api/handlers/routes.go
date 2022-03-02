@@ -61,4 +61,8 @@ func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *gorm.DB) {
 	{
 		likeRouter.GET("/", like.create)
 	}
+	subscriptionRouter := apiV1.Group("/subscription")
+	{
+		subscriptionRouter.GET("/", subscription.create)
+	}
 }
