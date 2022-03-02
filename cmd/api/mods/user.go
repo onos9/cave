@@ -14,6 +14,7 @@ var (
 type User struct {
 	utils.Base
 	Email                  string `gorm:"type:varchar(100);unique_index" `
+	Password               string `gorm:"migration"`
 	PasswordSalt           string
 	PasswordHash           []byte
 	Role                   int

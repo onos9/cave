@@ -54,16 +54,13 @@ func (ctrl *ChannelController) create(ctx *gin.Context) {
 
 // ChannelLoginRequest spec for login request
 type ChannelLoginRequest struct {
-	Email    string `json:"email" validate:"required,email,unique"`
-	Password string `json:"password" validate:"required"`
+	Name    string `json:"name" validate:"required,email,unique"`
+	User string `json:"user" validate:"required"`
 }
 
 // ChannelCreateRequest spec for signup request
 type ChannelCreateRequest struct {
 	Name     string    `json:"name"`
-	Thumnail string    `json:"thumnail"`
-	Banner   string    `json:"banner"`
-	About    string    `json:"about"`
 	User     mods.User `json:"user"`
 }
 
@@ -82,9 +79,6 @@ func (channelCreateRequest *ChannelCreateRequest) ToChannel() (*mods.Channel, er
 
 	channel := &mods.Channel{
 		Name:     channelCreateRequest.Name,
-		Thumnail: channelCreateRequest.Thumnail,
-		Banner:   channelCreateRequest.Banner,
-		About:    channelCreateRequest.About,
 		User:     channelCreateRequest.User,
 	}
 	return channel, nil

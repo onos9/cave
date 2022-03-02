@@ -30,7 +30,9 @@ func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *gorm.DB) {
 
 	userRouter := apiV1.Group("/user")
 	{
-		userRouter.GET("/", user.SignUp)
+		userRouter.GET("/:id", user.login)
+		userRouter.POST("/:id", user.logout)
+		userRouter.POST("/", user.register)
 	}
 
 	videoRouter := apiV1.Group("/video")
@@ -45,7 +47,7 @@ func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *gorm.DB) {
 
 	channelRouter := apiV1.Group("/channel")
 	{
-		channelRouter.GET("/", channel.create)
+		channelRouter.POST("/", channel.create)
 	}
 
 	commentRouter := apiV1.Group("/comment")
