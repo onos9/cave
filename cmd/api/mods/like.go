@@ -11,9 +11,9 @@ var (
 // Like is a model for Likes table
 type Like struct {
 	utils.Base
-	IsLiked bool  `json:"IsLiked"`
-	Video   Video `gorm:"foreignkey:VideoID" json:"Video"`
-	User    User  `gorm:"foreignkey:UserID"  json:"User"`
+	IsLiked bool  `json:"isLiked"`
+	Video   Video `gorm:"foreignkey:VideoID" json:"video"`
+	User    User  `gorm:"foreignkey:UserID"  json:"user"`
 }
 
 // TableName gorm standard table name
