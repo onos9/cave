@@ -13,14 +13,14 @@ var (
 // Video is a model for Videos table
 type Video struct {
 	utils.Base
-	Date        *time.Time `json:"Date"`
-	Title       string     `gorm:"type:varchar(100)" json:"Title"`
-	Thumnail    string     `json:"Thumnail"`
-	VideoID     string     `gorm:"type:varchar(100)" json:"VideoID"`
-	Ip          string     `gorm:"type:varchar(20)" json:"Ip"`
-	Description string     `gorm:"type:varchar(100)" json:"Description"`
-	Channel     Channel    `gorm:"foreignkey:ChannelID" json:"Channel"`
-	Category    Category   `gorm:"foreignkey:CategoryID" json:"Category"`
+	Date        *time.Time `json:"date"`
+	Title       string     `gorm:"type:varchar(100)" json:"title"`
+	Thumnail    string     `json:"thumnail"`
+	VideoID     string     `gorm:"type:varchar(100)" json:"videoId"`
+	Ip          string     `gorm:"type:varchar(20)" json:"ip"`
+	Description string     `gorm:"type:varchar(100)" json:"description"`
+	Channel     Channel    `gorm:"foreignkey:ChannelID" json:"channel"`
+	Category    Category   `gorm:"foreignkey:CategoryID" json:"category"`
 }
 
 // TableName gorm standard table name
