@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -23,6 +24,8 @@ const Key ctxKey = 1
 // Claims represents the authorization claims transmitted via a JWT
 type Claims struct {
 	jwt.StandardClaims
+	Roles       []string `json:"roles"`
+	Permissions []string `json:"permission"`
 }
 
 // ClaimPreferences defines preferences for the user
@@ -66,39 +69,36 @@ func NewClaimPreferences(timezone *time.Location, datetimeFormat, dateFormat, ti
 }
 
 // Valid is called during the parsing of a token.
-// func (c Claims) Valid() error {
-// 	for _, r := range c.Roles {
-// 		switch r {
-// 		case RoleAdmin, RoleUser: // Role is valid.
-// 		default:
-// 			return fmt.Errorf("invalid role %q", r)
-// 		}
-// 	}
-// 	if err := c.StandardClaims.Valid(); err != nil {
-// 		return errors.Wrap(err, "validating standard claims")
-// 	}
-// 	return nil
-// }
+func (c Claims) Valid() error {
+	for _, r := range c.Roles {
+		switch r {
+		case RoleAdmin, RoleUser: // Role is valid.
+		default:
+			return fmt.Errorf("invalid role %q", r)
+		}
+	}
+	if err := c.StandardClaims.Valid(); err != nil {
+		return errors.Wrap(err, "validating standard claims")
+	}
+	return nil
+}
 
 // HasAuth returns true if the user is authenticated
 func (c Claims) HasAuth() bool {
-	if c.Subject != "" {
-		return true
-	}
-	return false
+	return c.Subject != "" 
 }
 
 // HasRole returns true if the claims has atleast one of the provided roles.
-// func (c Claims) HasRole(roles ...string) bool {
-// 	for _, has := range c.Roles {
-// 		for _, want := range roles {
-// 			if has == want {
-// 				return true
-// 			}
-// 		}
-// 	}
-// 	return false
-// }
+func (c Claims) HasRole(roles ...string) bool {
+	for _, has := range c.Roles {
+		for _, want := range roles {
+			if has == want {
+				return true
+			}
+		}
+	}
+	return false
+}
 
 // TimeLocation returns the timezone used to format datetimes for the user.
 func (c ClaimPreferences) TimeLocation() *time.Location {

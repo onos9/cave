@@ -1,10 +1,12 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"time"
 
 	"github.com/cave/cmd/api/mods"
+	"github.com/cave/pkg/utils"
 
 	"github.com/pkg/errors"
 
@@ -46,9 +48,10 @@ func (ctrl *VideoController) Upload(ctx *gin.Context) {
 	//value := vid.Create()
 	ctx.JSON(200, gin.H{
 		"message": nil,
-		"respons":   "Ok!",
+		"respons": "Ok!",
 	})
-	log.Printf("video => %+v", vid)
+	s := utils.PrettyPrint(vid)
+	fmt.Printf("%+v\n", s)
 }
 
 // VideoLoginRequest spec for login request

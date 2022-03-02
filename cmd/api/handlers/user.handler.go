@@ -1,10 +1,12 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
+	"net/http"
 	"time"
 
-	"github.com/cave/cmd/models"
+	"github.com/cave/cmd/api/mods"
 	"github.com/cave/pkg/auth"
 
 	"github.com/pkg/errors"
@@ -13,7 +15,6 @@ import (
 	"github.com/pborman/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
-
 
 var (
 	// errAuthenticationFailure = errors.New("Authentication failed")
@@ -33,7 +34,83 @@ var (
 type UserController struct{}
 
 // SignUp registers user
-func (ctrl *UserController) SignUp(ctx *gin.Context) {
+func (ctrl *UserController) register(ctx *gin.Context) {
+
+	var usr mods.User
+	ctx.BindJSON(&userReq)
+
+	passwordSalt := uuid.NewRandom().String()
+	saltedPassword := userReq.Password + passwordSalt
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(saltedPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, errors.Wrap(err, "Error generating password hash")
+	}
+
+	usr{
+		passwordHash:passwordHash, 
+		passwordSalt:passwordSalt,
+	}
+
+	value := usr.Create()
+	token, _ := authenticator.GenerateToken(auth.Claims{})
+
+	ctx.JSON(200, gin.H{
+		"message": value,
+		"token":   token,
+	})
+}
+
+// Login user
+func (ctrl *UserController) login(ctx *gin.Context) {
+
+	userReq := mods.User
+	ctx.BindJSON(&userReq)
+
+	passwordSalt := uuid.NewRandom().String()
+	saltedPassword := userReq.Password + passwordSalt
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(saltedPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, errors.Wrap(err, "Error generating password hash")
+	}
+
+	usr := mods.User
+	err = usr.FetchByID()
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"error": fmt.Sprintf("user %s not found", req.Username),
+		})
+		return
+	}
+
+	if usr.PasswordHash != passwordHash {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"error": "incorrect password",
+		})
+		return
+	}
+
+	token, err := authenticator.GenerateToken(auth.Claims{})
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(200, gin.H{
+		"message": err,
+		"token":   token,
+	})
+}
+
+// UserLoginRequest spec for login request
+type UserLogoutRequest struct {
+	Email        string `json:"email" validate:"required,email,unique"`
+	Password     string `json:"password" validate:"required"`
+}
+
+// SignUp registers user
+func (ctrl *UserController) logout(ctx *gin.Context) {
 	// get values
 	// build into struct
 
@@ -50,54 +127,4 @@ func (ctrl *UserController) SignUp(ctx *gin.Context) {
 		"message": value,
 		"token":   token,
 	})
-}
-
-// UserLoginRequest spec for login request
-type UserLoginRequest struct {
-	Email    string `json:"email" validate:"required,email,unique"`
-	Password string `json:"password" validate:"required"`
-}
-
-// UserCreateRequest spec for signup request
-type UserCreateRequest struct {
-	Name            string     `json:"name" validate:"required" example:"Groot"`
-	Email           string     `json:"email" validate:"required,email,unique" example:"groot@golms.com"`
-	Password        string     `json:"password" validate:"required" example:"GrootSecret"`
-	PasswordConfirm string     `json:"password_confirm" validate:"required,eqfield=password" example:"GrootSecret"`
-	TimeZone        *time.Time `json:"timezone" validate:"required" example:"America/Anchorage"`
-}
-
-// ToUser converts UserCreateRequest to User object
-func (userCreateRequest *UserCreateRequest) ToUser() (*models.User, error) {
-	if userCreateRequest == nil {
-		return nil, errors.New("Null User Create Request")
-	}
-
-	passwordSalt := uuid.NewRandom().String()
-	saltedPassword := userCreateRequest.Password + passwordSalt
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(saltedPassword), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, errors.Wrap(err, "Error generating password hash")
-	}
-
-	user := &models.User{
-		Name:         userCreateRequest.Name,
-		Email:        userCreateRequest.Email,
-		PasswordSalt: passwordSalt,
-		PasswordHash: passwordHash,
-		TimeZone:     userCreateRequest.TimeZone,
-	}
-	return user, nil
-}
-
-// UserInfoUpdateRequest - spec for updating user info
-type UserInfoUpdateRequest struct {
-	ID        string `json:"id" validate:"required,uuid" example:"c01bdef7-173f-4d29-3edc60baf6a2"`
-	Name      string `json:"name" validate:"min=3,max=10,omitempty"`
-	Phone     string `json:"phone" validate:"omitempty"`
-	Title     string `json:"title" validate:"omitempty"`
-	KeySkills string `json:"key_skills" validate:"omitempty"`
-	About     string `gorm:"type:text" json:"about" validate:"omitempty"`
-
-	TimeZone *time.Time `json:"timezone" validation:"omitempty"`
 }

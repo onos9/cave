@@ -39,12 +39,13 @@ func LoadConfig() (*AppConfig, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	if conf.Storage.Host == "db" || conf.Storage == (Storage{}) {
-		err = godotenv.Load()
+		err = godotenv.Load("../../.env")
 		if err != nil {
 			return nil, err
 		}
-		
+
 		storage := Storage{
 			HandlerName: os.Getenv("STORAGE_HANDLERNAME"),
 			Host:        os.Getenv("STORAGE_HOST"),

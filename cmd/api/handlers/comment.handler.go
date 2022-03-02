@@ -1,10 +1,12 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"time"
 
 	"github.com/cave/cmd/api/mods"
+	"github.com/cave/pkg/utils"
 
 	"github.com/pkg/errors"
 
@@ -46,7 +48,8 @@ func (ctrl *CommentController) create(ctx *gin.Context) {
 		"message": nil,
 		"respons": "Ok!",
 	})
-	log.Printf("comment => %+v", vid)
+	s := utils.PrettyPrint(vid)
+	fmt.Printf("%+v\n", s)
 }
 
 // CommentLoginRequest spec for login request

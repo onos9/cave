@@ -4,8 +4,8 @@ import (
 	"github.com/cave/pkg/auth"
 	"github.com/pkg/errors"
 
-	"github.com/cave/cmd/models"
-
+	"github.com/cave/cmd/api/mods"
+                
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -23,14 +23,16 @@ func pingHandler(c *gin.Context) {
 
 // ApplyRoutes applies router to gin engine
 func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *gorm.DB) {
-	models.SetRepoDB(db)
+	mods.SetRepoDB(db)
 	authenticator = auth
 	apiV1 := r.Group("/v1")
 	apiV1.GET("/ping", pingHandler)
 
-	userRouter := apiV1.Group("/user", user.SignUp)
+	userRouter := apiV1.Group("/user")
 	{
-		userRouter.GET("/", user.SignUp)
+		userRouter.GET("/:id", user.login)
+		userRouter.POST("/:id", user.logout)
+		userRouter.POST("/", user.register)
 	}
 
 	videoRouter := apiV1.Group("/video")
@@ -45,13 +47,14 @@ func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *gorm.DB) {
 
 	channelRouter := apiV1.Group("/channel")
 	{
-		channelRouter.GET("/", channel.create)
+		channelRouter.POST("/", channel.create)
 	}
 
 	commentRouter := apiV1.Group("/comment")
 	{
 		commentRouter.GET("/", comment.create)
 	}
+<<<<<<< HEAD
 
 	dislikeRouter := apiV1.Group("/dislike")
 	{
@@ -65,4 +68,6 @@ func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *gorm.DB) {
 	{
 		subscriptionRouter.GET("/", subscription.create)
 	}
+=======
+>>>>>>> 46ac15f3e854498900e2ce545dc1980554e2d02c
 }

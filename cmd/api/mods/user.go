@@ -13,6 +13,7 @@ var (
 // User is a model for Users table
 type User struct {
 	utils.Base
+<<<<<<< HEAD
 	Email                  string     `gorm:"type:varchar(100);unique_index" json:"Email"`
 	Password               string     `gorm:"migration" json:"Password"`
 	PasswordSalt           string     `json:"PasswordSalt"`
@@ -31,6 +32,26 @@ type User struct {
 	Title                  string     `json:"Title"`
 	KeySkills              string     `json:"KeySkills"`
 	About                  string     `gorm:"type:text" json:"about" validate:"omitempty"`
+=======
+	Email                  string `gorm:"type:varchar(100);unique_index" `
+	Password               string `gorm:"migration"`
+	PasswordSalt           string
+	PasswordHash           []byte
+	Role                   int
+	SiginInCount           int
+	CurrentSignInAt        *time.Time
+	LastSignInAt           *time.Time
+	CurrentSignInIP        string
+	LastSignInIP           string
+	RememberToken          string
+	ConfirmedAt            *time.Time
+	ConfirmationMailSentAt *time.Time
+	Name                   string
+	Phone                  string
+	Title                  string
+	KeySkills              string
+	About                  string `gorm:"type:text" json:"about" validate:"omitempty"`
+>>>>>>> 46ac15f3e854498900e2ce545dc1980554e2d02c
 
 	TimeZone *time.Time `json:"timezone" validation:"omitempty"`
 }
