@@ -11,9 +11,9 @@ var (
 // Comment is a model for Comments table
 type Comment struct {
 	utils.Base
-	Described       string
-	Video           Video  `gorm:"foreignkey:VideoID"`
-	User            User   `gorm:"foreignkey:UserID"`
+	Described string `json:"Described"`
+	Video     Video  `gorm:"foreignkey:VideoID" json:"Video"`
+	User      User   `gorm:"foreignkey:UserID" json:"User"`
 }
 
 // TableName gorm standard table name
