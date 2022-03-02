@@ -4,8 +4,8 @@ import (
 	"github.com/cave/pkg/auth"
 	"github.com/pkg/errors"
 
-	"github.com/cave/cmd/models"
-
+	"github.com/cave/cmd/api/mods"
+                
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -23,12 +23,12 @@ func pingHandler(c *gin.Context) {
 
 // ApplyRoutes applies router to gin engine
 func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *gorm.DB) {
-	models.SetRepoDB(db)
+	mods.SetRepoDB(db)
 	authenticator = auth
 	apiV1 := r.Group("/v1")
 	apiV1.GET("/ping", pingHandler)
 
-	userRouter := apiV1.Group("/user", user.SignUp)
+	userRouter := apiV1.Group("/user")
 	{
 		userRouter.GET("/", user.SignUp)
 	}
@@ -53,5 +53,4 @@ func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *gorm.DB) {
 		commentRouter.GET("/", comment.create)
 
 	}
-
 }

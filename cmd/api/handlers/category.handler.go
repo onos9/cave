@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/cave/cmd/api/mods"
-
+	"github.com/cave/pkg/utils"
 	"github.com/pkg/errors"
 
 	"github.com/gin-gonic/gin"
@@ -46,7 +46,8 @@ func (ctrl *CategoryController) create(ctx *gin.Context) {
 		"message": nil,
 		"respons": "Ok!",
 	})
-	log.Printf("category => %+v", vid)
+	s := utils.PrettyPrint(vid)
+	log.Printf("category => %+v", s)
 }
 
 // CategoryLoginRequest spec for login request
