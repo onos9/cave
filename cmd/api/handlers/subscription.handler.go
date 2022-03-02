@@ -76,7 +76,7 @@ func (subscriptionCreateRequest *SubscriptionCreateRequest) ToSubscription() (*m
 	// }
 
 	subscription := &mods.Subscription{
-		IsSubscribed: subscriptionCreateRequest.IsSubscriptiond,
+		IsSubscribed: subscriptionCreateRequest.IsSubscribed,
 		Channel:      subscriptionCreateRequest.Channel,
 		User:         subscriptionCreateRequest.User,
 	}
