@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/cave/cmd/api/mods"
 	"github.com/cave/pkg/auth"
@@ -47,8 +46,8 @@ func (ctrl *UserController) register(ctx *gin.Context) {
 	}
 
 	usr{
-		passwordHash:passwordHash, 
-		passwordSalt:passwordSalt,
+		passwordHash: passwordHash,
+		passwordSalt: passwordSalt,
 	}
 
 	value := usr.Create()
@@ -105,8 +104,8 @@ func (ctrl *UserController) login(ctx *gin.Context) {
 
 // UserLoginRequest spec for login request
 type UserLogoutRequest struct {
-	Email        string `json:"email" validate:"required,email,unique"`
-	Password     string `json:"password" validate:"required"`
+	Email    string `json:"email" validate:"required,email,unique"`
+	Password string `json:"password" validate:"required"`
 }
 
 // SignUp registers user
