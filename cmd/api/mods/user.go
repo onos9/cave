@@ -14,7 +14,7 @@ var (
 type User struct {
 	utils.Base
 	Email                  string     `gorm:"type:varchar(100);unique_index" json:"email" `
-	Password               string     `gorm:"type:varchar(100)" json:"password"`
+	Password               string     `gorm:"migration" json:"password"`
 	PasswordSalt           string     `json:"passwordsalt"`
 	PasswordHash           []byte     `json:"passwordhash"`
 	Role                   int        `jason:"role"`
@@ -77,6 +77,16 @@ func (c *User) Create() error {
 // FetchByID fetches User by id
 func (c *User) FetchByID() error {
 	err := handler.First(c).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// FetchByID fetches User by Email
+func (c *User) FetchByEmail() error {
+	err := handler.Where("email=?",c.Email).First(c).Error
 	if err != nil {
 		return err
 	}

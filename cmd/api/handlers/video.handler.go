@@ -1,12 +1,10 @@
 package handlers
 
 import (
-	"fmt"
-	"log"
+	"net/http"
 	"time"
 
 	"github.com/cave/cmd/api/mods"
-	"github.com/cave/pkg/utils"
 
 	"github.com/pkg/errors"
 
@@ -35,23 +33,36 @@ var (
 type VideoController struct{}
 
 // SignUp registers video
-func (ctrl *VideoController) Upload(ctx *gin.Context) {
+func (ctrl *VideoController) upload(ctx *gin.Context) {
 	// get values
 	// build into struct
 
-	var uploadBody VideoCreateRequest
-	ctx.BindJSON(&uploadBody)
-	vid, err := uploadBody.ToVideo()
+	var video mods.Video
+	ctx.BindJSON(&video)
+
+	err := video.Create()
 	if err != nil {
-		log.Printf("error in video get => %+v", err.Error())
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Error creating video",
+			"error":   err,
+		})
+		return
 	}
+
+	err = video.FetchByID()
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Error can not fetch video",
+			"error":   err,
+		})
+		return
+	}
+
 	//value := vid.Create()
 	ctx.JSON(200, gin.H{
-		"message": nil,
-		"respons": "Ok!",
+		"message":  err,
+		"video_id": video.ID,
 	})
-	s := utils.PrettyPrint(vid)
-	fmt.Printf("%+v\n", s)
 }
 
 // VideoLoginRequest spec for login request

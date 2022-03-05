@@ -25,19 +25,21 @@ func pingHandler(c *gin.Context) {
 func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *database.Database) {
 	mods.SetRepoDB(db)
 	authenticator = auth
-	apiV1 := r.Group("/v1")
+	apiV1 := r.Group("/api/v1")
+
 	apiV1.GET("/ping", pingHandler)
+	apiV1.POST("/login", user.login)
+	apiV1.POST("/logout", user.logout)
+	apiV1.POST("/signup", user.signup)
 
 	userRouter := apiV1.Group("/user")
 	{
-		userRouter.GET("/:id", user.login)
-		userRouter.POST("/:id", user.logout)
-		userRouter.POST("/", user.register)
+		userRouter.GET("/", user.signup)
 	}
 
 	videoRouter := apiV1.Group("/video")
 	{
-		videoRouter.GET("/", video.Upload)
+		videoRouter.GET("/", video.upload)
 	}
 
 	categoryRouter := apiV1.Group("/category")

@@ -1,6 +1,7 @@
 package migrations
 
 import (
+	"github.com/cave/cmd/api/mods"
 	"github.com/cave/pkg/models"
 
 	"github.com/jinzhu/gorm"
@@ -26,4 +27,14 @@ func Migrate(db *gorm.DB) {
 	db.AutoMigrate(&models.TargetVersion{})
 	db.AutoMigrate(&models.TargetGroup{})
 	db.AutoMigrate(&models.StudentCourse{})
+
+	db.AutoMigrate(&mods.Category{})
+	db.AutoMigrate(&mods.Channel{})
+	db.AutoMigrate(&mods.Comment{})
+	db.AutoMigrate(&mods.Dislike{})
+	db.AutoMigrate(&mods.Like{})
+	db.AutoMigrate(&mods.User{})
+	db.AutoMigrate(&mods.Subscription{})
+	db.AutoMigrate(&mods.Video{})
+	db.AutoMigrate(&mods.View{})
 }

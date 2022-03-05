@@ -7,8 +7,6 @@ import (
 	"github.com/cave/cmd/api/mods"
 	"github.com/cave/pkg/auth"
 
-	"github.com/pkg/errors"
-
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -29,87 +27,107 @@ var (
 )
 
 // UserController is an anonymous struct for user controller
-type UserController struct{
-	Email string `json:"email"`
+type UserController struct {
+	Email    string `json:"email"`
 	Password string `json:"password"`
+	Username string `json:"username"`
 }
 
 // SignUp registers user
-func (ctrl *UserController) register(ctx *gin.Context) {
+func (ctrl *UserController) signup(ctx *gin.Context) {
 
 	var usr mods.User
-	ctx.BindJSON(&usr)
+	ctx.BindJSON(&ctrl)
 
 	passwordSalt := uuid.New().String()
-	saltedPassword := usr.Password + passwordSalt
+	saltedPassword := ctrl.Password + passwordSalt
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(saltedPassword), bcrypt.DefaultCost)
 	if err != nil {
-		errors.Wrap(err, "Error generating password hash")
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Error generating password hash",
+			"error":   err,
+		})
+		return
 	}
 
 	usr.PasswordSalt = passwordSalt
 	usr.PasswordHash = passwordHash
+	usr.Email = ctrl.Email
 
-	value := usr.Create()
-	token, _ := auth.CreateToken(usr.ID)
+	err = usr.Create()
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Error creating user",
+			"error":   err,
+		})
+		return
+	}
+
+	ts, _ := auth.CreateToken(usr.ID)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	err = auth.CreateAuth(usr.ID, ts)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	tokens := map[string]string{
+		"access_token":  ts.AccessToken,
+		"refresh_token": ts.RefreshToken,
+	}
 
 	ctx.JSON(200, gin.H{
-		"message": value,
-		"token":   token,
+		"message": "User created successfully",
+		"user":    ctrl,
+		"token":   tokens,
 	})
 }
 
 // Login user
 func (ctrl *UserController) login(ctx *gin.Context) {
-
-	var userReq mods.User
-	ctx.BindJSON(&userReq)
-
-	passwordSalt := uuid.New().String()
-	saltedPassword := userReq.Password + passwordSalt
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(saltedPassword), bcrypt.DefaultCost)
-	if err != nil {
-		errors.Wrap(err, "Error generating password hash")
-	}
+	ctx.BindJSON(&ctrl)
 
 	var usr mods.User
-	err = usr.FetchByID()
+	usr.Email = ctrl.Email
+	err := usr.FetchByEmail()
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
-			"error": fmt.Sprintf("user %s not found", userReq.Username),
+			"error": fmt.Sprintf("user %s not found", ctrl.Email),
 		})
 		return
 	}
 
-	if string(usr.PasswordHash) != string(passwordHash) {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error": "incorrect password",
-		})
-		return
-	}
-
-	//claims := auth.Claims{}
-
-	t, err := auth.CreateToken(usr.ID)
+	byteHash := []byte(usr.PasswordHash)
+	err = bcrypt.CompareHashAndPassword(byteHash, []byte(ctrl.Password+usr.PasswordSalt))
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error": err.Error(),
+			"error":   err,
+			"message": "incorrect password",
 		})
 		return
 	}
 
-	// saveErr := authenticator.CreateAuth(usr.ID, ts, mods.RedisClient)
-	// if saveErr != nil {
-	// 	ctx.JSON(http.StatusUnprocessableEntity, saveErr.Error())
-	// }
-	// tokens := map[string]string{
-	// 	"access_token":  ts.AccessToken,
-	// 	"refresh_token": ts.RefreshToken,
-	// }
+	ts, _ := auth.CreateToken(usr.ID)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	saveErr := auth.CreateAuth(usr.ID, ts)
+	if saveErr != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, saveErr.Error())
+	}
+	tokens := map[string]string{
+		"access_token":  ts.AccessToken,
+		"refresh_token": ts.RefreshToken,
+	}
 
 	ctx.JSON(200, gin.H{
 		"message": err,
-		"tokens":  t,
+		"tokens":  tokens,
 	})
 }
 

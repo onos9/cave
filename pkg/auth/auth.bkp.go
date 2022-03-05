@@ -18,7 +18,7 @@ var SecretKey []byte
 // KeyFunc generates a new private public key pairs
 type KeyFunc func(keyID string) (*rsa.PublicKey, error)
 
-type TokenDetails struct {
+type TokenDetailsbk struct {
 	AccessToken  string
 	RefreshToken string
 	AccessUuid   string
