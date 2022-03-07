@@ -11,7 +11,8 @@ var (
 // Category is a model for Categorys table
 type Category struct {
 	utils.Base
-	Title string `gorm:"type:varchar(100)" json:"title"`
+	Title    string `gorm:"type:varchar(100)" json:"title"`
+	Semester int    `gorm:"type:varchar(100)" json:"semester"`
 }
 
 // TableName gorm standard table name

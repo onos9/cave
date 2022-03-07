@@ -11,11 +11,12 @@ var (
 // Channel is a model for Channels table
 type Channel struct {
 	utils.Base
-	Name     string `gorm:"type:varchar(100);unique" json:"name"`
-	Thumnail string `json:"thumnail"`
-	Banner   string `json:"banner"`
-	About    string `gorm:"type:varchar(100)" json:"about"`
-	User     User   `gorm:"foreignkey:CourseID" json:"user"`
+	Name         string `gorm:"type:varchar(100);unique" json:"name"`
+	Thumbnail    string `json:"thumbnail"`
+	Banner       string `json:"banner"`
+	IsSubscribed bool   `json:"IsSubscribed"`
+	About        string `gorm:"type:varchar(100)" json:"about"`
+	User         User   `gorm:"foreignkey:CourseID" json:"user"`
 }
 
 // TableName gorm standard table name

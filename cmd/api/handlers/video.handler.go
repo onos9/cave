@@ -75,7 +75,7 @@ type VideoLoginRequest struct {
 type VideoCreateRequest struct {
 	Date        *time.Time
 	Title       string `json:"title"`
-	Thumnail    string `json:"thumnail"`
+	Thumbnail   string `json:"thumbnail"`
 	VideoID     string `json:"videoId"`
 	Ip          string `json:"ip"`
 	Description string `json:"description"`
@@ -96,7 +96,7 @@ func (videoCreateRequest *VideoCreateRequest) ToVideo() (*mods.Video, error) {
 
 	video := &mods.Video{
 		Title:       videoCreateRequest.Title,
-		Thumnail:    videoCreateRequest.Thumnail,
+		Thumbnail:   videoCreateRequest.Thumbnail,
 		Description: videoCreateRequest.Description,
 		VideoID:     string(passwordHash),
 	}
