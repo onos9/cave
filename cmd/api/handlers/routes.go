@@ -61,12 +61,15 @@ func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *database.Database)
 	{
 		dislikeRouter.GET("/", dislike.create)
 	}
+
 	likeRouter := apiV1.Group("/like")
 	{
 		likeRouter.GET("/", like.create)
 	}
+
 	subscriptionRouter := apiV1.Group("/subscription")
 	{
 		subscriptionRouter.GET("/", subscription.create)
 	}
+
 }

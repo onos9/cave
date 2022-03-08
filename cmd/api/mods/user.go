@@ -86,7 +86,7 @@ func (c *User) FetchByID() error {
 
 // FetchByID fetches User by Email
 func (c *User) FetchByEmail() error {
-	err := handler.Where("email=?",c.Email).First(c).Error
+	err := handler.Where("email=?", c.Email).First(c).Error
 	if err != nil {
 		return err
 	}
