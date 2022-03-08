@@ -8,24 +8,24 @@ var (
 
 // Bio is a model for Bios table
 type Bio struct {
-	ID            string `json:"id"`
-	Date          *time.Time
-	Bio           string `json:"bio"`
-	Email         string `gorm:"type:varchar(100);unique_index" json:"email" `
-	Name          string `json:"name"`
-	Age           string `json:"age"`
-	Dob           string `json:"dob"`
-	Gender        string `json:"gender"`
-	PhoneNumber   string `json:"phoneNumber"`
-	Username      string `json:"username"`
-	Phone         string `json:"phone"`
-	Address       string `json:"address"`
-	Title         string `json:"title"`
-	MaritalStatus string `json:"maritalStatus"`
-	Religion      string `json:"religion"`
-	KeySkills     string `json:"keySkills"`
-	About         string `gorm:"type:text" json:"about" validate:"omitempty"`
-	User          User   `gorm:"foreignkey:UserID" json:"user"`
+	ID          string `json:"id"`
+	Date        *time.Time
+	FirstName   string `json:"firstName"`
+	LastName    string `json:"lastName"`
+	MiddleName  string `json:"middleName"`
+	Dob         string `json:"dob"`
+	Gender      string `json:"gender"`
+	Address     string `json:"address"`
+	City        string `json:"city"`
+	State       string `json:"state"`
+	Country     string `json:"country"`
+	Zip         string `json:"zip"`
+	PhoneNo     string `json:"phoneNo"`
+	Email       string `gorm:"type:varchar(100);unique_index" json:"email" `
+	Nationality string `json:"nationality"`
+	Profession  string `json:"profession"`
+	About       string `gorm:"type:text" json:"about" validate:"omitempty"`
+	User        User   `gorm:"foreignkey:UserID" json:"user"`
 }
 
 // TableName gorm standard table name
@@ -46,9 +46,9 @@ func (c *BioList) TableName() string {
  */
 
 // GetCertificates returns bio certificates
-func (c *Bio) GetChannel() error {
-	return handler.Model(c).Related(&c.Bio).Error
-}
+// func (c *Bio) GetChannel() error {
+// 	return handler.Model(c).Related(&c.Bio).Error
+// }
 
 func (c *Bio) GetUser() error {
 	return handler.Model(c).Related(&c.User).Error

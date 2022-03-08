@@ -10,17 +10,19 @@ var (
 
 // Refree is a model for Refrees table
 type Refree struct {
-	ID             string `json:"id"`
-	Date           *time.Time
-	Name        string `gorm:"type:varchar(100);unique_index" json:"name" `
-	Email     string `json:"email"`
-	Phone string `json:"phone"`
-	About          string `gorm:"type:text" json:"about" validate:"omitempty"`
-	
+	ID              string `json:"id"`
+	Date            *time.Time
+	RefreeOneName   string `json:"refOneName`
+	RefreeOneEmail  string `json:"refOneEmail"`
+	RefreeOnePhone  string `json:"refOnePhone"`
+	RefreeTwoName   string `json:"refTwoName`
+	RefreeTwoEmail  string `json:"refTwoEmail"`
+	RefreeTwoePhone string `json:"refTwoPhone"`
+	About           string `gorm:"type:text" json:"about" validate:"omitempty"`
 
-// TableName gorm standard table name
-func (c *Refree) TableName() string {
-	return refreeTableName
+	// TableName gorm standard table name
+	// func (c *Refree) TableName() string {
+	// 	return refreeTableName
 }
 
 // RefreeList defines array of refree objects
@@ -40,9 +42,9 @@ func (c *RefreeList) TableName() string {
 // 	return handler.Model(c).Related(&c.Refree).Error
 // }
 
-func (c *Refree) GetUser() error {
-	return handler.Model(c).Related(&c.User).Error
-}
+// func (c *Refree) GetUser() error {
+// 	return handler.Model(c).Related(&c.User).Error
+// }
 
 /**
 CRUD functions

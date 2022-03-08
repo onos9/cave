@@ -1,5 +1,4 @@
-const defaultData = {
-
+{
   firstname: "",
   lastname: "",
   middlename: "",
@@ -14,16 +13,9 @@ const defaultData = {
   email: "",
   nationality: "",
   profession: "",
-  rel_status: "single",
-  weddate: "",
-  spousename: "",
-  marriagedate: "",
-  spouseagree: "",
-  childname: "",
-  friendname: "",
-  friendrel: "",
-  adullaminfo: "",
-  havecloserel: "no",
+  
+
+
   bornagain: "",
   salvbrief: "",
   godsworkings: "",
@@ -40,6 +32,10 @@ const defaultData = {
   waterbapt: "",
   baptdate: "",
   holyghostbapt: "",
+  
+
+
+
   disability: "",
   nervousill: "",
   anorexia: "",
@@ -52,24 +48,19 @@ const defaultData = {
   hadsurgery: "",
   pastexpinfluence: "",
   healthissuedesc: "",
-  helpfulabilities: "",
-  hobbies: "",
-  playinstrument: "",
-  instrument: "",
-  emergcontname: "",
-  emergcontrel: "",
-  emergphone: "",
-  emergaddress: "",
+  
+
+
   refonename: "",
   refoneemail: "",
   refonephone: "",
   reftwoname: "",
   reftwoemail: "",
   reftwophone: "",
-  programoption: "",
-  accomoption: "",
+  
+
+
   scholarship: "",
   scholreason: "",
   agree: ""
-
-};
+}

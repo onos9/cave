@@ -1,24 +1,35 @@
 package mods
 
+import "time"
+
 var (
 	backgroundTableName = "backgrounds"
 )
 
 // Background is a model for Backgrounds table
 type Background struct {
-	ID            string `json:"id"`
-	Date           *time.Time
-	Background    string `json:"background"`
-	BornAgainYear string `gorm:"type:varchar(100);unique_index" json:"bornAgainYear" `
-	Baptism       string `json:"baptism"`
-	Ministry      string `json:"ministry"`
-	Role          string `json:"role"`
-	About         string `gorm:"type:text" json:"about" validate:"omitempty"`
-	
+	ID               string `json:"id"`
+	Date             *time.Time
+	BornAgain        bool   `json:"bornAgain"`
+	SalvationBrief   string `json:"salvBrief"`
+	GodsWorkings     string `json:"godsWorkings"`
+	CallOfGod        string `json:"callOfGod"`
+	IntoMinistry     bool   `json:"intoMinistry"`
+	SpiritualGifts   string `json:"spiritGift"`
+	Reason           string `json:"reason"`
+	ChurchName       string `json:"churchName"`
+	ChurchAddress    string `json:"churchAddress"`
+	PastorName       string `json:"pastorName"`
+	PastorEmail      string `json:"pastorEmail"`
+	PastorPhone      string `json:"pastorPhone"`
+	ChurchInvolve    string `json:"churchInvolve"`
+	WaterBaptism     bool   `json:"waterBaptism"`
+	BaptismDate      string `json:"baptDate"`
+	HolyGhostBaptism bool   `json:"holyGhostBaptism"`
 
-// TableName gorm standard table name
-func (c *Background) TableName() string {
-	return backgroundTableName
+	// TableName gorm standard table name
+	// func (c *Background) TableName() string {
+	// 	return backgroundTableName
 }
 
 // BackgroundList defines array of background objects
@@ -34,13 +45,13 @@ func (c *BackgroundList) TableName() string {
  */
 
 // GetCertificates returns background certificates
-func (c *Background) GetChannel() error {
-	return handler.Model(c).Related(&c.Background).Error
-}
+// func (c *Background) GetChannel() error {
+// 	return handler.Model(c).Related(&c.Background).Error
+// }
 
-func (c *Background) GetUser() error {
-	return handler.Model(c).Related(&c.User).Error
-}
+// func (c *Background) GetUser() error {
+// 	return handler.Model(c).Related(&c.User).Error
+// }
 
 /**
 CRUD functions

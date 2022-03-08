@@ -13,6 +13,7 @@ type Candidate struct {
 	Bio           string `json:"bio"`
 	Qualification string `json:"qualification"`
 	Background    string `json:"background"`
+	Health        string `json:"health"`
 	Referee       string `json:"referee"`
 	Terms         bool   `json:"terms"`
 	User          User   `gorm:"foreignkey:UserID" json:"user"`

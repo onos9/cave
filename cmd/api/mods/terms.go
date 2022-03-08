@@ -12,8 +12,9 @@ var (
 type Terms struct {
 	ID             string `json:"id"`
 	Date           *time.Time
-	IAccept string `json:"iAccept"`
-	Decline string `json:"decline"`
+	Scholarship bool `json:"scholarship"`
+    ScholarshipReason string `json:"scholReason"`
+  Agree bool `json:"agree"`
 	About          string `gorm:"type:text" json:"about" validate:"omitempty"`
 	
 

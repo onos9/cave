@@ -16,11 +16,10 @@ type Qualification struct {
 	Instution      string `json:"university"`
 	GraduationYear string `json:"graduationYear"`
 	About          string `gorm:"type:text" json:"about" validate:"omitempty"`
-	
 
-// TableName gorm standard table name
-func (c *Qualification) TableName() string {
-	return qualificationTableName
+	// TableName gorm standard table name
+	// func (c *Qualification) TableName() string {
+	// 	return qualificationTableName
 }
 
 // QualificationList defines array of qualification objects
@@ -40,9 +39,9 @@ func (c *QualificationList) TableName() string {
 // 	return handler.Model(c).Related(&c.Qualification).Error
 // }
 
-func (c *Qualification) GetUser() error {
-	return handler.Model(c).Related(&c.User).Error
-}
+// func (c *Qualification) GetUser() error {
+// 	return handler.Model(c).Related(&c.User).Error
+// }
 
 /**
 CRUD functions
