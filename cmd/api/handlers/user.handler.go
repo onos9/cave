@@ -44,7 +44,7 @@ func (ctrl *UserController) googleAuth(ctx *gin.Context) {
 			"error":   err,
 		})
 		return
-	}
+	}  
 
 	// Validate the JWT is valid
 	claims, err := auth.ValidateGoogleJWT(ctrl.GoogleJWT)
