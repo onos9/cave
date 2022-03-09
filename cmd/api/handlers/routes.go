@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"github.com/cave/pkg/auth"
 	"github.com/cave/pkg/database"
 	"github.com/pkg/errors"
 
@@ -11,27 +10,22 @@ import (
 )
 
 var (
-	authenticator   *auth.Authenticator
+	//authenticator   *auth.Authenticator
 	ErrResetExpired = errors.New("Reset expired")
 )
 
-func pingHandler(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "pong",
-	})
-}
-
 // ApplyRoutes applies router to gin engine
-func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *database.Database) {
+func ApplyRoutes(r *gin.Engine, db *database.Database) {
 	mods.SetRepoDB(db)
-	authenticator = auth
+	auth := r.Group("/auth")
+	{
+		auth.POST("/login", user.login)
+		auth.POST("/logout", user.logout)
+		auth.POST("/signup", user.signup)
+		auth.POST("/", user.googleAuth)
+	}
+
 	apiV1 := r.Group("/api/v1")
-
-	apiV1.GET("/ping", pingHandler)
-	apiV1.POST("/login", user.login)
-	apiV1.POST("/logout", user.logout)
-	apiV1.POST("/signup", user.signup)
-
 	userRouter := apiV1.Group("/user")
 	{
 		userRouter.GET("/", user.signup)
@@ -39,7 +33,7 @@ func ApplyRoutes(r *gin.Engine, auth *auth.Authenticator, db *database.Database)
 
 	videoRouter := apiV1.Group("/video")
 	{
-		videoRouter.GET("/", video.upload)
+		videoRouter.POST("/", video.upload)
 	}
 
 	categoryRouter := apiV1.Group("/category")

@@ -28,9 +28,67 @@ var (
 
 // UserController is an anonymous struct for user controller
 type UserController struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Username string `json:"username"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
+	Username  string `json:"username"`
+	GoogleJWT string `json:"google_jwt"`
+}
+
+func (ctrl *UserController) googleAuth(ctx *gin.Context) {
+
+	// parse the GoogleJWT that was POSTed from the front-end
+	err := ctx.BindJSON(&ctrl)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Error decoding UserController",
+			"error":   err,
+		})
+		return
+	}
+
+	// Validate the JWT is valid
+	claims, err := auth.ValidateGoogleJWT(ctrl.GoogleJWT)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Invalid google auth token",
+			"error":   err,
+		})
+		return
+	}
+
+	var usr mods.User
+	usr.Email = claims.Email
+
+	err = usr.FetchByEmail()
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"error": fmt.Sprintf("user %s not found", ctrl.Email),
+		})
+		return
+	}
+
+	// create a JWT for OUR app and give it back to the client for future requests
+	ts, _ := auth.CreateToken(usr.ID)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	err = auth.CreateAuth(usr.ID, ts)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	tokens := map[string]string{
+		"access_token":  ts.AccessToken,
+		"refresh_token": ts.RefreshToken,
+	}
+
+	ctx.JSON(200, gin.H{
+		"message": "success",
+		"user":    ctrl,
+		"token":   tokens,
+	})
 }
 
 // SignUp registers user
@@ -63,26 +121,25 @@ func (ctrl *UserController) signup(ctx *gin.Context) {
 		return
 	}
 
-	ts, _ := auth.CreateToken(usr.ID)
-	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, err.Error())
-		return
-	}
+	// ts, _ := auth.CreateToken(usr.ID)
+	// if err != nil {
+	// 	ctx.JSON(http.StatusUnprocessableEntity, err.Error())
+	// 	return
+	// }
 
-	err = auth.CreateAuth(usr.ID, ts)
-	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, err.Error())
-	}
+	// err = auth.CreateAuth(usr.ID, ts)
+	// if err != nil {
+	// 	ctx.JSON(http.StatusUnprocessableEntity, err.Error())
+	// }
 
-	tokens := map[string]string{
-		"access_token":  ts.AccessToken,
-		"refresh_token": ts.RefreshToken,
-	}
+	// tokens := map[string]string{
+	// 	"access_token":  ts.AccessToken,
+	// 	"refresh_token": ts.RefreshToken,
+	// }
 
 	ctx.JSON(200, gin.H{
-		"message": "User created successfully",
-		"user":    ctrl,
-		"token":   tokens,
+		"message": "success",
+		"user":    usr,
 	})
 }
 
@@ -126,17 +183,16 @@ func (ctrl *UserController) login(ctx *gin.Context) {
 	}
 
 	ctx.JSON(200, gin.H{
-		"message": err,
+		"message": "success",
 		"tokens":  tokens,
 	})
 }
 
 // SignUp registers user
 func (ctrl *UserController) logout(ctx *gin.Context) {
-	// get values
-	// build into struct
+
 	ctx.JSON(200, gin.H{
-		"message": nil,
+		"message": "success",
 		"token":   "logout",
 	})
 }

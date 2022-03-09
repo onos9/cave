@@ -17,3 +17,5 @@
 go.sum
 .DS_Store
 cmd/.DS_Store
+
+google_client_id.json

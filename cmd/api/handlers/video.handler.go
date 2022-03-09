@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/cave/cmd/api/mods"
+	"github.com/cave/pkg/auth"
 
 	"github.com/pkg/errors"
 
@@ -37,10 +39,23 @@ func (ctrl *VideoController) upload(ctx *gin.Context) {
 	// get values
 	// build into struct
 
+	tokenAuth, err := auth.ExtractTokenMetadata(ctx.Request)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, "unauthorized")
+		return
+	}
+	userid, err := auth.FetchAuth(tokenAuth)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, "unauthorized")
+		return
+	}
+
 	var video mods.Video
 	ctx.BindJSON(&video)
 
-	err := video.Create()
+	video.ID = strconv.FormatUint(userid, 10)
+
+	err = video.Create()
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
 			"message": "Error creating video",
@@ -61,7 +76,8 @@ func (ctrl *VideoController) upload(ctx *gin.Context) {
 	//value := vid.Create()
 	ctx.JSON(200, gin.H{
 		"message":  err,
-		"video_id": video.ID,
+		"video_id": video.VideoID,
+		"user_id": userid,
 	})
 }
 
