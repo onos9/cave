@@ -10,16 +10,11 @@ var (
 
 // Refree is a model for Refrees table
 type Refree struct {
-	ID              string `json:"id"`
-	Date            *time.Time
-	RefreeOneName   string `json:"refOneName`
-	RefreeOneEmail  string `json:"refOneEmail"`
-	RefreeOnePhone  string `json:"refOnePhone"`
-	RefreeTwoName   string `json:"refTwoName`
-	RefreeTwoEmail  string `json:"refTwoEmail"`
-	RefreeTwoePhone string `json:"refTwoPhone"`
-	About           string `gorm:"type:text" json:"about" validate:"omitempty"`
-
+	ID       string `json:"id"`
+	Date     *time.Time
+	FullName string `json:"full_name"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
 	// TableName gorm standard table name
 	// func (c *Refree) TableName() string {
 	// 	return refreeTableName

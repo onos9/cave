@@ -17,14 +17,13 @@ type Health struct {
 	Anorexia               bool   `json:"anorexia"`
 	Diabetese              bool   `json:"diabetese"`
 	Epilepsy               bool   `json:"epilepsy"`
-	SpecialDiet            bool   `json:"specialDiet"`
-	LearningDisability     bool   `json:"learnDisability"`
+	StomachUlcers          bool   `json:"stomach_ulcers"`
+	SpecialDiet            bool   `json:"special_diet"`
+	LearningDisability     bool   `json:"learning_disability"`
 	UsedIllDrug            bool   `json:"usedIllDrug"`
-	TreatDrugAddic         bool   `json:"treatDrugAddic"`
-	HadSurgery             bool   `json:"hadSurgery"`
-	PastExpInfluence       string `json:"pastExpInfluence"`
+	DrugAddiction          bool   `json:"drug_addiction"`
+	HadSurgery             bool   `json:"had_surgery"`
 	HealthIssueDescription string `json:"healthIssueDesc"`
-	About                  string `gorm:"type:text" json:"about" validate:"omitempty"`
 
 	// TableName gorm standard table name
 	// func (c *Health) TableName() string {

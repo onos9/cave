@@ -10,9 +10,9 @@ var (
 type Bio struct {
 	ID          string `json:"id"`
 	Date        *time.Time
-	FirstName   string `json:"firstName"`
-	LastName    string `json:"lastName"`
-	MiddleName  string `json:"middleName"`
+	FirstName   string `json:"first_name"`
+	LastName    string `json:"last_name"`
+	MiddleName  string `json:"middle_name"`
 	Dob         string `json:"dob"`
 	Gender      string `json:"gender"`
 	Address     string `json:"address"`

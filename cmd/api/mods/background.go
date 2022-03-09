@@ -10,22 +10,22 @@ var (
 type Background struct {
 	ID               string `json:"id"`
 	Date             *time.Time
-	BornAgain        bool   `json:"bornAgain"`
-	SalvationBrief   string `json:"salvBrief"`
-	GodsWorkings     string `json:"godsWorkings"`
-	CallOfGod        string `json:"callOfGod"`
-	IntoMinistry     bool   `json:"intoMinistry"`
-	SpiritualGifts   string `json:"spiritGift"`
+	BornAgain        bool   `json:"born_again"`
+	SalvationBrief   string `json:"salvation_brief"`
+	GodsWorkings     string `json:"gods_workings"`
+	GodsCall         string `json:"gods_call"`
+	IntoMinistry     bool   `json:"into_ministry"`
+	SpiritualGifts   string `json:"spiritual_gifts"`
 	Reason           string `json:"reason"`
-	ChurchName       string `json:"churchName"`
-	ChurchAddress    string `json:"churchAddress"`
-	PastorName       string `json:"pastorName"`
-	PastorEmail      string `json:"pastorEmail"`
-	PastorPhone      string `json:"pastorPhone"`
-	ChurchInvolve    string `json:"churchInvolve"`
-	WaterBaptism     bool   `json:"waterBaptism"`
-	BaptismDate      string `json:"baptDate"`
-	HolyGhostBaptism bool   `json:"holyGhostBaptism"`
+	ChurchName       string `json:"church_name"`
+	ChurchAddress    string `json:"church_address"`
+	PastorName       string `json:"pastor_name"`
+	PastorEmail      string `json:"pastor_email"`
+	PastorPhone      string `json:"pastor_phone"`
+	ChurchInvolved   string `json:"church_involved"`
+	WaterBaptism     bool   `json:"water_baptism"`
+	BaptismDate      string `json:"baptism_date"`
+	HolyGhostBaptism bool   `json:"holyghost_baptism"`
 
 	// TableName gorm standard table name
 	// func (c *Background) TableName() string {

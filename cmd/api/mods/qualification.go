@@ -12,10 +12,10 @@ var (
 type Qualification struct {
 	ID             string `json:"id"`
 	Date           *time.Time
-	Degree         string `gorm:"type:varchar(100);unique_index" json:"degree" `
-	Instution      string `json:"university"`
-	GraduationYear string `json:"graduationYear"`
-	About          string `gorm:"type:text" json:"about" validate:"omitempty"`
+	Degree         string `json:"degree" `
+	Instution      string `json:"institution"`
+	InstutionName  string `json:"institution_name"`
+	GraduationYear string `json:"graduation_year"`
 
 	// TableName gorm standard table name
 	// func (c *Qualification) TableName() string {

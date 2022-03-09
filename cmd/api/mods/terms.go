@@ -10,13 +10,13 @@ var (
 
 // Terms is a model for Termss table
 type Terms struct {
-	ID             string `json:"id"`
-	Date           *time.Time
-	Scholarship bool `json:"scholarship"`
-    ScholarshipReason string `json:"scholReason"`
-  Agree bool `json:"agree"`
-	About          string `gorm:"type:text" json:"about" validate:"omitempty"`
-	
+	ID                string `json:"id"`
+	Date              *time.Time
+	Scholarship       bool   `json:"scholarship"`
+	ScholarshipReason string `json:"scholReason"`
+	Agree             bool   `json:"agree"`
+	About             string `gorm:"type:text" json:"about" validate:"omitempty"`
+}
 
 // TableName gorm standard table name
 func (c *Terms) TableName() string {
@@ -40,9 +40,9 @@ func (c *TermsList) TableName() string {
 // 	return handler.Model(c).Related(&c.Terms).Error
 // }
 
-func (c *Terms) GetUser() error {
-	return handler.Model(c).Related(&c.User).Error
-}
+// func (c *Terms) GetUser() error {
+// 	return handler.Model(c).Related(&c.User).Error
+// }
 
 /**
 CRUD functions
