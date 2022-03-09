@@ -11,10 +11,10 @@ var (
 // View is a model for Views table
 type View struct {
 	utils.Base
-	Name   string `gorm:"type:varchar(100);unique" `
-	Ip     string `gorm:"type:varchar(20)"`
-	IsView bool
-	Video  Video `gorm:"foreignkey:VideoID"`
+	Name   string `gorm:"type:varchar(100);unique" json:"name"`
+	Ip     string `gorm:"type:varchar(20)" json:"ip"`
+	IsView bool   `json:"view"`
+	Video  Video  `gorm:"foreignkey:VideoID"`
 }
 
 // TableName gorm standard table name

@@ -16,7 +16,6 @@ type Base struct {
 	DeletedAt *time.Time `sql:"index" json:"deleted_at"`
 }
 
-// BeforeCreate generates a uuid into the id before saving the model
 func (base *Base) BeforeCreate(scope *gorm.Scope) error {
 	uuid := uuid.NewRandom().String()
 	return scope.SetColumn("ID", uuid)
