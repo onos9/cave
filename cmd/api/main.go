@@ -4,12 +4,10 @@ import (
 	"encoding/json"
 	"log"
 	"os"
-	"time"
 
 	"github.com/cave/cmd/api/handlers"
 	"github.com/cave/configs"
 	"github.com/cave/migrations"
-	"github.com/cave/pkg/auth"
 	"github.com/cave/pkg/database"
 	"github.com/cave/pkg/flag"
 
@@ -56,12 +54,12 @@ func main() {
 	defer db.DB.Close()
 	defer db.Redis.Close()
 
-	authenticator, _ := auth.NewAuthenticatorFile("", time.Now().UTC(), configs.CFG.Auth.KeyExpiration)
+	//authenticator, _ := auth.NewAuthenticatorFile("", time.Now().UTC(), configs.CFG.Auth.KeyExpiration)
 
 	migrations.Migrate(db.DB)
 
 	app := gin.Default()
-	handlers.ApplyRoutes(app, authenticator, db)
+	handlers.ApplyRoutes(app, db)
 	app.Use(database.InjectDB(db))
 	app.Run(configs.CFG.Server.Host)
 }
