@@ -11,7 +11,18 @@ import (
 type AppConfig struct {
 	TLS     TLS
 	Storage Storage
+	Mail    Mail
 	Address string `envconfig:"ADDRESS"`
+}
+
+//Mail is mail handler config
+type Mail struct {
+	Scope        string `envconfig:"SCOPE"`
+	ExpiryTime   string `envconfig:"EXPIRY_TIME"`
+	ClientID     string `envconfig:"CLIENT_ID"`
+	ClientSecret string `envconfig:"CLIENT_SECRET"`
+	Code         string `envconfig:"CODE"`
+	GrantType    string `envconfig:"GRANT_TYPE"`
 }
 
 //Storage is storage handler config
@@ -65,8 +76,18 @@ func LoadConfig() (*AppConfig, error) {
 			Crt:   os.Getenv("TLS_CRT"),
 			CACrt: os.Getenv("TLS_CACRT"),
 		}
+
+		mail := Mail{
+			Scope:        os.Getenv("SCOPE"),
+			ExpiryTime:   os.Getenv("EXPIRY_TIME"),
+			ClientID:     os.Getenv("CLIENT_ID"),
+			ClientSecret: os.Getenv("CLIENT_SECRTE"),
+			Code:         os.Getenv("CODE"),
+			GrantType:    os.Getenv("GRANT_TYPE"),
+		}
 		conf.Storage = storage
 		conf.TLS = tls
+		conf.Mail = mail
 		conf.Address = os.Getenv("ADDRESS")
 	}
 

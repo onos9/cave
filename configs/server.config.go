@@ -26,7 +26,7 @@ var CFG struct {
 	}
 	DB struct {
 		Host       string `default:"127.0.0.1:5433" envconfig:"STORAGE_HOST"`
-		User       string `default:"postgres" envconfig:"DB_HOST"`
+		User       string `default:"user" envconfig:"DB_HOST"`
 		Pass       string `default:"postgres" envconfig:"DB_PASS" json:"-"`
 		Database   string `default:"shared" envconfig:"DATABASE"`
 		Driver     string `default:"postgres" envconfig:"Driver"`

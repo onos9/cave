@@ -1,8 +1,6 @@
 package mods
 
-import (
-	"time"
-)
+import "github.com/cave/pkg/utils"
 
 var (
 	healthTableName = "healths"
@@ -10,8 +8,7 @@ var (
 
 // Health is a model for Healths table
 type Health struct {
-	ID                     string `json:"id"`
-	Date                   *time.Time
+	utils.Base
 	Disability             bool   `json:"disability"`
 	Nervousillness         bool   `json:"nervousIll"`
 	Anorexia               bool   `json:"anorexia"`

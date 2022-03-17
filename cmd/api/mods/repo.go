@@ -40,12 +40,12 @@ func SetRepoDB(db *database.Database) {
 	handler = db.DB
 	RedisClient = db.Redis
 
-	var category Category
-	for _, cat := range categories {
-		category.Title = cat.Title
-		category.Semester = cat.Semester
-		category.Create()
-	}
+	// var category Category
+	// for _, cat := range categories {
+	// 	category.Title = cat.Title
+	// 	category.Semester = cat.Semester
+	// 	category.Create()
+	// }
 }
 
 // CloseDB closes handler db

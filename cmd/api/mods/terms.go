@@ -1,8 +1,6 @@
 package mods
 
-import (
-	"time"
-)
+import "github.com/cave/pkg/utils"
 
 var (
 	termsTableName = "termss"
@@ -10,12 +8,10 @@ var (
 
 // Terms is a model for Termss table
 type Terms struct {
-	ID                string `json:"id"`
-	Date              *time.Time
+	utils.Base
 	Scholarship       bool   `json:"scholarship"`
 	ScholarshipReason string `json:"scholReason"`
 	Agree             bool   `json:"agree"`
-	About             string `gorm:"type:text" json:"about" validate:"omitempty"`
 }
 
 // TableName gorm standard table name

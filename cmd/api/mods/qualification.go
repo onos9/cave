@@ -1,8 +1,6 @@
 package mods
 
-import (
-	"time"
-)
+import "github.com/cave/pkg/utils"
 
 var (
 	qualificationTableName = "qualifications"
@@ -10,8 +8,7 @@ var (
 
 // Qualification is a model for Qualifications table
 type Qualification struct {
-	ID             string `json:"id"`
-	Date           *time.Time
+	utils.Base
 	Degree         string `json:"degree" `
 	Instution      string `json:"institution"`
 	InstutionName  string `json:"institution_name"`

@@ -6,11 +6,14 @@ import (
 	"os"
 
 	"github.com/cave/cmd/api/handlers"
+	"github.com/cave/cmd/api/mods"
 	"github.com/cave/configs"
 	"github.com/cave/migrations"
 	"github.com/cave/pkg/database"
 	"github.com/cave/pkg/flag"
+	"github.com/cave/pkg/middlewares"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/kelseyhightower/envconfig"
 )
@@ -56,10 +59,15 @@ func main() {
 
 	//authenticator, _ := auth.NewAuthenticatorFile("", time.Now().UTC(), configs.CFG.Auth.KeyExpiration)
 
+	db.DB.CreateTable(&mods.Ref{})
 	migrations.Migrate(db.DB)
 
+	corsConf := cors.DefaultConfig()
+	corsConf.AllowOrigins = []string{"*"}
+
 	app := gin.Default()
-	handlers.ApplyRoutes(app, db)
+	app.Use(middlewares.CORS())
 	app.Use(database.InjectDB(db))
+	handlers.ApplyRoutes(app, db)
 	app.Run(configs.CFG.Server.Host)
 }

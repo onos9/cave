@@ -1,6 +1,8 @@
 package mods
 
-import "time"
+import (
+	"github.com/cave/pkg/utils"
+)
 
 var (
 	candidateTableName = "candidates"
@@ -8,15 +10,17 @@ var (
 
 // Candidate is a model for Candidates table
 type Candidate struct {
-	ID            string `json:"id"`
-	Date          *time.Time
-	Bio           string `json:"bio"`
-	Qualification string `json:"qualification"`
-	Background    string `json:"background"`
-	Health        string `json:"health"`
-	Referee       string `json:"referee"`
-	Terms         bool   `json:"terms"`
-	User          User   `gorm:"foreignkey:UserID" json:"user"`
+	utils.Base
+	Email         string        `gorm:"type:varchar(100);unique_index" json:"email" `
+	PasswordHash  []byte        `json:"password_hash"`
+	PasswordSalt  string        `json:"password_salt"`
+	IsVerified    bool          `json:"is_verified"`
+	Bio           Bio           `gorm:"foreignkey:BioID" json:"bio"`
+	Qualification Qualification `gorm:"foreignkey:QualificationID" json:"qualification"`
+	Background    Background    `gorm:"foreignkey:BackgroundID" json:"background"`
+	Health        Health        `gorm:"foreignkey:HealthID" json:"health"`
+	Referee       Ref           `gorm:"foreignkey:RefereeID" json:"referee"`
+	Terms         Terms         `gorm:"foreignkey:TermsID" json:"terms"`
 }
 
 // TableName gorm standard table name
@@ -37,12 +41,24 @@ func (c *CandidateList) TableName() string {
  */
 
 // GetCertificates returns candidate certificates
-func (c *Candidate) GetChannel() error {
+func (c *Candidate) GetBio() error {
 	return handler.Model(c).Related(&c.Bio).Error
 }
 
-func (c *Candidate) GetUser() error {
-	return handler.Model(c).Related(&c.User).Error
+func (c *Candidate) GetQualification() error {
+	return handler.Model(c).Related(&c.Qualification).Error
+}
+
+func (c *Candidate) GetBackground() error {
+	return handler.Model(c).Related(&c.Background).Error
+}
+
+func (c *Candidate) GetHealth() error {
+	return handler.Model(c).Related(&c.Health).Error
+}
+
+func (c *Candidate) GetTerms() error {
+	return handler.Model(c).Related(&c.Terms).Error
 }
 
 /**
@@ -71,6 +87,16 @@ func (c *Candidate) FetchByID() error {
 	return nil
 }
 
+// FetchByID fetches User by Email
+func (c *Candidate) FetchByEmail() error {
+	err := handler.Where("email=?", c.Email).First(c).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // FetchAll fetchs all Candidates
 func (c *Candidate) FetchAll(cl *CandidateList) error {
 	err := handler.Find(cl).Error
@@ -80,6 +106,12 @@ func (c *Candidate) FetchAll(cl *CandidateList) error {
 // UpdateOne updates a given candidate
 func (c *Candidate) UpdateOne() error {
 	err := handler.Save(c).Error
+	return err
+}
+
+// UpdateOne updates a given candidate or creates a new one if it doesn't exist'
+func (c *Candidate) UpdateOrCreateByEmail() error {
+	err := handler.Where("email=?", c.Email).FirstOrCreate(c).Error
 	return err
 }
 

@@ -1,6 +1,6 @@
 package mods
 
-import "time"
+import "github.com/cave/pkg/utils"
 
 var (
 	backgroundTableName = "backgrounds"
@@ -8,8 +8,7 @@ var (
 
 // Background is a model for Backgrounds table
 type Background struct {
-	ID               string `json:"id"`
-	Date             *time.Time
+	utils.Base
 	BornAgain        bool   `json:"born_again"`
 	SalvationBrief   string `json:"salvation_brief"`
 	GodsWorkings     string `json:"gods_workings"`

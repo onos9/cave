@@ -44,7 +44,7 @@ func (ctrl *UserController) googleAuth(ctx *gin.Context) {
 			"error":   err,
 		})
 		return
-	}  
+	}
 
 	// Validate the JWT is valid
 	claims, err := auth.ValidateGoogleJWT(ctrl.GoogleJWT)
@@ -143,56 +143,4 @@ func (ctrl *UserController) signup(ctx *gin.Context) {
 	})
 }
 
-// Login user
-func (ctrl *UserController) login(ctx *gin.Context) {
-	ctx.BindJSON(&ctrl)
 
-	var usr mods.User
-	usr.Email = ctrl.Email
-	err := usr.FetchByEmail()
-	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"error": fmt.Sprintf("user %s not found", ctrl.Email),
-		})
-		return
-	}
-
-	byteHash := []byte(usr.PasswordHash)
-	err = bcrypt.CompareHashAndPassword(byteHash, []byte(ctrl.Password+usr.PasswordSalt))
-	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error":   err,
-			"message": "incorrect password",
-		})
-		return
-	}
-
-	ts, _ := auth.CreateToken(usr.ID)
-	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, err.Error())
-		return
-	}
-
-	saveErr := auth.CreateAuth(usr.ID, ts)
-	if saveErr != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, saveErr.Error())
-	}
-	tokens := map[string]string{
-		"access_token":  ts.AccessToken,
-		"refresh_token": ts.RefreshToken,
-	}
-
-	ctx.JSON(200, gin.H{
-		"message": "success",
-		"tokens":  tokens,
-	})
-}
-
-// SignUp registers user
-func (ctrl *UserController) logout(ctx *gin.Context) {
-
-	ctx.JSON(200, gin.H{
-		"message": "success",
-		"token":   "logout",
-	})
-}

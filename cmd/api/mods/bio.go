@@ -1,6 +1,6 @@
 package mods
 
-import "time"
+import "github.com/cave/pkg/utils"
 
 var (
 	bioTableName = "bios"
@@ -8,8 +8,7 @@ var (
 
 // Bio is a model for Bios table
 type Bio struct {
-	ID          string `json:"id"`
-	Date        *time.Time
+	utils.Base
 	FirstName   string `json:"first_name"`
 	LastName    string `json:"last_name"`
 	MiddleName  string `json:"middle_name"`
@@ -19,13 +18,10 @@ type Bio struct {
 	City        string `json:"city"`
 	State       string `json:"state"`
 	Country     string `json:"country"`
-	Zip         string `json:"zip"`
-	PhoneNo     string `json:"phoneNo"`
-	Email       string `gorm:"type:varchar(100);unique_index" json:"email" `
+	Zip         string `json:"zipcode"`
+	PhoneNo     string `json:"phone"`
 	Nationality string `json:"nationality"`
 	Profession  string `json:"profession"`
-	About       string `gorm:"type:text" json:"about" validate:"omitempty"`
-	User        User   `gorm:"foreignkey:UserID" json:"user"`
 }
 
 // TableName gorm standard table name
@@ -49,10 +45,6 @@ func (c *BioList) TableName() string {
 // func (c *Bio) GetChannel() error {
 // 	return handler.Model(c).Related(&c.Bio).Error
 // }
-
-func (c *Bio) GetUser() error {
-	return handler.Model(c).Related(&c.User).Error
-}
 
 /**
 CRUD functions

@@ -37,4 +37,12 @@ func Migrate(db *gorm.DB) {
 	db.AutoMigrate(&mods.Subscription{})
 	db.AutoMigrate(&mods.Video{})
 	db.AutoMigrate(&mods.View{})
+
+	db.AutoMigrate(&mods.Background{})
+	db.AutoMigrate(&mods.Bio{})
+	db.AutoMigrate(&mods.Candidate{})
+	db.AutoMigrate(&mods.Qualification{})
+	db.AutoMigrate(&mods.Terms{})
+	db.AutoMigrate(&mods.Ref{})
+	db.AutoMigrate(&mods.Health{})
 }

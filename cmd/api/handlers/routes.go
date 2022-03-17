@@ -5,7 +5,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/cave/cmd/api/mods"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,13 +18,13 @@ func ApplyRoutes(r *gin.Engine, db *database.Database) {
 	mods.SetRepoDB(db)
 	auth := r.Group("/auth")
 	{
-		auth.POST("/login", user.login)
-		auth.POST("/logout", user.logout)
 		auth.POST("/signup", user.signup)
 		auth.POST("/", user.googleAuth)
 	}
 
 	apiV1 := r.Group("/api/v1")
+	candidate.setRoute(apiV1)
+
 	userRouter := apiV1.Group("/user")
 	{
 		userRouter.GET("/", user.signup)
