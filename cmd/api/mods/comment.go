@@ -1,11 +1,10 @@
 package mods
 
 import (
-	"github.com/cave/pkg/utils"
-)
+	"context"
 
-var (
-	commentTableName = "comments"
+	"github.com/cave/pkg/utils"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // Comment is a model for Comments table
@@ -16,78 +15,69 @@ type Comment struct {
 	User      User   `gorm:"foreignkey:UserID" json:"user"`
 }
 
-// TableName gorm standard table name
-func (c *Comment) TableName() string {
-	return commentTableName
-}
-
 // CommentList defines array of comment objects
 type CommentList []*Comment
 
-// TableName gorm standard table name
-func (c *CommentList) TableName() string {
-	return commentTableName
-}
-
-/**
-* Relationship functions
- */
-
-// GetCertificates returns comment certificates
-func (c *Comment) GetVideo() error {
-	return handler.Model(c).Related(&c.Video).Error
-}
-
-func (c *Comment) GetUser() error {
-	return handler.Model(c).Related(&c.User).Error
-}
 
 /**
 CRUD functions
 */
 
 // Create creates a new comment record
-func (c *Comment) Create() error {
-	possible := handler.NewRecord(c)
-	if possible {
-		if err := handler.Create(c).Error; err != nil {
-			return err
-		}
+func (m *Comment) Create() error {
+	_, err := db.Collection(m.Doc).InsertOne(context.TODO(), &m)
+	if err != nil {
+		return err
 	}
-
 	return nil
 }
 
 // FetchByID fetches Comment by id
-func (c *Comment) FetchByID() error {
-	err := handler.First(c).Error
+func (m *Comment) FetchByID() error {
+	err := db.Collection(m.Doc).FindOne(context.TODO(), bson.M{"_id": m.ID}).Decode(&m)
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
-// FetchAll fetchs all Comments
-func (c *Comment) FetchAll(cl *CommentList) error {
-	err := handler.Find(cl).Error
-	return err
+// FetchAll fetchs all Candidates
+func (m *Comment) FetchAll(cl *CandidateList) error {
+	cursor, err := db.Collection(m.Doc).Find(context.TODO(), bson.D{{}})
+	if err != nil {
+		return err
+	}
+	if err = cursor.All(context.TODO(), &cl); err != nil {
+		return err
+	}
+	return nil
 }
 
 // UpdateOne updates a given comment
-func (c *Comment) UpdateOne() error {
-	err := handler.Save(c).Error
-	return err
+func (m *Comment) UpdateOne() error {
+	update := bson.M{
+		"$inc": bson.M{"copies": 1},
+	}
+	_, err := db.Collection(m.Doc).UpdateOne(context.TODO(), bson.M{"_id": m.ID}, update)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Delete deletes comment by id
-func (c *Comment) Delete() error {
-	err := handler.Unscoped().Delete(c).Error
-	return err
+func (m *Comment) Delete() error {
+	_, err := db.Collection(m.Doc).DeleteOne(context.TODO(), bson.M{"_id": m.ID})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-// SoftDelete set's deleted at date
-func (c *Comment) SoftDelete() error {
-	err := handler.Delete(c).Error
-	return err
+func (m *Comment) DeleteMany() error {
+	_, err := db.Collection(m.Doc).DeleteMany(context.TODO(), bson.D{{}})
+	if err != nil {
+		return err
+	}
+	return nil
 }

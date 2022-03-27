@@ -1,13 +1,11 @@
 package mods
 
 import (
+	"context"
 	"time"
 
 	"github.com/cave/pkg/utils"
-)
-
-var (
-	videoTableName = "videos"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // Video is a model for Videos table
@@ -26,81 +24,71 @@ type Video struct {
 	Channel          Channel    `gorm:"foreignkey:ChannelID" json:"channel"`
 	Category         Category   `gorm:"foreignkey:CategoryID" json:"category"`
 	View             bool       `gorm:"foreignkey:ViewID" json:"view"`
-	User             User       `gorm:"foreignkey:UserID" json:"user"`
-}
-
-// TableName gorm standard table name
-func (c *Video) TableName() string {
-	return videoTableName
+	User             User       `gorm:"foreignkey:UserID" json:"video"`
 }
 
 // VideoList defines array of video objects
 type VideoList []*Video
-
-// TableName gorm standard table name
-func (c *VideoList) TableName() string {
-	return videoTableName
-}
-
-/**
-* Relationship functions
- */
-
-// GetCertificates returns video certificates
-func (c *Video) GetChannel() error {
-	return handler.Model(c).Related(&c.Channel).Error
-}
-
-func (c *Video) GetCategory() error {
-	return handler.Model(c).Related(&c.Category).Error
-}
 
 /**
 CRUD functions
 */
 
 // Create creates a new video record
-func (c *Video) Create() error {
-	possible := handler.NewRecord(c)
-	if possible {
-		if err := handler.Create(c).Error; err != nil {
-			return err
-		}
+func (m *Video) Create() error {
+	_, err := db.Collection(m.Doc).InsertOne(context.TODO(), &m)
+	if err != nil {
+		return err
 	}
-
 	return nil
 }
 
 // FetchByID fetches Video by id
-func (c *Video) FetchByID() error {
-	err := handler.First(c).Error
+func (m *Video) FetchByID() error {
+	err := db.Collection(m.Doc).FindOne(context.TODO(), bson.M{"_id": m.ID}).Decode(&m)
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
-// FetchAll fetchs all Videos
-func (c *Video) FetchAll(cl *VideoList) error {
-	err := handler.Find(cl).Error
-	return err
+// FetchAll fetchs all Candidates
+func (m *Video) FetchAll(cl *CandidateList) error {
+	cursor, err := db.Collection(m.Doc).Find(context.TODO(), bson.D{{}})
+	if err != nil {
+		return err
+	}
+	if err = cursor.All(context.TODO(), &cl); err != nil {
+		return err
+	}
+	return nil
 }
 
 // UpdateOne updates a given video
-func (c *Video) UpdateOne() error {
-	err := handler.Save(c).Error
-	return err
+func (m *Video) UpdateOne() error {
+	update := bson.M{
+		"$inc": bson.M{"copies": 1},
+	}
+	_, err := db.Collection(m.Doc).UpdateOne(context.TODO(), bson.M{"_id": m.ID}, update)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Delete deletes video by id
-func (c *Video) Delete() error {
-	err := handler.Unscoped().Delete(c).Error
-	return err
+func (m *Video) Delete() error {
+	_, err := db.Collection(m.Doc).DeleteOne(context.TODO(), bson.M{"_id": m.ID})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-// SoftDelete set's deleted at date
-func (c *Video) SoftDelete() error {
-	err := handler.Delete(c).Error
-	return err
+func (m *Video) DeleteMany() error {
+	_, err := db.Collection(m.Doc).DeleteMany(context.TODO(), bson.D{{}})
+	if err != nil {
+		return err
+	}
+	return nil
 }

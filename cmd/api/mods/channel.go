@@ -1,11 +1,10 @@
 package mods
 
 import (
-	"github.com/cave/pkg/utils"
-)
+	"context"
 
-var (
-	channelTableName = "channels"
+	"github.com/cave/pkg/utils"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // Channel is a model for Channels table
@@ -19,74 +18,68 @@ type Channel struct {
 	User         User   `gorm:"foreignkey:CourseID" json:"user"`
 }
 
-// TableName gorm standard table name
-func (c *Channel) TableName() string {
-	return channelTableName
-}
-
 // ChannelList defines array of channel objects
 type ChannelList []*Channel
-
-// TableName gorm standard table name
-func (c *ChannelList) TableName() string {
-	return channelTableName
-}
-
-/**
-* Relationship functions
- */
-
-// GetCertificates returns channel certificates
-func (c *Channel) GetCertificates() error {
-	return handler.Model(c).Related(&c.User).Error
-}
 
 /**
 CRUD functions
 */
 
 // Create creates a new channel record
-func (c *Channel) Create() error {
-	possible := handler.NewRecord(c)
-	if possible {
-		if err := handler.Create(c).Error; err != nil {
-			return err
-		}
+func (m *Channel) Create() error {
+	_, err := db.Collection(m.Doc).InsertOne(context.TODO(), &m)
+	if err != nil {
+		return err
 	}
-
 	return nil
 }
 
 // FetchByID fetches Channel by id
-func (c *Channel) FetchByID() error {
-	err := handler.First(c).Error
+func (m *Channel) FetchByID() error {
+	err := db.Collection(m.Doc).FindOne(context.TODO(), bson.M{"_id": m.ID}).Decode(&m)
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
-// FetchAll fetchs all Channels
-func (c *Channel) FetchAll(cl *ChannelList) error {
-	err := handler.Find(cl).Error
-	return err
+// FetchAll fetchs all Candidates
+func (m *Channel) FetchAll(cl *CandidateList) error {
+	cursor, err := db.Collection(m.Doc).Find(context.TODO(), bson.D{{}})
+	if err != nil {
+		return err
+	}
+	if err = cursor.All(context.TODO(), &cl); err != nil {
+		return err
+	}
+	return nil
 }
 
 // UpdateOne updates a given channel
-func (c *Channel) UpdateOne() error {
-	err := handler.Save(c).Error
-	return err
+func (m *Channel) UpdateOne() error {
+	update := bson.M{
+		"$inc": bson.M{"copies": 1},
+	}
+	_, err := db.Collection(m.Doc).UpdateOne(context.TODO(), bson.M{"_id": m.ID}, update)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Delete deletes channel by id
-func (c *Channel) Delete() error {
-	err := handler.Unscoped().Delete(c).Error
-	return err
+func (m *Channel) Delete() error {
+	_, err := db.Collection(m.Doc).DeleteOne(context.TODO(), bson.M{"_id": m.ID})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-// SoftDelete set's deleted at date
-func (c *Channel) SoftDelete() error {
-	err := handler.Delete(c).Error
-	return err
+func (m *Channel) DeleteMany() error {
+	_, err := db.Collection(m.Doc).DeleteMany(context.TODO(), bson.D{{}})
+	if err != nil {
+		return err
+	}
+	return nil
 }

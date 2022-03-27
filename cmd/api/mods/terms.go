@@ -1,10 +1,12 @@
 package mods
 
-import "github.com/cave/pkg/utils"
+import (
+	"context"
 
-var (
-	termsTableName = "termss"
+	"github.com/cave/pkg/utils"
+	"go.mongodb.org/mongo-driver/bson"
 )
+
 
 // Terms is a model for Termss table
 type Terms struct {
@@ -14,78 +16,68 @@ type Terms struct {
 	Agree             bool   `json:"agree"`
 }
 
-// TableName gorm standard table name
-func (c *Terms) TableName() string {
-	return termsTableName
-}
-
 // TermsList defines array of terms objects
 type TermsList []*Terms
-
-// TableName gorm standard table name
-func (c *TermsList) TableName() string {
-	return termsTableName
-}
-
-/**
-* Relationship functions
- */
-
-// GetCertificates returns terms certificates
-// func (c *Terms) GetChannel() error {
-// 	return handler.Model(c).Related(&c.Terms).Error
-// }
-
-// func (c *Terms) GetUser() error {
-// 	return handler.Model(c).Related(&c.User).Error
-// }
 
 /**
 CRUD functions
 */
 
 // Create creates a new terms record
-func (c *Terms) Create() error {
-	possible := handler.NewRecord(c)
-	if possible {
-		if err := handler.Create(c).Error; err != nil {
-			return err
-		}
+func (m *Terms) Create() error {
+	_, err := db.Collection(m.Doc).InsertOne(context.TODO(), &m)
+	if err != nil {
+		return err
 	}
-
 	return nil
 }
 
 // FetchByID fetches Terms by id
-func (c *Terms) FetchByID() error {
-	err := handler.First(c).Error
+func (m *Terms) FetchByID() error {
+	err := db.Collection(m.Doc).FindOne(context.TODO(), bson.M{"_id": m.ID}).Decode(&m)
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
-// FetchAll fetchs all Termss
-func (c *Terms) FetchAll(cl *TermsList) error {
-	err := handler.Find(cl).Error
-	return err
+// FetchAll fetchs all Candidates
+func (m *Terms) FetchAll(cl *CandidateList) error {
+	cursor, err := db.Collection(m.Doc).Find(context.TODO(), bson.D{{}})
+	if err != nil {
+		return err
+	}
+	if err = cursor.All(context.TODO(), &cl); err != nil {
+		return err
+	}
+	return nil
 }
 
 // UpdateOne updates a given terms
-func (c *Terms) UpdateOne() error {
-	err := handler.Save(c).Error
-	return err
+func (m *Terms) UpdateOne() error {
+	update := bson.M{
+		"$inc": bson.M{"copies": 1},
+	}
+	_, err := db.Collection(m.Doc).UpdateOne(context.TODO(), bson.M{"_id": m.ID}, update)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Delete deletes terms by id
-func (c *Terms) Delete() error {
-	err := handler.Unscoped().Delete(c).Error
-	return err
+func (m *Terms) Delete() error {
+	_, err := db.Collection(m.Doc).DeleteOne(context.TODO(), bson.M{"_id": m.ID})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-// SoftDelete set's deleted at date
-func (c *Terms) SoftDelete() error {
-	err := handler.Delete(c).Error
-	return err
+func (m *Terms) DeleteMany() error {
+	_, err := db.Collection(m.Doc).DeleteMany(context.TODO(), bson.D{{}})
+	if err != nil {
+		return err
+	}
+	return nil
 }

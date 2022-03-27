@@ -7,33 +7,26 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-// Bio is a model for Bios table
-type Bio struct {
+// Ref is a model for Refs table
+type Referee struct {
 	utils.Base
-	FirstName   string `json:"first_name"`
-	LastName    string `json:"last_name"`
-	MiddleName  string `json:"middle_name"`
-	Dob         string `json:"dob"`
-	Gender      string `json:"gender"`
-	Address     string `json:"address"`
-	City        string `json:"city"`
-	State       string `json:"state"`
-	Country     string `json:"country"`
-	Zip         string `json:"zipcode"`
-	PhoneNo     string `json:"phone"`
-	Nationality string `json:"nationality"`
-	Profession  string `json:"profession"`
+	FullName string `json:"full_name"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	// TableName gorm standard table name
+	// func (c *Ref) TableName() string {
+	// 	return refTableName
 }
 
-// BioList defines array of bio objects
-type BioList []*Bio
+// RefList defines array of refree objects
+type RefereeList []*Referee
 
 /**
 CRUD functions
 */
 
-// Create creates a new bio record
-func (m *Bio) Create() error {
+// Create creates a new referee record
+func (m *Referee) Create() error {
 	_, err := db.Collection(m.Doc).InsertOne(context.TODO(), &m)
 	if err != nil {
 		return err
@@ -41,8 +34,8 @@ func (m *Bio) Create() error {
 	return nil
 }
 
-// FetchByID fetches Bio by id
-func (m *Bio) FetchByID() error {
+// FetchByID fetches Referee by id
+func (m *Referee) FetchByID() error {
 	err := db.Collection(m.Doc).FindOne(context.TODO(), bson.M{"_id": m.ID}).Decode(&m)
 	if err != nil {
 		return err
@@ -51,7 +44,7 @@ func (m *Bio) FetchByID() error {
 }
 
 // FetchAll fetchs all Candidates
-func (m *Bio) FetchAll(cl *CandidateList) error {
+func (m *Referee) FetchAll(cl *CandidateList) error {
 	cursor, err := db.Collection(m.Doc).Find(context.TODO(), bson.D{{}})
 	if err != nil {
 		return err
@@ -62,8 +55,8 @@ func (m *Bio) FetchAll(cl *CandidateList) error {
 	return nil
 }
 
-// UpdateOne updates a given bio
-func (m *Bio) UpdateOne() error {
+// UpdateOne updates a given referee
+func (m *Referee) UpdateOne() error {
 	update := bson.M{
 		"$inc": bson.M{"copies": 1},
 	}
@@ -74,8 +67,8 @@ func (m *Bio) UpdateOne() error {
 	return nil
 }
 
-// Delete deletes bio by id
-func (m *Bio) Delete() error {
+// Delete deletes referee by id
+func (m *Referee) Delete() error {
 	_, err := db.Collection(m.Doc).DeleteOne(context.TODO(), bson.M{"_id": m.ID})
 	if err != nil {
 		return err
@@ -83,7 +76,7 @@ func (m *Bio) Delete() error {
 	return nil
 }
 
-func (m *Bio) DeleteMany() error {
+func (m *Referee) DeleteMany() error {
 	_, err := db.Collection(m.Doc).DeleteMany(context.TODO(), bson.D{{}})
 	if err != nil {
 		return err

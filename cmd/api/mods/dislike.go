@@ -1,12 +1,12 @@
 package mods
 
 import (
+	"context"
+
 	"github.com/cave/pkg/utils"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
-var (
-	dislikeTableName = "dislikes"
-)
 
 // Dislike is a model for Dislikes table
 type Dislike struct {
@@ -16,78 +16,68 @@ type Dislike struct {
 	User       User  `gorm:"foreignkey:UserID" json:"user"`
 }
 
-// TableName gorm standard table name
-func (c *Dislike) TableName() string {
-	return dislikeTableName
-}
-
 // DislikeList defines array of dislike objects
 type DislikeList []*Dislike
-
-// TableName gorm standard table name
-func (c *DislikeList) TableName() string {
-	return dislikeTableName
-}
-
-/**
-* Relationship functions
- */
-
-// GetCertificates returns dislike certificates
-func (c *Dislike) GetVideo() error {
-	return handler.Model(c).Related(&c.Video).Error
-}
-
-func (c *Dislike) GetUser() error {
-	return handler.Model(c).Related(&c.User).Error
-}
 
 /**
 CRUD functions
 */
 
 // Create creates a new dislike record
-func (c *Dislike) Create() error {
-	possible := handler.NewRecord(c)
-	if possible {
-		if err := handler.Create(c).Error; err != nil {
-			return err
-		}
+func (m *Dislike) Create() error {
+	_, err := db.Collection(m.Doc).InsertOne(context.TODO(), &m)
+	if err != nil {
+		return err
 	}
-
 	return nil
 }
 
 // FetchByID fetches Dislike by id
-func (c *Dislike) FetchByID() error {
-	err := handler.First(c).Error
+func (m *Dislike) FetchByID() error {
+	err := db.Collection(m.Doc).FindOne(context.TODO(), bson.M{"_id": m.ID}).Decode(&m)
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
-// FetchAll fetchs all Dislikes
-func (c *Dislike) FetchAll(cl *DislikeList) error {
-	err := handler.Find(cl).Error
-	return err
+// FetchAll fetchs all Candidates
+func (m *Dislike) FetchAll(cl *CandidateList) error {
+	cursor, err := db.Collection(m.Doc).Find(context.TODO(), bson.D{{}})
+	if err != nil {
+		return err
+	}
+	if err = cursor.All(context.TODO(), &cl); err != nil {
+		return err
+	}
+	return nil
 }
 
 // UpdateOne updates a given dislike
-func (c *Dislike) UpdateOne() error {
-	err := handler.Save(c).Error
-	return err
+func (m *Dislike) UpdateOne() error {
+	update := bson.M{
+		"$inc": bson.M{"copies": 1},
+	}
+	_, err := db.Collection(m.Doc).UpdateOne(context.TODO(), bson.M{"_id": m.ID}, update)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Delete deletes dislike by id
-func (c *Dislike) Delete() error {
-	err := handler.Unscoped().Delete(c).Error
-	return err
+func (m *Dislike) Delete() error {
+	_, err := db.Collection(m.Doc).DeleteOne(context.TODO(), bson.M{"_id": m.ID})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-// SoftDelete set's deleted at date
-func (c *Dislike) SoftDelete() error {
-	err := handler.Delete(c).Error
-	return err
+func (m *Dislike) DeleteMany() error {
+	_, err := db.Collection(m.Doc).DeleteMany(context.TODO(), bson.D{{}})
+	if err != nil {
+		return err
+	}
+	return nil
 }

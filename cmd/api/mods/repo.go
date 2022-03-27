@@ -2,14 +2,14 @@ package mods
 
 import (
 	"github.com/cave/pkg/database"
-	"github.com/go-redis/redis"
-	"github.com/jinzhu/gorm"
+	"github.com/go-redis/redis/v8"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var (
 	//errHandlerNotSet error = errors.New("handler not set properly")
-	handler     *gorm.DB
-	RedisClient *redis.Client
+	RdDB *redis.Client
+	db   *mongo.Database
 )
 
 var categories = []Category{
@@ -36,21 +36,7 @@ var categories = []Category{
 }
 
 // SetRepoDB global db handler
-func SetRepoDB(db *database.Database) {
-	handler = db.DB
-	RedisClient = db.Redis
-
-	// var category Category
-	// for _, cat := range categories {
-	// 	category.Title = cat.Title
-	// 	category.Semester = cat.Semester
-	// 	category.Create()
-	// }
-}
-
-// CloseDB closes handler db
-func CloseDB() {
-	if handler != nil {
-		handler.Close()
-	}
+func SetRepoDB() {
+	db = database.MgDB.Db
+	RdDB = database.RdDB
 }

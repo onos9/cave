@@ -1,12 +1,13 @@
 package mods
 
-import "github.com/cave/pkg/utils"
+import (
+	"context"
 
-var (
-	backgroundTableName = "backgrounds"
+	"github.com/cave/pkg/utils"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
-// Background is a model for Backgrounds table
+// background is a model for backgrounds table
 type Background struct {
 	utils.Base
 	BornAgain        bool   `json:"born_again"`
@@ -25,79 +26,70 @@ type Background struct {
 	WaterBaptism     bool   `json:"water_baptism"`
 	BaptismDate      string `json:"baptism_date"`
 	HolyGhostBaptism bool   `json:"holyghost_baptism"`
-
-	// TableName gorm standard table name
-	// func (c *Background) TableName() string {
-	// 	return backgroundTableName
 }
 
-// BackgroundList defines array of background objects
+// backgroundList defines array of background objects
 type BackgroundList []*Background
-
-// TableName gorm standard table name
-func (c *BackgroundList) TableName() string {
-	return backgroundTableName
-}
-
-/**
-* Relationship functions
- */
-
-// GetCertificates returns background certificates
-// func (c *Background) GetChannel() error {
-// 	return handler.Model(c).Related(&c.Background).Error
-// }
-
-// func (c *Background) GetUser() error {
-// 	return handler.Model(c).Related(&c.User).Error
-// }
 
 /**
 CRUD functions
 */
 
 // Create creates a new background record
-func (c *Background) Create() error {
-	possible := handler.NewRecord(c)
-	if possible {
-		if err := handler.Create(c).Error; err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// FetchByID fetches Background by id
-func (c *Background) FetchByID() error {
-	err := handler.First(c).Error
+func (m *Background) Create() error {
+	_, err := db.Collection(m.Doc).InsertOne(context.TODO(), &m)
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
-// FetchAll fetchs all Backgrounds
-func (c *Background) FetchAll(cl *BackgroundList) error {
-	err := handler.Find(cl).Error
-	return err
+// FetchByID fetches background by id
+func (m *Background) FetchByID() error {
+	err := db.Collection(m.Doc).FindOne(context.TODO(), bson.M{"_id": m.ID}).Decode(&m)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// FetchAll fetchs all Candidates
+func (m *Background) FetchAll(cl *CandidateList) error {
+	cursor, err := db.Collection(m.Doc).Find(context.TODO(), bson.D{{}})
+	if err != nil {
+		return err
+	}
+	if err = cursor.All(context.TODO(), &m); err != nil {
+		return err
+	}
+	return nil
 }
 
 // UpdateOne updates a given background
-func (c *Background) UpdateOne() error {
-	err := handler.Save(c).Error
-	return err
+func (m *Background) UpdateOne() error {
+	update := bson.M{
+		"$inc": bson.M{"copies": 1},
+	}
+	_, err := db.Collection(m.Doc).UpdateOne(context.TODO(), bson.M{"_id": m.ID}, update)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Delete deletes background by id
-func (c *Background) Delete() error {
-	err := handler.Unscoped().Delete(c).Error
-	return err
+func (m *Background) Delete() error {
+	_, err := db.Collection(m.Doc).DeleteOne(context.TODO(), bson.M{"_id": m.ID})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-// SoftDelete set's deleted at date
-func (c *Background) SoftDelete() error {
-	err := handler.Delete(c).Error
-	return err
+func (m *Background) DeleteMany() error {
+	_, err := db.Collection(m.Doc).DeleteMany(context.TODO(), bson.D{{}})
+	if err != nil {
+		return err
+	}
+	return nil
 }

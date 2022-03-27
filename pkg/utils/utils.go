@@ -4,30 +4,25 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/jinzhu/gorm"
-	"github.com/pborman/uuid"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Base serves as a base model for other models
 type Base struct {
-	ID        string     `sql:"type:uuid;primary_key;default:uuid_generate_v4()" validate:"omitempty,uuid,required"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"update_at"`
-	DeletedAt *time.Time `sql:"index" json:"deleted_at"`
-}
-
-func (base *Base) BeforeCreate(scope *gorm.Scope) error {
-	uuid := uuid.NewRandom().String()
-	return scope.SetColumn("ID", uuid)
+	ID        primitive.ObjectID ` json:"id" bson:"_id" validate:"omitempty,uuid,required"`
+	CreatedAt time.Time          `json:"created_at"`
+	UpdatedAt time.Time          `json:"update_at"`
+	DeletedAt *time.Time         `json:"-" bson:"deleted_at,omitempty"`
+	Doc       string             `bson:"-"`
 }
 
 // GetID returns Id of the model
-func (base *Base) GetID() string {
+func (base *Base) GetID() primitive.ObjectID {
 	return base.ID
 }
 
 // SetID sets Id of the model
-func (base *Base) SetID(id string) {
+func (base *Base) SetID(id primitive.ObjectID) {
 	base.ID = id
 }
 

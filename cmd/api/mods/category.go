@@ -1,11 +1,10 @@
 package mods
 
 import (
-	"github.com/cave/pkg/utils"
-)
+	"context"
 
-var (
-	categoryTableName = "categorys"
+	"github.com/cave/pkg/utils"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // Category is a model for Categorys table
@@ -15,74 +14,68 @@ type Category struct {
 	Semester int    `gorm:"type:varchar(100)" json:"semester"`
 }
 
-// TableName gorm standard table name
-func (c *Category) TableName() string {
-	return categoryTableName
-}
-
 // CategoryList defines array of category objects
 type CategoryList []*Category
-
-// TableName gorm standard table name
-func (c *CategoryList) TableName() string {
-	return categoryTableName
-}
-
-/**
-* Relationship functions
- */
-
-// GetCertificates returns category certificates
-// func (c *Category) GetCertificates() error {
-// 	return handler.Model(c).Related(&c.Certificates).Error
-// }
 
 /**
 CRUD functions
 */
 
-// Create creates a new category record
-func (c *Category) Create() error {
-	possible := handler.NewRecord(c)
-	if possible {
-		if err := handler.Create(c).Error; err != nil {
-			return err
-		}
+// Create creates a new candidate record
+func (m *Category) Create() error {
+	_, err := db.Collection(m.Doc).InsertOne(context.TODO(), &m)
+	if err != nil {
+		return err
 	}
-
 	return nil
 }
 
 // FetchByID fetches Category by id
-func (c *Category) FetchByID() error {
-	err := handler.First(c).Error
+func (m *Category) FetchByID() error {
+	err := db.Collection(m.Doc).FindOne(context.TODO(), bson.M{"_id": m.ID}).Decode(&m)
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
-// FetchAll fetchs all Categorys
-func (c *Category) FetchAll(cl *CategoryList) error {
-	err := handler.Find(cl).Error
-	return err
+// FetchAll fetchs all Candidates
+func (m *Category) FetchAll(cl *CandidateList) error {
+	cursor, err := db.Collection(m.Doc).Find(context.TODO(), bson.D{{}})
+	if err != nil {
+		return err
+	}
+	if err = cursor.All(context.TODO(), &cl); err != nil {
+		return err
+	}
+	return nil
 }
 
-// UpdateOne updates a given category
-func (c *Category) UpdateOne() error {
-	err := handler.Save(c).Error
-	return err
+// UpdateOne updates a given candidate
+func (m *Category) UpdateOne() error {
+	update := bson.M{
+		"$inc": bson.M{"copies": 1},
+	}
+	_, err := db.Collection(m.Doc).UpdateOne(context.TODO(), bson.M{"_id": m.ID}, update)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-// Delete deletes category by id
-func (c *Category) Delete() error {
-	err := handler.Unscoped().Delete(c).Error
-	return err
+// Delete deletes candidate by id
+func (m *Category) Delete() error {
+	_, err := db.Collection(m.Doc).DeleteOne(context.TODO(), bson.M{"_id": m.ID})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-// SoftDelete set's deleted at date
-func (c *Category) SoftDelete() error {
-	err := handler.Delete(c).Error
-	return err
+func (m *Category) DeleteMany() error {
+	_, err := db.Collection(m.Doc).DeleteMany(context.TODO(), bson.D{{}})
+	if err != nil {
+		return err
+	}
+	return nil
 }

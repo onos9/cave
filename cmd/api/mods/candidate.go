@@ -1,128 +1,91 @@
 package mods
 
 import (
-	"github.com/cave/pkg/utils"
-)
+	"context"
 
-var (
-	candidateTableName = "candidates"
+	"github.com/cave/pkg/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"gorm.io/datatypes"
 )
 
 // Candidate is a model for Candidates table
 type Candidate struct {
 	utils.Base
-	Email         string        `gorm:"type:varchar(100);unique_index" json:"email" `
-	PasswordHash  []byte        `json:"password_hash"`
-	PasswordSalt  string        `json:"password_salt"`
-	IsVerified    bool          `json:"is_verified"`
-	Bio           Bio           `gorm:"foreignkey:BioID" json:"bio"`
-	Qualification Qualification `gorm:"foreignkey:QualificationID" json:"qualification"`
-	Background    Background    `gorm:"foreignkey:BackgroundID" json:"background"`
-	Health        Health        `gorm:"foreignkey:HealthID" json:"health"`
-	Referee       Ref           `gorm:"foreignkey:RefereeID" json:"referee"`
-	Terms         Terms         `gorm:"foreignkey:TermsID" json:"terms"`
-}
+	Email        string `gorm:"type:varchar(100);unique_index" json:"email" `
+	PasswordHash []byte `json:"password_hash"`
+	PasswordSalt string `json:"password_salt"`
+	IsVerified   bool   `json:"is_verified"`
 
-// TableName gorm standard table name
-func (c *Candidate) TableName() string {
-	return candidateTableName
+	Data          string         `gorm:"type:text" json:"data"`
+	Qualification datatypes.JSON `json:"qualification"`
+	Background    datatypes.JSON `json:"background"`
+	Health        datatypes.JSON `json:"health"`
+	Referee       datatypes.JSON `json:"referee"`
+	Terms         datatypes.JSON `json:"terms"`
 }
 
 // CandidateList defines array of candidate objects
 type CandidateList []*Candidate
-
-// TableName gorm standard table name
-func (c *CandidateList) TableName() string {
-	return candidateTableName
-}
-
-/**
-* Relationship functions
- */
-
-// GetCertificates returns candidate certificates
-func (c *Candidate) GetBio() error {
-	return handler.Model(c).Related(&c.Bio).Error
-}
-
-func (c *Candidate) GetQualification() error {
-	return handler.Model(c).Related(&c.Qualification).Error
-}
-
-func (c *Candidate) GetBackground() error {
-	return handler.Model(c).Related(&c.Background).Error
-}
-
-func (c *Candidate) GetHealth() error {
-	return handler.Model(c).Related(&c.Health).Error
-}
-
-func (c *Candidate) GetTerms() error {
-	return handler.Model(c).Related(&c.Terms).Error
-}
 
 /**
 CRUD functions
 */
 
 // Create creates a new candidate record
-func (c *Candidate) Create() error {
-	possible := handler.NewRecord(c)
-	if possible {
-		if err := handler.Create(c).Error; err != nil {
-			return err
-		}
+func (m *Candidate) Create() error {
+	_, err := db.Collection(m.Doc).InsertOne(context.TODO(), &m)
+	if err != nil {
+		return err
 	}
-
 	return nil
 }
 
 // FetchByID fetches Candidate by id
-func (c *Candidate) FetchByID() error {
-	err := handler.First(c).Error
+func (m *Candidate) FetchByID() error {
+	err := db.Collection(m.Doc).FindOne(context.TODO(), bson.M{"_id": m.ID}).Decode(&m)
 	if err != nil {
 		return err
 	}
-
-	return nil
-}
-
-// FetchByID fetches User by Email
-func (c *Candidate) FetchByEmail() error {
-	err := handler.Where("email=?", c.Email).First(c).Error
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
 // FetchAll fetchs all Candidates
-func (c *Candidate) FetchAll(cl *CandidateList) error {
-	err := handler.Find(cl).Error
-	return err
+func (m *Candidate) FetchAll(cl *CandidateList) error {
+	cursor, err := db.Collection(m.Doc).Find(context.TODO(), bson.D{{}})
+	if err != nil {
+		return err
+	}
+	if err = cursor.All(context.TODO(), &cl); err != nil {
+		return err
+	}
+	return nil
 }
 
 // UpdateOne updates a given candidate
-func (c *Candidate) UpdateOne() error {
-	err := handler.Save(c).Error
-	return err
-}
-
-// UpdateOne updates a given candidate or creates a new one if it doesn't exist'
-func (c *Candidate) UpdateOrCreateByEmail() error {
-	err := handler.Where("email=?", c.Email).FirstOrCreate(c).Error
-	return err
+func (m *Candidate) UpdateOne() error {
+	update := bson.M{
+		"$inc": bson.M{"copies": 1},
+	}
+	_, err := db.Collection(m.Doc).UpdateOne(context.TODO(), bson.M{"_id": m.ID}, update)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Delete deletes candidate by id
-func (c *Candidate) Delete() error {
-	err := handler.Unscoped().Delete(c).Error
-	return err
+func (m *Candidate) Delete() error {
+	_, err := db.Collection(m.Doc).DeleteOne(context.TODO(), bson.M{"_id": m.ID})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-// SoftDelete set's deleted at date
-func (c *Candidate) SoftDelete() error {
-	err := handler.Delete(c).Error
-	return err
+func (m *Candidate) DeleteMany() error {
+	_, err := db.Collection(m.Doc).DeleteMany(context.TODO(), bson.D{{}})
+	if err != nil {
+		return err
+	}
+	return nil
 }

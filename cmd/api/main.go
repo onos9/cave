@@ -1,73 +1,82 @@
 package main
 
 import (
-	"encoding/json"
-	"log"
-	"os"
+	"fmt"
 
-	"github.com/cave/cmd/api/handlers"
-	"github.com/cave/cmd/api/mods"
-	"github.com/cave/configs"
-	"github.com/cave/migrations"
-	"github.com/cave/pkg/database"
-	"github.com/cave/pkg/flag"
-	"github.com/cave/pkg/middlewares"
+	"github.com/cave/cmd/api/controller"
+	cfg "github.com/cave/config"
+	db "github.com/cave/pkg/database"
+	"github.com/cave/pkg/zoho"
 
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"github.com/kelseyhightower/envconfig"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/swaggo/swag/example/basic/docs"
 )
 
 func main() {
-	log.SetFlags(log.LstdFlags | log.Lmicroseconds | log.Lshortfile)
-	log.SetPrefix("go-lms-api" + " : ")
-	log := log.New(os.Stdout, log.Prefix(), log.Flags())
 
-	if err := envconfig.Process("go-lms-api", &configs.CFG); err != nil {
-		log.Fatalf("main : Error Parsing Config file: %+v", err)
-	}
+	app := fiber.New()
 
-	if err := flag.Process(&configs.CFG); err != nil {
-		if err != flag.ErrHelp {
-			log.Fatalf("main : Error Parsing Command Line : %+v", err)
-		}
-		// else provide help here
-		return
-	}
+	/*
+		========== Setup Configs ============
+	*/
 
-	// Print the config
-	{
-		cfgJSON, err := json.MarshalIndent(configs.CFG, "", "")
-		if err != nil {
-			log.Fatalf("main : Error marshaling config to JSON : %+v", err)
-		}
-		log.Printf("main : Config : %v\n", string(cfgJSON))
-	}
+	cfg.LoadConfig()
+	config := cfg.GetConfig()
 
-	dbConfig, err := configs.LoadConfig()
-	if err != nil {
-		log.Printf("main : Error loading database %+v", err)
-	}
-	log.Printf("%+v", dbConfig)
-	db, err := database.Initialize(dbConfig.Storage)
-	if err != nil {
-		log.Fatalf("main: Error initializing database %+v", err)
-	}
+	/*
+		========== Setup DB ============
+	*/
 
-	defer db.DB.Close()
-	defer db.Redis.Close()
+	// Connect to Postgres
+	// db.ConnectPostgres()
 
-	//authenticator, _ := auth.NewAuthenticatorFile("", time.Now().UTC(), configs.CFG.Auth.KeyExpiration)
+	// Drop on serve restarts in dev
+	// db.PgDB.Migrator().DropTable(&user.User{})
 
-	db.DB.CreateTable(&mods.Ref{})
-	migrations.Migrate(db.DB)
+	// Migration
+	// db.PgDB.AutoMigrate(&user.User{})
+	//migrations.Migrate(db.DB)
 
-	corsConf := cors.DefaultConfig()
-	corsConf.AllowOrigins = []string{"*"}
+	// Connect to Mongo
+	db.ConnectMongo()
 
-	app := gin.Default()
-	app.Use(middlewares.CORS())
-	app.Use(database.InjectDB(db))
-	handlers.ApplyRoutes(app, db)
-	app.Run(configs.CFG.Server.Host)
+	// Connect to Redis
+	db.ConnectRedis()
+
+	zoho.NewMailer(config)
+
+	/*
+		============ Set Up Middlewares ============
+	*/
+
+	// Default Log Middleware
+	app.Use(logger.New())
+
+	// Recovery Middleware
+	app.Use(recover.New())
+
+	// cors
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
+		AllowHeaders: "Accept, Origin, Content-Type",
+	}))
+
+	/*
+		============ Set Up Routes ============
+	*/
+	controller.SetupRoutes(app)
+
+	/*
+		============ Setup Swagger ===============
+	*/
+
+	// FIXME, In Production, Port Should not be added to the Swagger Host
+	docs.SwaggerInfo.Host = config.Host + ":" + config.Port
+
+	// Run the app and listen on given port
+	port := fmt.Sprintf(":%s", config.Port)
+	app.Listen(port)
 }
