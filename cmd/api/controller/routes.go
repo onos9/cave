@@ -18,7 +18,7 @@ func SetupRoutes(app *fiber.App) {
 	// serve Single Page application on "/web" route
 	// assume static file at dist folder
 	app.Static("/web", "web/dist")
-	
+
 	// serve the 'index.html', if there ids no matching routes.
 	app.Get("/web/*", func(ctx *fiber.Ctx) error {
 		return ctx.SendFile("./web/dist/index.html")
@@ -41,7 +41,7 @@ func SetupRoutes(app *fiber.App) {
 	auth.Get("/mail", user.signin)
 
 	// User Group
-	u := app.Group("/user")	
+	u := app.Group("/user")
 	u.Get("/", middlewares.RequireLoggedIn(), user.getAll)
 	u.Get("/:id", middlewares.RequireLoggedIn(), user.getOne)
 	u.Post("/:id", middlewares.RequireLoggedIn(), user.updateOne)
@@ -49,7 +49,7 @@ func SetupRoutes(app *fiber.App) {
 
 	// Mail Routes
 	m := v1.Group("/mail")
-	m.Post("/",middlewares.RequireLoggedIn(), mailer.send)
+	m.Post("/", middlewares.RequireLoggedIn(), mailer.send)
 	// m.Get("/", middlewares.RequireLoggedIn(), mail.getAll)
 	// m.Get("/:id", middlewares.RequireLoggedIn(), mail.getOne)
 	// m.Post("/:id", middlewares.RequireLoggedIn(), mail.updateOne)
