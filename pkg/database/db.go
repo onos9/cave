@@ -9,25 +9,13 @@ import (
 
 	// Configs
 	cfg "github.com/cave/config"
-
-	// Gorm
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-
-	// Redis
 	"github.com/go-redis/redis/v8"
-
-	// Mongo
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
-	// PgDB is the postgress connection handle
-	PgDB *gorm.DB
-	// MgDB is the mongodb connection handle
 	MgDB MongoInstance
-	// RdDB Connection Handle
 	RdDB *redis.Client
 )
 
@@ -37,35 +25,23 @@ type MongoInstance struct {
 	Db     *mongo.Database
 }
 
-// ConnectPostgres Returns the Pg DB Instance
-func ConnectPostgres() {
-	dsn := cfg.GetConfig().Postgres.GetPostgresConnectionInfo()
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-
-	if err != nil {
-		fmt.Println(strings.Repeat("!", 40))
-		fmt.Println("☹️  Could Not Establish Postgres DB Connection")
-		fmt.Println(strings.Repeat("!", 40))
-		log.Fatal(err)
-	}
-
-	fmt.Println(strings.Repeat("-", 40))
-	fmt.Println("😀 Connected To Postgres DB")
-	fmt.Println(strings.Repeat("-", 40))
-
-	PgDB = db
-}
-
 // ConnectMongo Returns the Mongo DB Instance
 func ConnectMongo() {
-	client, err := mongo.NewClient(options.Client().ApplyURI(cfg.GetConfig().Mongo.URI))
+	opts := options.Client().ApplyURI(cfg.GetConfig().Mongo.URI)
+	client, err := mongo.NewClient(opts)
+	if err != nil {
+		fmt.Println(strings.Repeat("!", 40))
+		fmt.Println("☹️  Could Not Create Mongo DB Client")
+		fmt.Println(strings.Repeat("!", 40))
+
+		log.Fatal(err)
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	err = client.Connect(ctx)
 	db := client.Database(cfg.GetConfig().Mongo.MongoDBName)
-
 	if err != nil {
 		fmt.Println(strings.Repeat("!", 40))
 		fmt.Println("☹️  Could Not Establish Mongo DB Connection")
@@ -77,7 +53,7 @@ func ConnectMongo() {
 	fmt.Println(strings.Repeat("-", 40))
 	fmt.Println("😀 Connected To Mongo DB")
 	fmt.Println(strings.Repeat("-", 40))
-	
+
 	MgDB = MongoInstance{
 		Client: client,
 		Db:     db,

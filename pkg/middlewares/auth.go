@@ -1,36 +1,67 @@
 package middlewares
 
 import (
-	"strings"
+	"net/http"
+	
+	cfg "github.com/cave/config"
 
-	"github.com/gin-gonic/gin"
-
-	"github.com/cave/pkg/auth"
+	jwt "github.com/golang-jwt/jwt/v4"
+	"github.com/gofiber/fiber/v2"
+	jwtware "github.com/gofiber/jwt/v2"
 )
 
-// JWTAuthMiddleware gets token from header and sets claims and auth key in the context
-func JWTAuthMiddleware(authenticator *auth.Authenticator) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		tokenString, err := ctx.Cookie("token")
+// RequireLoggedIn ensures access only to logged in users by checking for token presence and validity
+func RequireLoggedIn() fiber.Handler {
+	return jwtware.New(jwtware.Config{
+		SigningKey:   []byte(cfg.GetConfig().JWTAccessSecret),
+		ErrorHandler: jwtError,
+	})
+}
 
-		// failed to read cookie
-		if err != nil {
-			// try Http Header
-			authorization := ctx.Request.Header.Get("Authorization")
-			if authorization != "" {
-				sp := strings.Split(authorization, "Bearer ")
-				// invalid token
-				if len(sp) >= 1 {
-					tokenString = sp[1]
-				}
-			}
+// TODO, Research how fiber checks for expired token?
+func jwtError(c *fiber.Ctx, err error) error {
+	if err.Error() == "Missing or malformed JWT" {
+		var errorList []*fiber.Error
+		errorList = append(
+			errorList,
+			&fiber.Error{
+				Code:    fiber.StatusUnauthorized,
+				Message: "Missing or Malformed Authentication Token",
+			},
+		)
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"errors": errorList})
 
-		}
-
-		claims, _ := authenticator.ParseClaims(tokenString)
-
-		ctx.Set("claims", claims)
-		ctx.Set("auth_key", auth.Key)
-		ctx.Next()
 	}
+
+	var errorList []*fiber.Error
+	errorList = append(
+		errorList,
+		&fiber.Error{
+			Code:    fiber.StatusUnauthorized,
+			Message: "Invalid or Expired Authentication Token",
+		},
+	)
+	return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"errors": errorList})
+}
+
+// RequireAdmin Ensures A route Can Only Be Accessed by an Admin user
+// This function can be extended to handle different roles
+func RequireAdmin(c *fiber.Ctx) error {
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	role := claims["role"].(string)
+
+	var errorList []*fiber.Error
+
+	if role != "admin" {
+		errorList = append(
+			errorList,
+			&fiber.Error{
+				Code:    fiber.StatusUnauthorized,
+				Message: "You're Not Authorized",
+			},
+		)
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"errors": errorList})
+	}
+	return c.Next()
 }

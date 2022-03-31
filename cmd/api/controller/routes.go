@@ -2,30 +2,30 @@ package controller
 
 import (
 	// Middlewares
-	"github.com/cave/cmd/api/mods"
+	"github.com/cave/pkg/middlewares"
+	"github.com/cave/pkg/models"
 
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
 )
 
+type Resp map[string]interface{}
+
 // SetupRoutes setups router
 func SetupRoutes(app *fiber.App) {
-	mods.SetRepoDB()
+	models.SetRepoDB()
 
-	// Prepare a static middleware to serve the built React files.
-	app.Static("/", "./web/build")
-
-	// Prepare a fallback route to always serve the 'index.html', had there not be any matching routes.
-	app.Static("*", "./web/build/index.html")
-
-	// app.Get("/web/*", func(ctx *fiber.Ctx) error {
-	// 	return ctx.SendFile("./dist/index.html")
-	// })
+	// serve Single Page application on "/web" route
+	// assume static file at dist folder
+	app.Static("/web", "web/dist")
+	
+	// serve the 'index.html', if there ids no matching routes.
+	app.Get("/web/*", func(ctx *fiber.Ctx) error {
+		return ctx.SendFile("./web/dist/index.html")
+	})
 
 	api := app.Group("/api")
-
 	v1 := api.Group("/v1")
-
 	v1.Use("/docs", swagger.HandlerDefault)
 
 	v1.Get("/", func(c *fiber.Ctx) error {
@@ -34,26 +34,24 @@ func SetupRoutes(app *fiber.App) {
 		})
 	})
 
-	// v1.Get("/home", ctl.HomeController)
-
 	// Auth Group
-	auth := v1.Group("/auth")
-	auth.Post("/register", candidate.register)
-	auth.Post("/login", candidate.login)
+	auth := app.Group("/auth")
+	auth.Post("/signup", user.signup)
+	auth.Post("/signin", user.signin)
+	auth.Get("/mail", user.signin)
 
-	// Candidates
-	cand := v1.Group("/candidate")
-	cand.Post("/", candidate.create)
-	cand.Get("/", candidate.getAll)
-	cand.Get("/:_id", candidate.google)
+	// User Group
+	u := app.Group("/user")	
+	u.Get("/", middlewares.RequireLoggedIn(), user.getAll)
+	u.Get("/:id", middlewares.RequireLoggedIn(), user.getOne)
+	u.Post("/:id", middlewares.RequireLoggedIn(), user.updateOne)
+	u.Delete("/:id", middlewares.RequireLoggedIn(), user.deleteOne)
 
-	// Candidates
-	mail := v1.Group("/mail")
-	mail.Post("/", mailer.sendMail)
-	mail.Get("/", mailer.credential)
-	mail.Post("/code", mailer.code)
-	mail.Get("/token", mailer.token)
-
-	// Authenticated Routes
-	//mail.Post("/", middlewares.RequireLoggedIn(), candidate.create)
+	// Mail Routes
+	m := v1.Group("/mail")
+	m.Post("/",middlewares.RequireLoggedIn(), mailer.send)
+	// m.Get("/", middlewares.RequireLoggedIn(), mail.getAll)
+	// m.Get("/:id", middlewares.RequireLoggedIn(), mail.getOne)
+	// m.Post("/:id", middlewares.RequireLoggedIn(), mail.updateOne)
+	// m.Delete("/:id", middlewares.RequireLoggedIn(), mail.deleteOne)
 }

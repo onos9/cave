@@ -17,62 +17,32 @@ import (
 
 func main() {
 
-	app := fiber.New()
-
-	/*
-		========== Setup Configs ============
-	*/
-
+	// Setup configs
 	cfg.LoadConfig()
 	config := cfg.GetConfig()
 
-	/*
-		========== Setup DB ============
-	*/
-
-	// Connect to Postgres
-	// db.ConnectPostgres()
-
-	// Drop on serve restarts in dev
-	// db.PgDB.Migrator().DropTable(&user.User{})
-
-	// Migration
-	// db.PgDB.AutoMigrate(&user.User{})
-	//migrations.Migrate(db.DB)
-
-	// Connect to Mongo
+	// Setup Adapters
 	db.ConnectMongo()
-
-	// Connect to Redis
 	db.ConnectRedis()
-
 	zoho.NewMailer(config)
 
-	/*
-		============ Set Up Middlewares ============
-	*/
+	// Setup fiber api
+	app := fiber.New()
 
-	// Default Log Middleware
-	app.Use(logger.New())
-
-	// Recovery Middleware
-	app.Use(recover.New())
+	// Set Up Middlewares
+	app.Use(logger.New())   // Default Log Middleware
+	app.Use(recover.New())  // Recovery Middleware
 
 	// cors
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
-		AllowHeaders: "Accept, Origin, Content-Type",
+		AllowHeaders: "Accept, Origin, Content-Type, Authorization",
 	}))
 
-	/*
-		============ Set Up Routes ============
-	*/
+	// Setup Routes
 	controller.SetupRoutes(app)
 
-	/*
-		============ Setup Swagger ===============
-	*/
-
+	//Setup Swagger 
 	// FIXME, In Production, Port Should not be added to the Swagger Host
 	docs.SwaggerInfo.Host = config.Host + ":" + config.Port
 

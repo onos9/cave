@@ -15,7 +15,6 @@ const (
 // Config object
 type Config struct {
 	Env              string         `env:"ENV"`
-	Postgres         PostgresConfig `json:"postgres"`
 	Mongo            MongoDBConfig  `json:"mongo"`
 	Redis            RedisConfig    `json:"redis"`
 	ZohoMail         ZohoMail       `json:"zohomail"`
@@ -49,7 +48,6 @@ func LoadConfig() {
 func GetConfig() Config {
 	return Config{
 		Env:              os.Getenv("ENV"),
-		Postgres:         GetPostgresConfig(),
 		Mongo:            GetMongoDBConfig(),
 		Redis:            GetRedisConfig(),
 		ZohoMail:         GetZohoMailConfig(),

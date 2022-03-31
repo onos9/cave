@@ -1,6 +1,6 @@
-FROM golang:1.14
+FROM golang:1.17
 
-WORKDIR /Go-LMS
+WORKDIR /caveapi
 
 COPY go.mod ./
 
@@ -10,4 +10,4 @@ RUN go mod download
 
 RUN go get github.com/githubnemo/CompileDaemon
 
-ENTRYPOINT export STORAGE_HOST=db && CompileDaemon --build="go build cmd/graphql/main.go" --command="./main"
+ENTRYPOINT export STORAGE_HOST=db && CompileDaemon --build="go build cmd/api/main.go" --command="./main"

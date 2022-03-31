@@ -1,28 +1,41 @@
-version: '3'
+version: '3.8'
 
+# Mongodb Service
 services:
-    db: 
-        build:
-            context: ./postgres
-            args:
-                - POSTGRES_DB=${STORAGE_DATABASE}
-                - POSTGRES_USER=${STORAGE_DBUSER}
-                - POSTGRES_PASSWORD=${STORAGE_DBPASSWORD}
+    db:
+        image: mongo:latest # use the latest image.
+        container_name: mongodb
+        restart: unless-stopped
+        environment: # set required env variables to access mongo
+            MONGO_DB: ${MONGO_DB_NAME}
+            MONGO_USER: ${MONGO_USER}
+            MONGO_PASSWORD: ${MONGO_PASSWORD}
         ports:
-            - "127.0.0.1:5432:5432"
+        - 27017:27017
+        volumes: # optional to preserve database after container is deleted.
+        - ./dbdata:/data/db
+
+    # Mongo Express Service
+    mongo-express:
+        image: mongo-express:latest # latest image
+        container_name: mongo-express
+        restart: unless-stopped
+        ports:
+        - 8081:8081
         environment:
-            - POSTGRES_DB=${STORAGE_DATABASE}
-            - POSTGRES_USER=${STORAGE_DBUSER}
-            - POSTGRES_PASSWORD=${STORAGE_DBPASSWORD}
-        networks:
-            - pupilgo
+            ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER}
+            ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
+            ME_CONFIG_MONGODB_SERVER: mongodb 
     redis:
+        container_name: redis
         image: "redis:alpine"
         restart: unless-stopped
         networks:
-            - pupilgo
-    backend:
-        build: .
+            - cave_net
+    api:
+        container_name: api
+        build:
+            context: .
         ports:
             - "8000:3000" 
         restart: unless-stopped
@@ -30,24 +43,24 @@ services:
             - db
             - redis
         volumes:
-            - ./:/Go-LMS
+            - ./:/caveapi
         environment:
             REDIS_URL: redis:6379   
         networks:
-            - pupilgo
+            - cave_net
     frontend:
-        build: ./user-interface
+        build: ./web
         command: npm run start
         ports: 
             - "3000:3000"
         depends_on:
             - backend
         volumes:
-            - /user-interface/node_modules
-            - ./user-interface:/user-interface
+            - /web/node_modules
+            - ./web:/web
         networks:
-            - pupilgo
+            - cave_net
         stdin_open: true
 
 networks:
-    pupilgo:
+    cave_net:
