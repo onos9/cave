@@ -2,6 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/cave/cmd/api/controller"
 	cfg "github.com/cave/config"
@@ -15,6 +20,8 @@ import (
 	"github.com/swaggo/swag/example/basic/docs"
 )
 
+const idleTimeout = 5 * time.Second
+
 func main() {
 
 	// Setup configs
@@ -27,26 +34,43 @@ func main() {
 	zoho.NewMailer(config)
 
 	// Setup fiber api
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		IdleTimeout: idleTimeout,
+	})
 
 	// Set Up Middlewares
-	app.Use(logger.New())   // Default Log Middleware
-	app.Use(recover.New())  // Recovery Middleware
+	app.Use(logger.New())  // Default Log Middleware
+	app.Use(recover.New()) // Recovery Middleware
 
 	// cors
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
-		AllowHeaders: "Accept, Origin, Content-Type, Authorization",
+		AllowOrigins:     "*",
+		AllowHeaders:     "Origin, Content-Type, Accept, Range, Authorization",
+		AllowCredentials: true,
+		AllowMethods:     "GET,POST,HEAD,DELETE,PUT",
+		ExposeHeaders:    "X-Total-Count, Content-Range",
 	}))
 
 	// Setup Routes
 	controller.SetupRoutes(app)
 
-	//Setup Swagger 
+	//Setup Swagger
 	// FIXME, In Production, Port Should not be added to the Swagger Host
 	docs.SwaggerInfo.Host = config.Host + ":" + config.Port
 
 	// Run the app and listen on given port
 	port := fmt.Sprintf(":%s", config.Port)
-	app.Listen(port)
+
+	go func() {
+		if err := app.Listen(port); err != nil {
+			log.Panic(err)
+		}
+	}()
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	<-c
+	
+	fmt.Println("\n\nShutting down server...")
+	_ = app.Shutdown()
 }

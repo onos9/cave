@@ -36,12 +36,15 @@ func SetupRoutes(app *fiber.App) {
 
 	// Auth Group
 	auth := app.Group("/auth")
-	auth.Post("/signup", user.signup)
-	auth.Post("/signin", user.signin)
-	auth.Get("/mail", user.signin)
-
+	auth.Post("/signup", userAuth.signup)
+	auth.Post("/", userAuth.signin)
+	auth.Get("/:id", userAuth.newToken)
+	auth.Delete("/:id", userAuth.signout)
+	auth.Get("/mail", userAuth.signin)
+	
 	// User Group
 	u := app.Group("/user")
+	u.Post("/", middlewares.RequireLoggedIn(), user.create)
 	u.Get("/", middlewares.RequireLoggedIn(), user.getAll)
 	u.Get("/:id", middlewares.RequireLoggedIn(), user.getOne)
 	u.Post("/:id", middlewares.RequireLoggedIn(), user.updateOne)

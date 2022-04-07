@@ -25,11 +25,11 @@ func jwtError(c *fiber.Ctx, err error) error {
 		errorList = append(
 			errorList,
 			&fiber.Error{
-				Code:    fiber.StatusUnauthorized,
+				Code:    fiber.StatusForbidden,
 				Message: "Missing or Malformed Authentication Token",
 			},
 		)
-		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"errors": errorList})
+		return c.Status(http.StatusForbidden).JSON(fiber.Map{"errors": errorList})
 
 	}
 
@@ -37,11 +37,11 @@ func jwtError(c *fiber.Ctx, err error) error {
 	errorList = append(
 		errorList,
 		&fiber.Error{
-			Code:    fiber.StatusUnauthorized,
+			Code:    fiber.StatusForbidden,
 			Message: "Invalid or Expired Authentication Token",
 		},
 	)
-	return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"errors": errorList})
+	return c.Status(http.StatusForbidden).JSON(fiber.Map{"errors": errorList})
 }
 
 // RequireAdmin Ensures A route Can Only Be Accessed by an Admin user

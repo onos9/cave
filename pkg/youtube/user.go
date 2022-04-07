@@ -55,7 +55,7 @@ CRUD functions
 // Create creates a new candidate record
 func (m *User) Create() error {
 	m.ID = primitive.NewObjectIDFromTimestamp(time.Now())
-	m.CreatedAt = time.Now()
+	//m.CreatedAt = time.Now()
 	_, err := db.Collection(userCol).InsertOne(context.TODO(), &m)
 	if err != nil {
 		return err
@@ -95,7 +95,7 @@ func (m *User) FetchAll(cl *UserList) error {
 
 // UpdateOne updates a given candidate
 func (m *User) UpdateOne() error {
-	m.UpdatedAt = time.Now()
+	//m.UpdatedAt = time.Now()
 	update := bson.M{
 		"$inc": bson.M{"copies": 1},
 	}
@@ -108,7 +108,7 @@ func (m *User) UpdateOne() error {
 
 // Delete deletes candidate by id
 func (m *User) Delete() error {
-	m.DeletedAt = time.Now()
+	//m.DeletedAt = time.Now()
 	_, err := db.Collection(userCol).DeleteOne(context.TODO(), bson.M{"_id": m.ID})
 	if err != nil {
 		return err

@@ -1,6 +1,10 @@
 package utils
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"math/big"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 // HashPassword returns a hashed password
 func HashPassword(password string) (string, error) {
@@ -10,7 +14,14 @@ func HashPassword(password string) (string, error) {
 }
 
 // CheckPasswordHash validates hashed passwords
-func CheckPasswordHash(password string, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+func CheckPasswordHash(hash []byte, password string) bool {
+	err := bcrypt.CompareHashAndPassword(hash, []byte(password))
 	return err == nil
+}
+
+// CheckPasswordHash validates hashed passwords
+func GeneratePassword() string {
+	p := make([]byte, 16)
+	p[10] = 0xFF
+	return new(big.Int).SetBytes(p).Text(62)
 }

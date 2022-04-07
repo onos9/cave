@@ -12,14 +12,14 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/cave/config"
+	configs "github.com/cave/config"
 	"github.com/cave/pkg/database"
 	"github.com/go-redis/redis/v8"
 	"github.com/mailazy/mailazy-go"
 )
 
 var (
-	Mail *Mailer
+	mail *Mailer
 	MIME = "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 )
 
@@ -46,30 +46,30 @@ type Mailer struct {
 var ctx = context.Background()
 
 func NewMailer(config configs.Config) {
-	Mail = &Mailer{
+	mail = &Mailer{
 		cfg:   config,
 		redis: database.RdDB,
 	}
 }
 
-func (m *Mailer) parseTemplate() error {
+func ParseTemplate() error {
 	t, err := template.ParseFiles("template.html")
 	if err != nil {
 		return err
 	}
 	buf := new(bytes.Buffer)
-	if err = t.Execute(buf, m); err != nil {
+	if err = t.Execute(buf, mail); err != nil {
 		return err
 	}
-	m.body = buf.String()
+	mail.body = buf.String()
 	return nil
 
 }
 
-func (m *Mailer) RequestTokens(code string) error {
+func RequestTokens(code string) error {
 
 	// we can call set with a `Key` and a `Value`.
-	err := m.redis.Set(ctx, "zoho_code", code, 0).Err()
+	err := mail.redis.Set(ctx, "zoho_code", code, 0).Err()
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (m *Mailer) RequestTokens(code string) error {
 	resource := "/oauth/v2/token"
 	data := url.Values{}
 
-	mCfg := m.cfg.ZohoMail
+	mCfg := mail.cfg.ZohoMail
 	data.Set("code", code)
 	data.Set("client_id", mCfg.ClientID)
 	data.Set("client_secret", mCfg.ClientSecret)
@@ -105,26 +105,26 @@ func (m *Mailer) RequestTokens(code string) error {
 		return err
 	}
 
-	err = json.Unmarshal(body, &m)
+	err = json.Unmarshal(body, &mail)
 	if err != nil {
 		return err
 	}
 
-	err = m.redis.Set(ctx, "zohoRefreshToken", m.RefreshToken, 0).Err()
+	err = mail.redis.Set(ctx, "zohoRefreshToken", mail.RefreshToken, 0).Err()
 	if err != nil {
 		return err
 	}
 
-	m.Respons = map[string]interface{}{
+	mail.Respons = map[string]interface{}{
 		"success": true,
 	}
 	return nil
 }
 
-func (m *Mailer) GetNewToken() error {
+func GetNewToken() error {
 
 	// we can call set with a `Key` and a `Value`.
-	rt, err := m.redis.Get(ctx, "zohoRefreshToken").Result()
+	rt, err := mail.redis.Get(ctx, "zohoRefreshToken").Result()
 	if err != nil {
 		return err
 	}
@@ -133,7 +133,7 @@ func (m *Mailer) GetNewToken() error {
 	resource := "/oauth/v2/token"
 	data := url.Values{}
 
-	mCfg := m.cfg.ZohoMail
+	mCfg := mail.cfg.ZohoMail
 	data.Set("refresh_token", rt)
 	data.Set("client_id", mCfg.ClientID)
 	data.Set("client_secret", mCfg.ClientSecret)
@@ -159,21 +159,21 @@ func (m *Mailer) GetNewToken() error {
 		return err
 	}
 
-	err = json.Unmarshal(body, &m)
+	err = json.Unmarshal(body, &mail)
 	if err != nil {
 		return err
 	}
 
-	m.Respons = map[string]interface{}{
-		"access_token": m.AccessToken,
+	mail.Respons = map[string]interface{}{
+		"access_token": mail.AccessToken,
 	}
 
 	return nil
 }
 
-func (m *Mailer) GetCredential() error {
+func GetCredential() error {
 	apiUrl := "https://mail.zoho.com"
-	resource := fmt.Sprintf("api/accounts/%s", m.cfg.ZohoMail.AccountID)
+	resource := fmt.Sprintf("api/accounts/%s", mail.cfg.ZohoMail.AccountID)
 
 	u, _ := url.ParseRequestURI(apiUrl)
 	u.Path = resource
@@ -181,7 +181,7 @@ func (m *Mailer) GetCredential() error {
 
 	client := &http.Client{}
 	r, _ := http.NewRequest(http.MethodGet, urlStr, nil)
-	r.Header.Add("Authorization", fmt.Sprintf("Zoho-oauthtoken %s", m.AccessToken))
+	r.Header.Add("Authorization", fmt.Sprintf("Zoho-oauthtoken %s", mail.AccessToken))
 
 	resp, err := client.Do(r)
 	if err != nil {
@@ -194,7 +194,7 @@ func (m *Mailer) GetCredential() error {
 		return err
 	}
 
-	err = json.Unmarshal(body, &m.Respons)
+	err = json.Unmarshal(body, &mail.Respons)
 	if err != nil {
 		return err
 	}
@@ -203,23 +203,23 @@ func (m *Mailer) GetCredential() error {
 
 }
 
-func (m *Mailer) ZohoSend() error {
+func ZohoSend(m Mailer) error {
 	apiUrl := "https://mail.zoho.com"
-	resource := fmt.Sprintf("api/accounts/%s/messages", m.cfg.ZohoMail.AccountID)
+	resource := fmt.Sprintf("api/accounts/%s/messages", mail.cfg.ZohoMail.AccountID)
 
 	u, _ := url.ParseRequestURI(apiUrl)
 	u.Path = resource
 	urlStr := u.String()
 
-	mail := map[string]string{
-		"fromAddress": m.cfg.ZohoMail.FromEmail,
+	mailData := map[string]string{
+		"fromAddress": mail.cfg.ZohoMail.FromEmail,
 		"toAddress":   m.ToAddress,
 		"subject":     m.Subject,
 		"content":     m.Content,
 		"askReceip":   m.AskReceip,
 	}
 
-	json_data, err := json.Marshal(mail)
+	json_data, err := json.Marshal(mailData)
 	if err != nil {
 		return err
 	}
@@ -229,7 +229,7 @@ func (m *Mailer) ZohoSend() error {
 
 	client := &http.Client{}
 	r, _ := http.NewRequest(http.MethodPost, urlStr, bytes.NewBuffer(json_data))
-	r.Header.Add("Authorization", fmt.Sprintf("Zoho-oauthtoken %s", m.AccessToken))
+	r.Header.Add("Authorization", fmt.Sprintf("Zoho-oauthtoken %s", mail.AccessToken))
 	r.Header.Add("Content-Type", "application/json")
 
 	resp, err := client.Do(r)
@@ -243,7 +243,7 @@ func (m *Mailer) ZohoSend() error {
 		return err
 	}
 
-	err = json.Unmarshal(body, &m.Respons)
+	err = json.Unmarshal(body, &mail.Respons)
 	if err != nil {
 		return err
 	}
@@ -252,26 +252,26 @@ func (m *Mailer) ZohoSend() error {
 
 }
 
-func (m *Mailer) Send() error {
-	err := m.parseTemplate()
-	if err != nil {
-		return err
-	}
-	mCfg := m.cfg.ZohoMail
+func Send(m Mailer) *mailazy.SendMailError {
+	// err := parseTemplate()
+	// if err != nil {
+	// 	return err
+	// }
+	mCfg := mail.cfg
 	senderClient := mailazy.NewSenderClient(mCfg.MailLaizyKey, mCfg.MailLaizySecret)
 	to := m.ToAddress
 	from := "Adullam <no-reply@adullam.ng>"
 	subject := m.Subject
-	textContent := m.body        
+	textContent := m.body
 	htmlContent := ""
 	req := mailazy.NewSendMailRequest(to, from, subject, textContent, htmlContent)
 
-	resp, _ := senderClient.Send(req)
-	// if err != nil {
-	// 	return err
-	// }
+	resp, err := senderClient.Send(req)
+	if err != nil {
+		return err
+	}
 
-	m.Respons = map[string]interface{}{
+	mail.Respons = map[string]interface{}{
 		"mailRespons": resp.Message,
 	}
 
