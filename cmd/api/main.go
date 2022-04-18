@@ -47,7 +47,7 @@ func main() {
 		AllowOrigins:     "*",
 		AllowHeaders:     "Origin, Content-Type, Accept, Range, Authorization",
 		AllowCredentials: true,
-		AllowMethods:     "GET,POST,HEAD,DELETE,PUT",
+		AllowMethods:     "GET,POST,HEAD,DELETE,PUT,PATCH",
 		ExposeHeaders:    "X-Total-Count, Content-Range",
 	}))
 

@@ -8,6 +8,8 @@ import (
 	"github.com/cave/pkg/auth"
 	"github.com/cave/pkg/models"
 	"github.com/cave/pkg/utils"
+	"github.com/cave/pkg/zoho"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -28,11 +30,11 @@ func (c *AuthController) signup(ctx *fiber.Ctx) error {
 	}
 
 	// Hash Password
-	hashedPass, _ := utils.HashPassword(c.Password)
+	hashedPass, _ := utils.EncryptPassword(c.Password)
 	user.PasswordHash = []byte(hashedPass)
 	user.Email = c.Email
 	user.EnrollProgress = 0
-	user.Role = "candidate"
+	user.Role = "prospective"
 
 	//Save User To DB
 	if err := user.Create(); err != nil {
@@ -42,9 +44,25 @@ func (c *AuthController) signup(ctx *fiber.Ctx) error {
 		})
 	}
 
-	return ctx.Status(http.StatusCreated).JSON(Resp{
-		"message":      "success",
-		"redirect_uri": fmt.Sprintf("http://localhost:3000/#/sign-in/?email=%s", c.Email),
+	vt, err := auth.IssueVerificationToken(user)
+	if err != nil {
+		return ctx.Status(http.StatusForbidden).JSON(err.Error())
+	}
+
+	mail := fiber.Map{
+		"fromAddress": "admin@adullam.ng",
+		"toAddress":   c.Email,
+		"subject":     "Activate Your Adullam Account",
+		"content":     fmt.Sprintf("http://localhost:3000/#/sign-in/%s", vt),
+	}
+
+	_, err = zoho.SendMail(mail)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(err.Error)
+	}
+
+	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
+		"emailed": true,
 	})
 
 }
@@ -67,14 +85,14 @@ func (c *AuthController) signin(ctx *fiber.Ctx) error {
 	}
 
 	// Check if Password is Correct (Hash and Compare DB Hash)
-	passwordIsCorrect := utils.CheckPasswordHash(user.PasswordHash, c.Password)
+	passwordIsCorrect := utils.VerifyPassword(user.PasswordHash, c.Password)
 	if !passwordIsCorrect {
 		return ctx.Status(http.StatusForbidden).JSON(Resp{
 			"message": "Incorrect Password",
 		})
 	}
 
-	t, err := auth.IssueAccessToken(user)
+	at, err := auth.IssueAccessToken(user)
 	if err != nil {
 		return ctx.Status(http.StatusForbidden).JSON(err.Error())
 	}
@@ -82,6 +100,11 @@ func (c *AuthController) signin(ctx *fiber.Ctx) error {
 	rt, err := auth.IssueRefreshToken(user)
 	if err != nil {
 		return ctx.Status(http.StatusForbidden).JSON(err.Error())
+	}
+
+	cred, err := zoho.GetCredential()
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
 	}
 
 	cookie := fiber.Cookie{
@@ -97,18 +120,20 @@ func (c *AuthController) signin(ctx *fiber.Ctx) error {
 
 	ctx.Cookie(&cookie)
 
-	roles := []string{"admin", "candidate", "guest"}
+	roles := []string{"admin", "prospective", "guest"}
 
-	return ctx.Status(http.StatusCreated).JSON(Resp{
-		"accessToken": t,
+	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
+		"mail":        cred,
+		"accessToken": at,
 		"user":        user,
 		"roles":       roles,
+		"login":       true,
 	})
 }
 
 func (c *AuthController) signout(ctx *fiber.Ctx) error {
 	cookie := fiber.Cookie{
-		Name:     "refresh_token",
+		Name:     "token",
 		Value:    "",
 		Expires:  time.Now().Add(-time.Hour),
 		HTTPOnly: true,
@@ -117,22 +142,75 @@ func (c *AuthController) signout(ctx *fiber.Ctx) error {
 	ctx.Cookie(&cookie)
 
 	return ctx.JSON(fiber.Map{
-		"message": "success",
+		"accessToken": nil,
+		"login":       false,
 	})
 }
 
-func (c *AuthController) newToken(ctx *fiber.Ctx) error {
-
+func (c *AuthController) token(ctx *fiber.Ctx) error {
 	var user models.User
 
-	if err := ctx.BodyParser(&user); err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(err)
-	}
-
-	err := user.FetchByID()
+	token := ctx.Cookies("token")
+	claims, err := auth.ParseToken(token)
 	if err != nil {
-		return ctx.Status(http.StatusForbidden).JSON(err)
+		return ctx.Status(http.StatusOK).JSON(fiber.Map{
+			"login": false,
+		})
 	}
 
-	return ctx.Status(http.StatusOK).JSON(user)
+	user.Role = claims["role"].(string)
+	err = user.FetchByID(claims["userID"].(string))
+	if err != nil {
+		return ctx.Status(http.StatusForbidden).JSON(err.Error())
+	}
+
+	t, err := auth.IssueAccessToken(user)
+	if err != nil {
+		return ctx.Status(http.StatusForbidden).JSON(err.Error())
+	}
+
+	roles := []string{"admin", "prospective", "guest"}
+
+	cred, err := zoho.GetCredential()
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"mail":        cred,
+		"accessToken": t,
+		"user":        user,
+		"roles":       roles,
+		"login":       true,
+	})
+}
+
+func (c *AuthController) verify(ctx *fiber.Ctx) error {
+	var user models.User
+
+	token := ctx.Params("token")
+	claims, err := auth.ParseToken(token)
+	if err != nil {
+		return ctx.Status(http.StatusOK).JSON(fiber.Map{
+			"isVerified": false,
+		})
+	}
+
+	user.Role = claims["role"].(string)
+	user.Id, err = primitive.ObjectIDFromHex(claims["userID"].(string))
+	if err != nil {
+		return ctx.Status(http.StatusForbidden).JSON(err.Error())
+	}
+
+	user.IsVerified = true
+	user.UpdateOne()
+	if err != nil {
+		return ctx.Status(http.StatusForbidden).JSON(err.Error())
+	}
+
+	return ctx.JSON(fiber.Map{
+		"accessToken": nil,
+		"login":       false,
+		"isVerified": true,
+	})
 }

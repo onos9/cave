@@ -7,14 +7,14 @@ import (
 )
 
 // HashPassword returns a hashed password
-func HashPassword(password string) (string, error) {
+func EncryptPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	return string(bytes), err
 }
 
 // CheckPasswordHash validates hashed passwords
-func CheckPasswordHash(hash []byte, password string) bool {
+func VerifyPassword(hash []byte, password string) bool {
 	err := bcrypt.CompareHashAndPassword(hash, []byte(password))
 	return err == nil
 }

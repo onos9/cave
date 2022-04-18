@@ -10,57 +10,52 @@ services:
             MONGO_DB: ${MONGO_DB_NAME}
             MONGO_USER: ${MONGO_USER}
             MONGO_PASSWORD: ${MONGO_PASSWORD}
-        ports:
-        - 27017:27017
+ 
         volumes: # optional to preserve database after container is deleted.
-        - ./dbdata:/data/db
+        - ./cavedata/dbdata:/data/db
 
-    # Mongo Express Service
-    mongo-express:
-        image: mongo-express:latest # latest image
-        container_name: mongo-express
-        restart: unless-stopped
-        ports:
-        - 8081:8081
-        environment:
-            ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER}
-            ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
-            ME_CONFIG_MONGODB_SERVER: mongodb 
     redis:
         container_name: redis
         image: "redis:alpine"
         restart: unless-stopped
         networks:
             - cave_net
+
     api:
         container_name: api
         build:
             context: .
+            args:
+                BUILD_SERVICE: api
+            target: dev
         ports:
-            - "8000:3000" 
+            - "9000:9000" 
         restart: unless-stopped
         depends_on: 
             - db
             - redis
         volumes:
-            - ./:/caveapi
+            - ./cavedata/api:/cave/api
         environment:
-            REDIS_URL: redis:6379   
+            REDIS_PORT: ${REDIS_PORT}
+            REDIS_HOST: ${REDIS_HOST}  
         networks:
             - cave_net
-    frontend:
-        build: ./web
-        command: npm run start
-        ports: 
-            - "3000:3000"
-        depends_on:
-            - backend
-        volumes:
-            - /web/node_modules
-            - ./web:/web
-        networks:
-            - cave_net
-        stdin_open: true
+    
+    
+    # frontend:
+    #     build: ./web
+    #     command: npm run start
+    #     ports: 
+    #         - "3000:3000"
+    #     depends_on:
+    #         - api
+    #     volumes:
+    #         - /web/node_modules
+    #         - ./web:/web
+    #     networks:
+    #         - cave_net
+    #     stdin_open: true
 
 networks:
     cave_net:

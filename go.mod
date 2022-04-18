@@ -11,7 +11,6 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.0.0
 	github.com/google/uuid v1.0.0
 	github.com/joho/godotenv v1.4.0
-	github.com/mailazy/mailazy-go v0.0.2
 	github.com/swaggo/swag v1.8.0
 	go.mongodb.org/mongo-driver v1.8.4
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
@@ -33,15 +32,10 @@ require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/go-cmp v0.5.5 // indirect
-	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
-	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/klauspost/compress v1.15.0 // indirect
-	github.com/kunal-saini/httpman v0.1.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
-	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
-	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect

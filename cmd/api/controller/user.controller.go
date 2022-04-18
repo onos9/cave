@@ -27,7 +27,7 @@ func (c *UserController) create(ctx *fiber.Ctx) error {
 	user.IsVerified = true
 
 	// Hash Password
-	hashedPass, _ := utils.HashPassword(password)
+	hashedPass, _ := utils.EncryptPassword(password)
 	user.PasswordHash = []byte(hashedPass)
 
 	//Save User To DB
@@ -38,7 +38,7 @@ func (c *UserController) create(ctx *fiber.Ctx) error {
 		})
 	}
 
-	return ctx.Status(http.StatusCreated).JSON(Resp{
+	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
 		"password": password,
 	})
 
@@ -47,17 +47,16 @@ func (c *UserController) create(ctx *fiber.Ctx) error {
 func (c *UserController) getOne(ctx *fiber.Ctx) error {
 
 	var user models.User
+	id := ctx.Params("id")
 
-	if err := ctx.BodyParser(&user); err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(err)
-	}
-
-	err := user.FetchByID()
+	err := user.FetchByID(id)
 	if err != nil {
 		return ctx.Status(http.StatusForbidden).JSON(err)
 	}
 
-	return ctx.Status(http.StatusOK).JSON(user)
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"id": user,
+	})
 }
 
 func (c *UserController) getAll(ctx *fiber.Ctx) error {
@@ -69,7 +68,9 @@ func (c *UserController) getAll(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusForbidden).JSON(err)
 	}
 
-	return ctx.Status(http.StatusOK).JSON(userList)
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"list": userList,
+	})
 }
 
 func (c *UserController) updateOne(ctx *fiber.Ctx) error {
@@ -77,20 +78,31 @@ func (c *UserController) updateOne(ctx *fiber.Ctx) error {
 	var user models.User
 	err := json.Unmarshal(ctx.Body(), &user)
 	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
 	}
 
 	user.Id, err = primitive.ObjectIDFromHex(ctx.Params("id"))
 	if err != nil {
-		return err
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
 	}
 
 	err = user.UpdateOne()
 	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(err)
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
 	}
 
-	return ctx.Status(http.StatusOK).JSON("success")
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"success": true,
+	})
 }
 
 func (c *UserController) deleteOne(ctx *fiber.Ctx) error {
@@ -106,5 +118,7 @@ func (c *UserController) deleteOne(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(err)
 	}
 
-	return ctx.Status(http.StatusOK).JSON(user)
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"deleted": user,
+	})
 }

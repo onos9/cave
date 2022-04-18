@@ -4,276 +4,237 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"html/template"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
+	"path"
+	"runtime"
 	"strings"
+	"time"
 
-	configs "github.com/cave/config"
+	"github.com/cave/config"
 	"github.com/cave/pkg/database"
 	"github.com/go-redis/redis/v8"
-	"github.com/mailazy/mailazy-go"
+	"github.com/gofiber/fiber/v2"
 )
 
 var (
 	mail *Mailer
-	MIME = "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+	cfg  config.ZohoMail
+	RdDB *redis.Client
 )
 
 type Mailer struct {
-	FromAddress string `json:"fromAddress"`
-	ToAddress   string `json:"toAddress"`
-	Subject     string `json:"subject"`
-	Content     string `json:"content"`
-	AskReceip   string `json:"askReceip"`
-
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 	ApiDomain    string `json:"api_domain"`
 	TokenType    string `json:"token_type"`
 	ExpiresIn    int    `json:"expires_in"`
 	Error        string `json:"error"`
-
-	body    string
-	cfg     configs.Config
-	redis   *redis.Client
-	Respons map[string]interface{}
 }
 
 var ctx = context.Background()
 
-func NewMailer(config configs.Config) {
-	mail = &Mailer{
-		cfg:   config,
-		redis: database.RdDB,
-	}
+func NewMailer(conf config.Config) {
+	cfg = conf.ZohoMail
+	mail = &Mailer{}
+	RdDB = database.RdDB
 }
 
-func ParseTemplate() error {
-	t, err := template.ParseFiles("template.html")
+func doRequest(r *http.Request, v interface{}) error {
+	client := &http.Client{}
+	resp, err := client.Do(r)
 	if err != nil {
 		return err
 	}
-	buf := new(bytes.Buffer)
-	if err = t.Execute(buf, mail); err != nil {
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
 		return err
 	}
-	mail.body = buf.String()
+
+	err = json.Unmarshal(body, v)
+	if err != nil {
+		return err
+	}
 	return nil
-
 }
 
-func RequestTokens(code string) error {
-
-	// we can call set with a `Key` and a `Value`.
-	err := mail.redis.Set(ctx, "zoho_code", code, 0).Err()
+func RequestTokens(code string) (string, error) {
+	err := RdDB.Set(ctx, "zoho_code", code, 0).Err()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	apiUrl := "https://accounts.zoho.com"
 	resource := "/oauth/v2/token"
 	data := url.Values{}
 
-	mCfg := mail.cfg.ZohoMail
 	data.Set("code", code)
-	data.Set("client_id", mCfg.ClientID)
-	data.Set("client_secret", mCfg.ClientSecret)
-	data.Set("redirect_uri", mCfg.RedirectURL)
+	data.Set("client_id", cfg.ClientID)
+	data.Set("client_secret", cfg.ClientSecret)
+	data.Set("redirect_uri", cfg.RedirectURL)
 	data.Set("grant_type", "authorization_code")
 
 	u, _ := url.ParseRequestURI(apiUrl)
 	u.Path = resource
 	urlStr := u.String()
 
-	client := &http.Client{}
 	r, _ := http.NewRequest(http.MethodPost, urlStr, strings.NewReader(data.Encode())) // URL-encoded payload
-	// r.Header.Add("Authorization", "auth_token=\"XXXXXXX\"")
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	resp, err := client.Do(r)
+	err = doRequest(r, &mail)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	err = RdDB.Set(ctx, "zohoRefreshToken", mail.RefreshToken, 0).Err()
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	err = json.Unmarshal(body, &mail)
+	expireTime := time.Duration(mail.ExpiresIn) * time.Second
+	err = RdDB.Set(ctx, "accessToken", mail.AccessToken, expireTime).Err()
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	err = mail.redis.Set(ctx, "zohoRefreshToken", mail.RefreshToken, 0).Err()
-	if err != nil {
-		return err
-	}
-
-	mail.Respons = map[string]interface{}{
-		"success": true,
-	}
-	return nil
+	return mail.AccessToken, nil
 }
 
-func GetNewToken() error {
+func GetNewToken() (string, error) {
+	at, err := RdDB.Get(ctx, "accessToken").Result()
+	if err == nil {
+		mail.AccessToken = at
+		return at, nil
+	}
 
-	// we can call set with a `Key` and a `Value`.
-	rt, err := mail.redis.Get(ctx, "zohoRefreshToken").Result()
+	rt, err := RdDB.Get(ctx, "zohoRefreshToken").Result()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	apiUrl := "https://accounts.zoho.com"
 	resource := "/oauth/v2/token"
 	data := url.Values{}
 
-	mCfg := mail.cfg.ZohoMail
 	data.Set("refresh_token", rt)
-	data.Set("client_id", mCfg.ClientID)
-	data.Set("client_secret", mCfg.ClientSecret)
-	data.Set("redirect_uri", mCfg.RedirectURL)
+	data.Set("client_id", cfg.ClientID)
+	data.Set("client_secret", cfg.ClientSecret)
+	data.Set("redirect_uri", cfg.RedirectURL)
 	data.Set("grant_type", "refresh_token")
 
 	u, _ := url.ParseRequestURI(apiUrl)
 	u.Path = resource
 	urlStr := u.String()
 
-	client := &http.Client{}
 	r, _ := http.NewRequest(http.MethodPost, urlStr, strings.NewReader(data.Encode()))
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	resp, err := client.Do(r)
+	err = doRequest(r, &mail)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	expireTime := time.Duration(mail.ExpiresIn) * time.Second
+	err = RdDB.Set(ctx, "accessToken", mail.AccessToken, expireTime).Err()
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	err = json.Unmarshal(body, &mail)
-	if err != nil {
-		return err
-	}
-
-	mail.Respons = map[string]interface{}{
-		"access_token": mail.AccessToken,
-	}
-
-	return nil
+	return mail.AccessToken, nil
 }
 
-func GetCredential() error {
+func GetCredential() (fiber.Map, error) {
 	apiUrl := "https://mail.zoho.com"
-	resource := fmt.Sprintf("api/accounts/%s", mail.cfg.ZohoMail.AccountID)
+	resource := fmt.Sprintf("api/accounts/%s", cfg.AccountID)
 
 	u, _ := url.ParseRequestURI(apiUrl)
 	u.Path = resource
 	urlStr := u.String()
 
-	client := &http.Client{}
 	r, _ := http.NewRequest(http.MethodGet, urlStr, nil)
 	r.Header.Add("Authorization", fmt.Sprintf("Zoho-oauthtoken %s", mail.AccessToken))
 
-	resp, err := client.Do(r)
+	var resp fiber.Map
+	err := doRequest(r, &resp)
 	if err != nil {
-		return err
+		return fiber.Map{}, err
 	}
 
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(body, &mail.Respons)
-	if err != nil {
-		return err
-	}
-
-	return nil
-
+	return resp, nil
 }
 
-func ZohoSend(m Mailer) error {
+func SendMail(m fiber.Map) (fiber.Map, error) {
 	apiUrl := "https://mail.zoho.com"
-	resource := fmt.Sprintf("api/accounts/%s/messages", mail.cfg.ZohoMail.AccountID)
+	resource := fmt.Sprintf("api/accounts/%s/messages", cfg.AccountID)
 
 	u, _ := url.ParseRequestURI(apiUrl)
 	u.Path = resource
 	urlStr := u.String()
 
-	mailData := map[string]string{
-		"fromAddress": mail.cfg.ZohoMail.FromEmail,
-		"toAddress":   m.ToAddress,
-		"subject":     m.Subject,
-		"content":     m.Content,
-		"askReceip":   m.AskReceip,
-	}
-
-	json_data, err := json.Marshal(mailData)
+	tpl, err := ParseTemplate(m)
 	if err != nil {
-		return err
+		return fiber.Map{}, err
 	}
-	log.Println(string(json_data))
 
-	//m.GetNewToken()
+	m["content"] = tpl
 
-	client := &http.Client{}
+	json_data, err := json.Marshal(m)
+	if err != nil {
+		return fiber.Map{}, err
+	}
+
+	_, err = GetNewToken()
+	if err != nil {
+		return fiber.Map{}, err
+	}
+
 	r, _ := http.NewRequest(http.MethodPost, urlStr, bytes.NewBuffer(json_data))
 	r.Header.Add("Authorization", fmt.Sprintf("Zoho-oauthtoken %s", mail.AccessToken))
 	r.Header.Add("Content-Type", "application/json")
 
-	resp, err := client.Do(r)
+	var resp fiber.Map
+	err = doRequest(r, &resp)
 	if err != nil {
-		return err
+		return fiber.Map{}, err
 	}
 
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(body, &mail.Respons)
-	if err != nil {
-		return err
-	}
-
-	return nil
-
+	return resp, nil
 }
 
-func Send(m Mailer) *mailazy.SendMailError {
-	// err := parseTemplate()
-	// if err != nil {
-	// 	return err
-	// }
-	mCfg := mail.cfg
-	senderClient := mailazy.NewSenderClient(mCfg.MailLaizyKey, mCfg.MailLaizySecret)
-	to := m.ToAddress
-	from := "Adullam <no-reply@adullam.ng>"
-	subject := m.Subject
-	textContent := m.body
-	htmlContent := ""
-	req := mailazy.NewSendMailRequest(to, from, subject, textContent, htmlContent)
+func ParseTemplate(m fiber.Map) (string, error) {
+	_, filename, _, ok := runtime.Caller(1)
+	if !ok {
+		return "", errors.New("can not get filename")
+	}
 
-	resp, err := senderClient.Send(req)
+	dir := path.Dir(filename)
+	filePath := fmt.Sprintf("%s/templates/signup.html", dir)
+	t, err := template.ParseFiles(filePath)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	mail.Respons = map[string]interface{}{
-		"mailRespons": resp.Message,
+	buf := new(bytes.Buffer)
+	if err = t.Execute(buf, m); err != nil {
+		return "", err
 	}
 
-	return nil
+	return buf.String(), nil
+}
+
+func GetZohoMailConfig() fiber.Map {
+	return fiber.Map{
+		"client_id":     cfg.ClientID,
+		"redirect_uri":  cfg.RedirectURL,
+		"scope":         cfg.Scope,
+		"response_type": "code",
+		"access_type":   "offline",
+		"prompt":        "consent",
+	}
 }

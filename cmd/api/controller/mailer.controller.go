@@ -8,16 +8,6 @@ import (
 )
 
 var (
-	// errAuthenticationFailure = errors.New("Authentication failed")
-	// errorNotFound            = errors.New("Entity not found")
-	// errForbidden             = errors.New("Attempted action is not allowed")
-	// errUnableToCreateCandidate    = errors.New("Unable to create Candidate")
-	// errUnableToFetchCandidate     = errors.New("Unable to fetch candidate")
-	// errUnableToFetchCandidateList = errors.New("Unable to fetch candidate list")
-	// errUnableToUpdateCandidate    = errors.New("Unable to update candidate")
-	// errUnableToDeleteCandidate    = errors.New("Unable to delete candidate")
-
-	// ErrResetExpired occurs when the reset hash exceeds the expiration
 	mailer *MailerController
 )
 
@@ -33,20 +23,47 @@ type MailerController struct {
 
 func (c *MailerController) send(ctx *fiber.Ctx) error {
 
-	if err := ctx.BodyParser(&zoho.Mailer{}); err != nil {
+	var mail fiber.Map
+
+	if err := ctx.BodyParser(&mail); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err)
 	}
 
-	mail := zoho.Mailer{
-		ToAddress: c.To,
-		Subject:   c.Subject,
-		Content:   c.Body,
-		AskReceip: c.AskReceip,
-	}
-	if err := zoho.Send(mail); err != nil {
+	resp, err := zoho.SendMail(mail)
+	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error)
 	}
 	return ctx.Status(http.StatusCreated).JSON(Resp{
-		"message": "success",
+		"respons": resp,
+	})
+}
+
+func (c *MailerController) zohoCode(ctx *fiber.Ctx) error {
+
+	cfg := zoho.GetZohoMailConfig()
+	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
+		"credentials": cfg,
+	})
+}
+
+func (c *MailerController) token(ctx *fiber.Ctx) error {
+
+	if err := ctx.BodyParser(&c); err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
+	}
+
+	token, err := zoho.RequestTokens(c.Code)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
+	}
+
+	cred, err := zoho.GetCredential()
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
+	}
+
+	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
+		"token":    token,
+		"mail": cred,
 	})
 }

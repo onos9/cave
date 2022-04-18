@@ -1,4 +1,4 @@
-package configs
+package config
 
 import (
 	"log"
@@ -23,8 +23,6 @@ type Config struct {
 	JWTIssuer        string        `env:"JWT_ISSUER"`
 	Host             string        `env:"APP_HOST"`
 	Port             string        `env:"APP_PORT"`
-	MailLaizySecret  string        `env:"MAIL_LAIZY_SECRETE"`
-	MailLaizyKey     string        `env:"MAIL_LAIZY_KEY"`
 }
 
 // IsProd Checks if env is production
@@ -59,7 +57,5 @@ func GetConfig() Config {
 		JWTIssuer:        os.Getenv("JWT_ISSUER"),
 		Host:             os.Getenv("APP_HOST"),
 		Port:             os.Getenv("APP_PORT"),
-		MailLaizySecret:  os.Getenv("MAIL_LAIZY_SECRETE"),
-		MailLaizyKey:     os.Getenv("MAIL_LAIZY_KEY"),
 	}
 }

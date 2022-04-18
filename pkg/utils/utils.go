@@ -8,7 +8,7 @@ import (
 
 // Base serves as a base model for other models
 type Base struct {
-	ID        primitive.ObjectID `bson:"id"`
+	ID        primitive.ObjectID `bson:"id" json:"-"`
 	CreatedAt *time.Time         `json:"created_at"`
 	UpdatedAt *time.Time         `json:"update_at"`
 	DeletedAt *time.Time         `json:"-" bson:"deleted_at,omitempty"`

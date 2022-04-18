@@ -36,23 +36,28 @@ func SetupRoutes(app *fiber.App) {
 
 	// Auth Group
 	auth := app.Group("/auth")
-	auth.Post("/signup", userAuth.signup)
+	auth.Get("/", userAuth.token)
 	auth.Post("/", userAuth.signin)
-	auth.Get("/:id", userAuth.newToken)
-	auth.Delete("/:id", userAuth.signout)
-	auth.Get("/mail", userAuth.signin)
+	auth.Post("/:token", userAuth.verify)
+	auth.Put("/", userAuth.signup)
+	auth.Delete("/", userAuth.signout)
 	
+	
+
 	// User Group
 	u := app.Group("/user")
 	u.Post("/", middlewares.RequireLoggedIn(), user.create)
 	u.Get("/", middlewares.RequireLoggedIn(), user.getAll)
 	u.Get("/:id", middlewares.RequireLoggedIn(), user.getOne)
-	u.Post("/:id", middlewares.RequireLoggedIn(), user.updateOne)
+	u.Patch("/:id", middlewares.RequireLoggedIn(), user.updateOne)
 	u.Delete("/:id", middlewares.RequireLoggedIn(), user.deleteOne)
 
 	// Mail Routes
-	m := v1.Group("/mail")
+	m := app.Group("/mail")
 	m.Post("/", middlewares.RequireLoggedIn(), mailer.send)
+	m.Get("/", middlewares.RequireLoggedIn(), mailer.zohoCode)
+	m.Post("/token", middlewares.RequireLoggedIn(), mailer.token)
+	m.Get("/", middlewares.RequireLoggedIn(), mailer.zohoCode)
 	// m.Get("/", middlewares.RequireLoggedIn(), mail.getAll)
 	// m.Get("/:id", middlewares.RequireLoggedIn(), mail.getOne)
 	// m.Post("/:id", middlewares.RequireLoggedIn(), mail.updateOne)

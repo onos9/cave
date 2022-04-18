@@ -128,7 +128,7 @@ type Referee struct {
 type Terms struct {
 	Scholarship       bool   `bson:"scholarship,omitempty" json:"scholarship"`
 	ScholarshipReason string `bson:"scholReason,omitempty" json:"scholReason"`
-	Agree             bool   `bson:"agree,omitempty" json:"agree"`
+	Agree             string   `bson:"agree,omitempty" json:"agree"`
 }
 
 // UserList defines array of user objects
@@ -152,8 +152,13 @@ func (m *User) Create() error {
 }
 
 // FetchByID fetches User by id
-func (m *User) FetchByID() error {
-	err := db.Collection(userCol).FindOne(context.TODO(), bson.M{"_id": m.Id}).Decode(&m)
+func (m *User) FetchByID(id string) error {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+
+	err = db.Collection(userCol).FindOne(context.TODO(), bson.M{"_id": oid}).Decode(&m)
 	if err != nil {
 		return err
 	}
