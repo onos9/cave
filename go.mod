@@ -3,17 +3,17 @@ module github.com/cave
 go 1.17
 
 require (
-	github.com/arsmn/fiber-swagger/v2 v2.24.0
+	github.com/arsmn/fiber-swagger/v2 v2.31.1
 	github.com/go-playground/validator/v10 v10.10.1
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/gofiber/fiber/v2 v2.29.0
+	github.com/gofiber/fiber/v2 v2.32.0
 	github.com/gofiber/jwt/v2 v2.2.7
-	github.com/golang-jwt/jwt/v4 v4.0.0
-	github.com/google/uuid v1.0.0
+	github.com/golang-jwt/jwt/v4 v4.4.1
+	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.4.0
-	github.com/swaggo/swag v1.8.0
-	go.mongodb.org/mongo-driver v1.8.4
-	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
+	github.com/swaggo/swag v1.8.1
+	go.mongodb.org/mongo-driver v1.9.0
+	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
 )
 
 require (
@@ -31,7 +31,6 @@ require (
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
-	github.com/google/go-cmp v0.5.5 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.15.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
@@ -39,7 +38,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.34.0 // indirect
+	github.com/valyala/fasthttp v1.35.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.0.2 // indirect
