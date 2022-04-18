@@ -41,4 +41,4 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
 
       - name: Make directory on server
-        run: ssh staging 'mkdir cavelms'
+        run: ssh staging 'sudo mkdir cavelms'
