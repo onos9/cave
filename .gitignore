@@ -21,3 +21,5 @@ cmd/.DS_Store
 google_client_id.json
 cmd/api/.env
 .env
+
+cavedata
