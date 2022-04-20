@@ -26,6 +26,11 @@ jobs:
         with:
           key: ${{ secrets.SSH_PRIVATE_KEY }} 
           known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
+     
+      - name: SSH Agent
+        run: | 
+          ```eval `ssh-agent -s````
+          ssh-add ~/.ssh/id_rsa
           
       - name: Adding Known Hosts
         run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
