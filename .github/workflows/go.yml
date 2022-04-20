@@ -2,12 +2,11 @@ name: Go
 
 on:
   push:
-    branches: [ dev ]
+    branches: [ develop ]
   pull_request:
-    branches: [ dev ]
+    branches: [ develop ]
 
 jobs:
-
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -39,6 +38,6 @@ jobs:
       uses: actions/setup-go@v2.0.3
       with:
         # The Go version to download (if necessary) and use. Supports semver spec and ranges.
-        go-version:  1.13
+        go-version:  1.17
         # Whether to download only stable versions
         stable: true
