@@ -14,11 +14,11 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
-/go.sum
-/.DS_Store
-/cmd/.DS_Store
+go.sum
+.DS_Store
+cmd/.DS_Store
 
-/google_client_id.json
-/cmd/api/.env
-/rest.http
-/cavedata
+google_client_id.json
+cmd/api/.env
+rest.http
+cavedata
