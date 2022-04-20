@@ -31,7 +31,7 @@ services:
                 BUILD_SERVICE: api
             target: dev
         ports:
-            - "8000:9000" 
+            - "9000:9000" 
         restart: unless-stopped
         depends_on: 
             - db
