@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: CICD
 
 # Controls when the workflow will run
 on:
@@ -16,7 +16,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build:
+  deploy:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -35,4 +35,4 @@ jobs:
       # Runs a set of commands using the ssh shell
       - name: Deploy wit git
         run: |
-         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'cd cavelms && git pull && touch pulled123'
+         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'cd cavelms && git pull && make run'
