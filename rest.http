@@ -1,5 +1,5 @@
 ###Get a list of all products
-GET http://localhost:9000/auth
+GET http://65.21.16.90:9000/auth
 
 ### Create a product
 POST http://localhost:9000/auth
