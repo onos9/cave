@@ -20,6 +20,5 @@
 
 /google_client_id.json
 /cmd/api/.env
-/.env
 /rest.http
 /cavedata
