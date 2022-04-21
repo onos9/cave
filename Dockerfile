@@ -21,7 +21,7 @@ RUN apk update && apk upgrade \
 
 # Fetch dependencies.
 COPY . /app
-COPY dbinit.js /docker-entrypoint-initdb.d/
+# COPY dbinit.js /docker-entrypoint-initdb.d/
 RUN go mod tidy -compat=1.17 \
     && go mod -d -v \
     && go get github.com/githubnemo/CompileDaemon
