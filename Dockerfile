@@ -23,7 +23,8 @@ RUN apk update && apk upgrade \
 COPY . /app
 # COPY dbinit.js /docker-entrypoint-initdb.d/
 RUN go mod tidy -compat=1.17 \
-    && go mod -d -v \
+    && go mod download \
+    && go mod verify \
     && go get github.com/githubnemo/CompileDaemon
 
 ENTRYPOINT export STORAGE_HOST=db && CompileDaemon --build="go build cmd/api/main.go" --command="./main"
