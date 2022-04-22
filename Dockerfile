@@ -1,6 +1,3 @@
-ARG  BUILDER_IMAGE=golang:alpine
-ARG BUILD_SERVICE
-
 ###############################
 # STEP 1 create dev image
 ###############################
