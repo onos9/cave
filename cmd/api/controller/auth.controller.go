@@ -38,7 +38,7 @@ func (c *AuthController) signup(ctx *fiber.Ctx) error {
 
 	//Save User To DB
 	if err := user.Create(); err != nil {
-		return ctx.Status(http.StatusInternalServerError).JSON(Resp{
+		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"message": "User Not Registered",
 			"error":   err.Error(),
 		})
@@ -63,6 +63,7 @@ func (c *AuthController) signup(ctx *fiber.Ctx) error {
 
 	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
 		"emailed": true,
+		"success": true,
 	})
 
 }

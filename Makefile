@@ -1,14 +1,4 @@
 VERSION=`git rev-parse HEAD`
-BUILD=`date +%FT%T%z`
-LDFLAGS=-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD}"
-DOCKER_IMAGE=smallest-secured-golang-docker-image
-
-# AWS related variables, eu-west-3 is Paris region
-AWS_REGION=eu-west-3
-AWS_ACCOUNT_NUMBER=123412341234
-
-#GCP related variables
-GCP_PROJECT_ID='chemidy'
 
 .PHONY: help
 help: ## - Show help message
@@ -18,8 +8,13 @@ help: ## - Show help message
 .PHONY: build
 build:	## - Build the cave docker image  
 	@printf "\033[32m\xE2\x9c\x93 Building the cave image \n\033[0m"
-	
+	@docker-compose -p cave -f docker/docker-compose.yml build
 
+.PHONY: config
+config:	## - Build the cave docker image  
+	@printf "\033[32m\xE2\x9c\x93 Building the cave image \n\033[0m"
+	@docker-compose -f docker/docker-compose.yml config
+	
 .PHONY: build-no-cache
 build-no-cache:docker-pull	## - Build the cave docker image without cache
 	@printf "\033[32m\xE2\x9c\x93 Build the image with cache disabled \n\033[0m"
@@ -32,12 +27,12 @@ ls: ## - List 'cave' docker images
 .PHONY: run
 run:	## - Run the cave docker image  
 	@printf "\033[32m\xE2\x9c\x93 Running cave docker image  \n\033[0m"
-	@docker-compose up -d
+	@docker-compose -p cave -f docker/docker-compose.yml up  -d
 
 .PHONY: stop
 stop:	## - Stop the cave docker image  
 	@printf "\033[32m\xE2\x9c\x93 Stopping cave docker image  \n\033[0m"
-	@docker-compose down
+	@docker-compose -f docker/docker-compose.yml down
 
 .PHONY: push-to-azure
 push-to-azure:	## - Push docker image to azurecr.io Container Registry
@@ -45,5 +40,18 @@ push-to-azure:	## - Push docker image to azurecr.io Container Registry
 
 .PHONY: scan
 scan:	## - Scan for known vulnerabilities the cave docker image  
-	@printf "\033[32m\xE2\x9c\x93 Scan for known vulnerabilities the smallest and secured golang docker image  \n\033[0m"
-	@docker scan -f Dockerfile smallest-secured-golang
+	@printf "\033[32m\xE2\x9c\x93 Scaning for known vulnerabilities   \n\033[0m"
+	@docker scan -f Dockerfile 
+
+.PHONY: deploy
+deploy:build	## - Scan for known vulnerabilities the cave docker image  
+	@printf "\033[32m\xE2\x9c\x93 Deploying to VPS \n\033[0m"
+	@docker-compose -f docker/docker-compose.yml stop
+	@docker-compose -f docker/docker-compose.yml rm -f
+	@docker-compose -f docker/docker-compose.yml up -d
+
+.PHONY: rm
+rm:	## - Scan for known vulnerabilities the cave docker image  
+	@printf "\033[32m\xE2\x9c\x93 Deploying to VPS \n\033[0m"
+	@docker-compose -f docker/docker-compose.yml stop
+	@docker-compose -f docker/docker-compose.yml rm -f

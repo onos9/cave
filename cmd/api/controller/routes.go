@@ -41,8 +41,6 @@ func SetupRoutes(app *fiber.App) {
 	auth.Post("/:token", userAuth.verify)
 	auth.Put("/", userAuth.signup)
 	auth.Delete("/", userAuth.signout)
-	
-	
 
 	// User Group
 	u := app.Group("/user")

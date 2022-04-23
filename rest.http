@@ -6,16 +6,18 @@ GET http://localhost:9000/auth
 GET http://65.21.16.90:9000/auth
 
 ### Create a product
-POST http://localhost:9000/auth
+put http://localhost:9000/auth
 Content-Type: application/json
 
 {
   "email": "onos9@adullam.ng",
-  "password": 1234
+  "password": "1234"
 }
 
 ### GET a product by id
 GET http://localhost:9000/user/5df118b3c86e5826958b661a
+Content-Type: application/json
+Authorization:
 
 ### Update a product by id
 PUT  http://localhost:9000/user/5df118b3c86e5826958b661a
