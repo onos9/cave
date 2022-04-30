@@ -45,8 +45,7 @@ RUN apk update && apk upgrade \
     && apk add --no-cache \
     git 
 
-RUN git clone https://github.com/onos9/cave.git /app
-RUN git clone https://github.com/onos9/cave.git /web
+COPY  . /app
 
 # Fetch dependencies.
 RUN go mod tidy -compat=1.17 \
