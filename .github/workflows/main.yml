@@ -36,7 +36,10 @@ jobs:
       - name: Deploy with rsync
         run: rsync -avz . ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/cavelms
 
+      - name: Decoding eniron environmental variables
+        run: openssl base64 -d -in ${{ secrets.ENV_FILE }} -out docs/.env
+
       # Runs a set of commands using the ssh shell
-      - name: Deploy to server using SSH
+      - name: Deploying to server using SSH
         run: |
          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'cd cavelms && make deploy'
