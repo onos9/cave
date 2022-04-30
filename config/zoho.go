@@ -18,7 +18,7 @@ type ZohoMail struct {
 }
 
 // GetRedisConfig returns RedisConfig object
-func GetZohoMailConfig() ZohoMail {
+func GetMailConfig() ZohoMail {
 	return ZohoMail{
 		FromEmail:       os.Getenv("EMAIL_FROM"),
 		ClientID:        os.Getenv("CLIENT_ID"),

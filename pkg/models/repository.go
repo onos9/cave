@@ -1,28 +1,41 @@
 package models
 
 import (
+	"context"
+
 	"github.com/cave/pkg/database"
-	"github.com/go-redis/redis/v8"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
-	//errHandlerNotSet error = errors.New("handler not set properly")
-	RdDB *redis.Client
-	db   *mongo.Database
+	db *mongo.Database
 )
 
 // SetRepoDB global db handler
-func SetRepoDB() {
-	db = database.MgDB.Db
-	RdDB = database.RdDB
+func SetRepoDB(dbi *database.DB) {
+
+	db = dbi.MongoDB
+
+	SetIndex("users", "email")
+}
+
+func SetIndex(doc, field string) error {
+
+	coll := db.Collection(doc)
+	count, err := coll.CountDocuments(context.Background(), bson.M{})
+	if err != nil && count == 0 {
+		return err
+	}
 
 	opt := options.Index()
 	opt.SetUnique(true)
 
-	// index := mongo.IndexModel{Keys: bson.M{"email": 1}, Options: opt}
-	// if _, err := db.Collection("users").Indexes().CreateOne(context.Background(), index); err != nil {
-	// 	log.Println("Could not create index:", err)
-	// }
+	index := mongo.IndexModel{Keys: bson.M{field: 1}, Options: opt}
+	if _, err := coll.Indexes().CreateOne(context.Background(), index); err != nil {
+		return err
+	}
+
+	return nil
 }

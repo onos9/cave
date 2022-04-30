@@ -10,8 +10,7 @@ import (
 
 	"github.com/cave/cmd/api/controller"
 	cfg "github.com/cave/config"
-	db "github.com/cave/pkg/database"
-	"github.com/cave/pkg/zoho"
+	"github.com/cave/pkg/database"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -28,10 +27,7 @@ func main() {
 	cfg.LoadConfig()
 	config := cfg.GetConfig()
 
-	// Setup Adapters
-	db.ConnectMongo()
-	db.ConnectRedis()
-	zoho.NewMailer(config)
+	db := database.NewDBConnection()
 
 	// Setup fiber api
 	app := fiber.New(fiber.Config{
@@ -52,7 +48,7 @@ func main() {
 	}))
 
 	// Setup Routes
-	controller.SetupRoutes(app)
+	controller.SetupRoutes(app, db)
 
 	//Setup Swagger
 	// FIXME, In Production, Port Should not be added to the Swagger Host
@@ -70,7 +66,7 @@ func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	<-c
-	
+
 	fmt.Println("\n\nShutting down server...")
 	_ = app.Shutdown()
 }

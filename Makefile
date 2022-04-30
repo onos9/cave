@@ -32,7 +32,7 @@ run:	## - Run the cave docker image
 .PHONY: stop
 stop:	## - Stop the cave docker image  
 	@printf "\033[32m\xE2\x9c\x93 Stopping cave docker image  \n\033[0m"
-	@docker-compose -f docker/docker-compose.yml down
+	@docker-compose -p cave -f docker/docker-compose.yml down
 
 .PHONY: push-to-azure
 push-to-azure:	## - Push docker image to azurecr.io Container Registry
@@ -44,14 +44,18 @@ scan:	## - Scan for known vulnerabilities the cave docker image
 	@docker scan -f Dockerfile 
 
 .PHONY: deploy
-deploy:build	## - Scan for known vulnerabilities the cave docker image  
+deploy:stop	## - Scan for known vulnerabilities the cave docker image  
 	@printf "\033[32m\xE2\x9c\x93 Deploying to VPS \n\033[0m"
-	@docker-compose -f docker/docker-compose.yml stop
-	@docker-compose -f docker/docker-compose.yml rm -f
-	@docker-compose -f docker/docker-compose.yml up -d
-
+	@docker rmi -f cave_api 
+	@docker-compose -p cave -f docker/docker-compose.yml up -d
+	
 .PHONY: rm
 rm:	## - Scan for known vulnerabilities the cave docker image  
+	@printf "\033[32m\xE2\x9c\x93 Stopping and removing servers \n\033[0m"
+	@docker-compose -p cave -f docker/docker-compose.yml stop api
+	@docker-compose -p cave -f docker/docker-compose.yml rm -f
+
+.PHONY: prune
+prune:	## - Scan for known vulnerabilities the cave docker image  
 	@printf "\033[32m\xE2\x9c\x93 Deploying to VPS \n\033[0m"
-	@docker-compose -f docker/docker-compose.yml stop
-	@docker-compose -f docker/docker-compose.yml rm -f
+	@docker system prune -a -f

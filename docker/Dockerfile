@@ -2,7 +2,7 @@
 # STEP 1 create dev image
 ###############################
 FROM golang:1.17-alpine AS dev
-WORKDIR /
+WORKDIR /app
 
 ENV GO111MODULE="on"
 ENV GOOS="linux"
@@ -15,7 +15,8 @@ RUN apk update && apk upgrade \
     git
 
 # Fetch dependencies.
-COPY . .
+COPY  . /app
+
 # COPY dbinit.js /docker-entrypoint-initdb.d/
 RUN go mod tidy -compat=1.17 \
     && go mod download \
@@ -45,6 +46,7 @@ RUN apk update && apk upgrade \
     git 
 
 RUN git clone https://github.com/onos9/cave.git /app
+RUN git clone https://github.com/onos9/cave.git /web
 
 # Fetch dependencies.
 RUN go mod tidy -compat=1.17 \
@@ -58,7 +60,13 @@ RUN cd cmd/api \
 ################################
 # STEP 3 build a small image
 ################################
-FROM scratch AS prod
-COPY --from=builder /app/.env .env
+FROM scratch AS server
 COPY --from=builder /app/api ./api
+ENTRYPOINT ["./api"]
+
+################################
+# STEP 3 build a small image
+################################
+FROM scratch AS web
+COPY --from=builder /app/web/build ./web
 ENTRYPOINT ["./api"]

@@ -39,7 +39,7 @@ func (c *AuthController) signup(ctx *fiber.Ctx) error {
 	//Save User To DB
 	if err := user.Create(); err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"message": "User Not Registered",
+			"success": false,
 			"error":   err.Error(),
 		})
 	}
@@ -56,9 +56,14 @@ func (c *AuthController) signup(ctx *fiber.Ctx) error {
 		"content":     fmt.Sprintf("http://localhost:3000/#/sign-in/%s", vt),
 	}
 
-	_, err = zoho.SendMail(mail)
+	m := new(zoho.Mailer)
+	_, err = m.SendMail(mail)
 	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(err.Error)
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"emailed": false,
+			"success": true,
+			"error":   err.Error(),
+		})
 	}
 
 	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
@@ -103,10 +108,11 @@ func (c *AuthController) signin(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusForbidden).JSON(err.Error())
 	}
 
-	cred, err := zoho.GetCredential()
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
-	}
+	// m := new(zoho.Mailer)
+	// cred, err := m.GetCredential()
+	// if err != nil {
+	// 	return ctx.Status(http.StatusBadRequest).JSON(err.Error())
+	// }
 
 	cookie := fiber.Cookie{
 		Name:     "token",
@@ -124,7 +130,7 @@ func (c *AuthController) signin(ctx *fiber.Ctx) error {
 	roles := []string{"admin", "prospective", "guest"}
 
 	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
-		"mail":        cred,
+		// "mail":        cred,
 		"accessToken": at,
 		"user":        user,
 		"roles":       roles,
@@ -172,13 +178,14 @@ func (c *AuthController) token(ctx *fiber.Ctx) error {
 
 	roles := []string{"admin", "prospective", "guest"}
 
-	cred, err := zoho.GetCredential()
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
-	}
+	// m := new(zoho.Mailer)
+	// cred, err := m.GetCredential()
+	// if err != nil {
+	// 	return ctx.Status(http.StatusBadRequest).JSON(err.Error())
+	// }
 
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{
-		"mail":        cred,
+		// "mail":        cred,
 		"accessToken": t,
 		"user":        user,
 		"roles":       roles,
@@ -212,6 +219,6 @@ func (c *AuthController) verify(ctx *fiber.Ctx) error {
 	return ctx.JSON(fiber.Map{
 		"accessToken": nil,
 		"login":       false,
-		"isVerified": true,
+		"isVerified":  true,
 	})
 }

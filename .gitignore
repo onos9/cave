@@ -23,3 +23,5 @@ cmd/api/.env
 .env
 rest.http
 docker/cavedata
+*.env
+*.env.base64

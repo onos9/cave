@@ -50,7 +50,7 @@ func GetConfig() Config {
 		Env:      os.Getenv("ENV"),
 		Mongo:    GetMongoDBConfig(),
 		Redis:    GetRedisConfig(),
-		ZohoMail: GetZohoMailConfig(),
+		ZohoMail: GetMailConfig(),
 
 		JWTAccessSecret:  os.Getenv("JWT_ACCESS_SIGN_KEY"),
 		JWTRefreshSecret: os.Getenv("JWT_REFRESH_SIGN_KEY"),

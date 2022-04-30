@@ -2,6 +2,7 @@ package controller
 
 import (
 	// Middlewares
+	"github.com/cave/pkg/database"
 	"github.com/cave/pkg/middlewares"
 	"github.com/cave/pkg/models"
 
@@ -12,8 +13,8 @@ import (
 type Resp map[string]interface{}
 
 // SetupRoutes setups router
-func SetupRoutes(app *fiber.App) {
-	models.SetRepoDB()
+func SetupRoutes(app *fiber.App, db *database.DB) {
+	models.SetRepoDB(db)
 
 	// serve Single Page application on "/web" route
 	// assume static file at dist folder
@@ -56,6 +57,7 @@ func SetupRoutes(app *fiber.App) {
 	m.Get("/", middlewares.RequireLoggedIn(), mailer.zohoCode)
 	m.Post("/token", middlewares.RequireLoggedIn(), mailer.token)
 	m.Get("/", middlewares.RequireLoggedIn(), mailer.zohoCode)
+	
 	// m.Get("/", middlewares.RequireLoggedIn(), mail.getAll)
 	// m.Get("/:id", middlewares.RequireLoggedIn(), mail.getOne)
 	// m.Post("/:id", middlewares.RequireLoggedIn(), mail.updateOne)

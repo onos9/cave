@@ -7,7 +7,7 @@ services:
         container_name: mongo
         restart: unless-stopped
         networks:
-            - cave_net
+            - net
         ports:
             - "27017:27017" 
         volumes: # optional to preserve database after container is deleted.
@@ -18,33 +18,35 @@ services:
         image: "redis:alpine"
         restart: unless-stopped
         networks:
-            - cave_net
+            - net
 
     api:
-        container_name: api
+        restart: unless-stopped
+        command: -c chown -R ${UID}:${GID} /cave
         build:
             context: ../
             dockerfile: docker/Dockerfile
-            target: prod
+            target: dev
         ports:
             - "2345:2345"
             - "9000:9000" 
         networks:
-            - cave_net
-        restart: unless-stopped
-        environment: # set required env variables to access mongo
-            MONGO_URI: ${MONGO_URI}
+            - net
+        env_file: # set required env variables 
+            - ./.env
         depends_on: 
             - db
             - redis
         volumes:
             - ../../cavedata/api:/cave/api
-        command: -c chown -R ${UID}:${GID} /cave
-    
-    
+            - ../../cavedata/go-modules:/go/pkg/mod
+        
     # frontend:
-    #     build: ./web
-    #     command: npm run start
+    #     restart: unless-stopped
+    #     build:
+    #         context: ../
+    #         dockerfile: docker/Dockerfile
+    #         target: dev
     #     ports: 
     #         - "3000:3000"
     #     depends_on:
@@ -53,8 +55,8 @@ services:
     #         - /web/node_modules
     #         - ./web:/web
     #     networks:
-    #         - cave_net
+    #         - net
     #     stdin_open: true
 
 networks:
-    cave_net:
+    net:

@@ -14,19 +14,22 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var (
-	MgDB MongoInstance
-	RdDB *redis.Client
-)
-
 // MongoInstance contains the Mongo client and database objects
-type MongoInstance struct {
-	Client *mongo.Client
-	Db     *mongo.Database
+type DB struct {
+	MongoClient *mongo.Client
+	MongoDB     *mongo.Database
+}
+
+func NewDBConnection() *DB {
+	mongo, mongoClient := connectMongo()
+	return &DB{
+		MongoClient: mongoClient,
+		MongoDB:     mongo,
+	}
 }
 
 // ConnectMongo Returns the Mongo DB Instance
-func ConnectMongo() {
+func connectMongo() (*mongo.Database, *mongo.Client) {
 	opts := options.Client().ApplyURI(cfg.GetConfig().Mongo.URI)
 	client, err := mongo.NewClient(opts)
 	if err != nil {
@@ -41,7 +44,7 @@ func ConnectMongo() {
 	defer cancel()
 
 	err = client.Connect(ctx)
-	db := client.Database(cfg.GetConfig().Mongo.MongoDBName)
+	mongo := client.Database(cfg.GetConfig().Mongo.MongoDBName)
 	if err != nil {
 		fmt.Println(strings.Repeat("!", 40))
 		fmt.Println("☹️  Could Not Establish Mongo DB Connection")
@@ -54,32 +57,15 @@ func ConnectMongo() {
 	fmt.Println("😀 Connected To Mongo DB")
 	fmt.Println(strings.Repeat("-", 40))
 
-	MgDB = MongoInstance{
-		Client: client,
-		Db:     db,
-	}
+	return mongo, client
 }
 
 // ConnectRedis returns the Redis Instance
-func ConnectRedis() {
+func RedisClient(dbn int) *redis.Client {
 	client := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", cfg.GetConfig().Redis.HOST, cfg.GetConfig().Redis.PORT),
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Password: "",  // no password set
+		DB:       dbn, // database number
 	})
-
-	pong, err := client.Ping(client.Context()).Result()
-
-	if err != nil {
-		fmt.Println(strings.Repeat("!", 40))
-		fmt.Println("☹️  Could Not Establish Redis Connection")
-		fmt.Println(strings.Repeat("!", 40))
-		log.Fatal(err)
-	}
-
-	fmt.Println(strings.Repeat("-", 40))
-	fmt.Printf("😀 Connected To Redis: %s\n", pong)
-	fmt.Println(strings.Repeat("-", 40))
-
-	RdDB = client
+	return client
 }

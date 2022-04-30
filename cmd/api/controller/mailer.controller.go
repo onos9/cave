@@ -29,10 +29,12 @@ func (c *MailerController) send(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(err)
 	}
 
-	resp, err := zoho.SendMail(mail)
+	m := new(zoho.Mailer)
+	resp, err := m.SendMail(mail)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error)
 	}
+	
 	return ctx.Status(http.StatusCreated).JSON(Resp{
 		"respons": resp,
 	})
@@ -40,7 +42,8 @@ func (c *MailerController) send(ctx *fiber.Ctx) error {
 
 func (c *MailerController) zohoCode(ctx *fiber.Ctx) error {
 
-	cfg := zoho.GetZohoMailConfig()
+	m := new(zoho.Mailer)
+	cfg := m.GetMailConfig()
 	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
 		"credentials": cfg,
 	})
@@ -52,18 +55,19 @@ func (c *MailerController) token(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
 	}
 
-	token, err := zoho.RequestTokens(c.Code)
+	m := new(zoho.Mailer)
+	token, err := m.RequestTokens(c.Code)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
 	}
 
-	cred, err := zoho.GetCredential()
+	cred, err := m.GetCredential()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
 	}
 
 	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
-		"token":    token,
-		"mail": cred,
+		"token": token,
+		"mail":  cred,
 	})
 }
