@@ -20,7 +20,7 @@ cmd/.DS_Store
 
 google_client_id.json
 
-/rest.http
+rest.http
 .env.base64
 .env
 cmd/api/.env
