@@ -15,13 +15,12 @@
 # vendor/
 
 go.sum
-.DS_Store
+*.DS_Store
 cmd/.DS_Store
 
 google_client_id.json
-cmd/api/.env
+
+/rest.http
+.env.base64
 .env
-rest.http
-docker/cavedata
-*.env
-*.env.base64
+cmd/api/.env
