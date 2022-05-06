@@ -14,9 +14,6 @@ services:
             - 8000:8181
         networks:
             - net
-        volumes:
-            - ../../cavedata/nginx/admin:/var/www/html/admin
-            - ../../cavedata/nginx/web:/var/www/html/web
     
     redis:
         container_name: redis

@@ -51,6 +51,7 @@ ENTRYPOINT ["./api"]
 FROM nginx:alpine AS nginx
 COPY docker/nginx/default.conf /etc/nginx/conf.d
 COPY --from=builder /app/admin/build/ /var/www/html/admin
+COPY --from=builder /app/web/ /var/www/html/web
 
 ################################
 # STEP 5 build for php
