@@ -16,7 +16,7 @@ RUN apk update && apk upgrade \
     && apk add --no-cache \
     git nodejs npm
 
-COPY go.* /app
+COPY go.* /app/
 
 # Fetch dependencies.
 RUN  go mod tidy -compat=1.17 \
