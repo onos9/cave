@@ -1,4 +1,4 @@
-# syntax = docker/dockerfile:1-experimental
+
 ###############################
 # STEP 2 Build services image
 ###############################
@@ -26,14 +26,17 @@ RUN  go mod tidy -compat=1.17 \
 COPY  . /app
 
 # Buid for production
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    cd cmd/api \
+RUN cd cmd/api \
     && go build -gcflags "all=-N -l" -o ../../api
 
+RUN git clone https://github.com/onos9/cave-landing.git web
 RUN git clone https://github.com/onos9/cave-web.git admin \
     && cd admin \
     && npm install \
     && npm run build
+
+
+
 
 ################################
 # STEP 3 build a small image
@@ -48,7 +51,6 @@ ENTRYPOINT ["./api"]
 FROM nginx:alpine AS nginx
 COPY docker/nginx/default.conf /etc/nginx/conf.d
 COPY --from=builder /app/admin/build/ /var/www/html/admin
-COPY data/ /var/www/html/web
 
 ################################
 # STEP 5 build for php
@@ -56,4 +58,4 @@ COPY data/ /var/www/html/web
 FROM php:fpm-alpine As php
 RUN docker-php-ext-install opcache
 COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
-COPY data/ /var/www/html/web
+COPY --from=builder /app/web/ /var/www/html/web

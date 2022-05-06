@@ -3,6 +3,7 @@ version: '3.8'
 services:    
     nginx:
         container_name: nginx
+        restart: unless-stopped
         image: nginx
         build:
             context: ../
