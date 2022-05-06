@@ -36,8 +36,12 @@ func LoadConfig() {
 	if err != nil {
 		log.Println(err)
 	}
-	environmentPath := filepath.Join(currentPath, ".env")
 
+	if env := os.Getenv("ENV"); env=="prod" {
+		return
+	}
+	
+	environmentPath := filepath.Join(currentPath, ".env")
 	if err := godotenv.Load(environmentPath); err != nil {
 		log.Fatal("Error loading .env file")
 		log.Fatal(err)

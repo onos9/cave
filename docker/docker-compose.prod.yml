@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:    
+    nginx:
+        container_name: nginx
+        image: nginx
+        build:
+            context: ../
+            dockerfile: docker/Dockerfile
+            target: nginx
+        ports:
+            - 8888:80
+            - 8000:8181
+        networks:
+            - net
+        volumes:
+            - ../../cavedata/nginx/admin:/var/www/html/admin
+            - ../../cavedata/nginx/web:/var/www/html/web
+    
+    redis:
+        container_name: redis
+        image: "redis:alpine"
+        restart: unless-stopped
+        networks:
+            - net
+
+    mongodb:
+        image: mongo:latest
+        container_name: mongo
+        restart: unless-stopped
+        volumes: 
+            - ../../cavedata/dbdata:/data/db
+        networks:
+            - net
+    
+    mongo-express:
+        image: mongo-express
+        container_name: mongo-express
+        restart: always
+        ports:
+            - 8081
+        environment:
+            ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
+        networks:
+            - net
+    
+    php:
+        container_name: php
+        image: php
+        build:
+            context: ../
+            dockerfile: docker/Dockerfile
+            target: php
+        networks:
+            - net
+
+    api:
+        restart: unless-stopped
+        build:
+            context: ../
+            dockerfile: docker/Dockerfile
+            target: api
+        ports:
+            - 3000 
+        env_file: 
+            - ../.env
+        depends_on: 
+            - mongodb
+            - redis
+        volumes:
+            - ../../cavedata/api:/cave/api
+            - ../../cavedata/go-modules:/go/pkg/mod  
+        networks:
+            - net
+
+networks:
+    net:

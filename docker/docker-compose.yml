@@ -1,62 +1,75 @@
 version: '3.8'
 
-# Mongodb Service
 services:
-    db:
-        image: mongo:latest # use the latest image.
+    mongodb:
+        image: mongo:latest
         container_name: mongo
         restart: unless-stopped
         networks:
             - net
         ports:
             - "27017:27017" 
-        volumes: # optional to preserve database after container is deleted.
+        volumes:
         - ../../cavedata/dbdata:/data/db
 
+    # mongo-express:
+    #     image: mongo-express
+    #     restart: always
+    #     ports:
+    #         - 8081:8081
+    #     environment:
+    #         ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+
     redis:
-        container_name: redis
         image: "redis:alpine"
+        container_name: redis
         restart: unless-stopped
         networks:
             - net
-
-    api:
-        restart: unless-stopped
-        command: -c chown -R ${UID}:${GID} /cave
+        
+    nginx:
+        image: nginx:latest
+        container_name: nginx
         build:
             context: ../
             dockerfile: docker/Dockerfile
-            target: server
         ports:
-            - "2345:2345"
-            - "9000:9000" 
+            - "8080:8080"
         networks:
             - net
-        env_file: # set required env variables 
-            - ./.env
+        volumes:
+            - ../../cavedata/web:/var/www/html/
+            - ../../cavedata/logs/nginx:/var/log/nginx/
+      
+    php:
+        image: php:fpm-alpine
+        container_name: php
+        networks:
+            - net
+        volumes:
+            - ../../cavedata/web:/var/www/html
+
+    api:
+        image: api:1.0.2
+        restart: unless-stopped
+        build:
+            context: ../
+            dockerfile: docker/Dockerfile
+            target: api
+        ports:
+            - "2345:2345"
+            - "8000:8000" 
+        env_file:
+            - ../.env
         depends_on: 
-            - db
+            - mongodb
             - redis
+            - nginx
+            - php
         volumes:
             - ../../cavedata/api:/cave/api
             - ../../cavedata/go-modules:/go/pkg/mod
-        
-    # frontend:
-    #     restart: unless-stopped
-    #     build:
-    #         context: ../
-    #         dockerfile: docker/Dockerfile
-    #         target: dev
-    #     ports: 
-    #         - "3000:3000"
-    #     depends_on:
-    #         - api
-    #     volumes:
-    #         - /web/node_modules
-    #         - ./web:/web
-    #     networks:
-    #         - net
-    #     stdin_open: true
-
+        networks:
+            - net
 networks:
     net:
