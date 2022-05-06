@@ -23,7 +23,7 @@ RUN  go mod tidy -compat=1.17 \
     && go mod download \
     && go mod verify
 
-COPY  . /app
+COPY  . /app/
 
 # Buid for production
 RUN cd cmd/api \
