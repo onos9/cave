@@ -1,33 +1,4 @@
-###############################
-# STEP 1 create dev image
-###############################
-FROM golang:1.17-alpine AS dev
-WORKDIR /app
-
-ENV GO111MODULE="on"
-ENV GOOS="linux"
-ENV CGO_ENABLED=0
-ENV GOARCH=amd64
-
-# System dependencies
-RUN apk update && apk upgrade \
-    && apk add --no-cache \
-    git
-
-# Fetch dependencies.
-COPY  . /app
-
-# COPY dbinit.js /docker-entrypoint-initdb.d/
-RUN go mod tidy -compat=1.17 \
-    && go mod download \
-    && go mod verify \
-    && go install github.com/go-delve/delve/cmd/dlv@latest
-
-RUN go build -gcflags "all=-N -l"  cmd/api/main.go
-
-ENTRYPOINT /go/bin/dlv --listen=:2345 --headless=true --log=true --log-output=debugger,debuglineerr,gdbwire,lldbout,rpc --accept-multiclient --api-version=2 exec ./main
-
-
+# syntax = docker/dockerfile:1-experimental
 ###############################
 # STEP 2 Build services image
 ###############################
