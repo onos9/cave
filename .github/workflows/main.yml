@@ -35,7 +35,7 @@ jobs:
 
       - name: Decoding environmental variables
         run: |
-          echo ${{ secrets.ENV_FILE }} > docker/.env.base64
+          echo ${{ secrets.ENV_FILE }} >> docker/.env.base64
           openssl base64 -d -in docker/.env.base64 -out .env
           rm -rf docker/.env.base64
 
