@@ -36,7 +36,7 @@ RUN git clone https://github.com/onos9/cave-web.git admin \
     && npm run build
 
 
-
+# ENTRYPOINT ["./api"]
 
 ################################
 # STEP 3 build a small image

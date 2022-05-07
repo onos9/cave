@@ -36,7 +36,7 @@ jobs:
       - name: Decoding environmental variables
         run: |
           echo ${{ secrets.SSH_HOST }} > docker/.env.base64
-          openssl base64 -d -in docker/.env.base64 -out docker/.env
+          openssl base64 -d -in docker/.env.base64 -out .env
           rm -rf docker/.env.base64
 
       - name: Deploy with rsync
@@ -45,4 +45,4 @@ jobs:
       # Runs a set of commands using the ssh shell
       - name: Deploying to server using SSH
         run: |
-         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'cd cavelms && make deploy && rm -rf docker/.env'
+         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'cd cavelms && make deploy && rm -rf .env'
