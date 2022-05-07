@@ -57,7 +57,7 @@ services:
         build:
             context: ../
             dockerfile: docker/Dockerfile
-            target: api
+            target: builder
         ports:
             - 3000 
         env_file: 
