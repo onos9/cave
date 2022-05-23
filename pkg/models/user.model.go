@@ -17,17 +17,19 @@ const (
 // User struct for users table
 type User struct {
 	utils.Base
-	Id             primitive.ObjectID `json:"id" bson:"_id"`
+	Id primitive.ObjectID `json:"id" bson:"_id"`
+
 	*BioData       `bson:"bioData,omitempty" json:"bioData"`
 	*Qualification `bson:"qualification,omitempty" json:"qualification"`
 	*Background    `bson:"background,omitempty" json:"background"`
 	*Health        `bson:"health,omitempty" json:"health"`
 	*Terms         `bson:"terms,omitempty" json:"terms"`
+	RefereeList    []*Referee `bson:"referees,omitempty" json:"referees"`
 
-	RefereeList            []*Referee `bson:"referees,omitempty" json:"referees"`
+	UserID                 string     `bson:"userID,omitempty" json:"userID"`
 	Email                  string     `bson:"email,omitempty" json:"email,omitempty"`
 	Password               string     `bson:"-" json:"password,omitempty"`
-	IsVerified             bool       `bson:"isVerified" json:"isVerified,omitempty"`
+	IsVerified             bool       `bson:"isVerified,omitempty" json:"isVerified,omitempty"`
 	PasswordSalt           string     `bson:"passwordsalt,omitempty" json:"-"`
 	PasswordHash           []byte     `bson:"passwordhash,omitempty" json:"-"`
 	ExternalID             string     `bson:"external_id,omitempty" json:"externalID,omitempty"`
@@ -50,6 +52,7 @@ type User struct {
 	Status                 string     `bson:"status,omitempty" json:"status"`
 	Program                string     `bson:"program,omitempty" json:"program"`
 	ProgramOption          string     `bson:"programOption,omitempty" json:"programOption"`
+	Wallet                 int        `bson:"wallet,omitempty" json:"wallet"`
 
 	TimeZone        *time.Time        `bson:"timeZone,omitempty" json:"timeZone,omitempty"`
 	AuthoredCourses CourseAuthorList  `bson:"authoredCourses,omitempty" json:"authoredCourses,omitempty"`
@@ -128,7 +131,7 @@ type Referee struct {
 type Terms struct {
 	Scholarship       bool   `bson:"scholarship,omitempty" json:"scholarship"`
 	ScholarshipReason string `bson:"scholReason,omitempty" json:"scholReason"`
-	Agree             string   `bson:"agree,omitempty" json:"agree"`
+	Agree             string `bson:"agree,omitempty" json:"agree"`
 }
 
 // UserList defines array of user objects
@@ -143,6 +146,7 @@ func (m *User) Create() error {
 	t := time.Now()
 	m.CreatedAt = &t
 	m.Id = primitive.NewObjectID()
+
 	result, err := db.Collection(userCol).InsertOne(context.TODO(), &m)
 	if err != nil {
 		return err

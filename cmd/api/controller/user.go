@@ -11,12 +11,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-var user *UserController
+var user *User
 
-// UserController is an anonymous struct for user controller
-type UserController struct{}
+// User is an anonymous struct for user controller
+type User struct{}
 
-func (c *UserController) create(ctx *fiber.Ctx) error {
+func (c *User) create(ctx *fiber.Ctx) error {
 	var user models.User
 
 	if err := ctx.BodyParser(&c); err != nil {
@@ -44,7 +44,7 @@ func (c *UserController) create(ctx *fiber.Ctx) error {
 
 }
 
-func (c *UserController) getOne(ctx *fiber.Ctx) error {
+func (c *User) getOne(ctx *fiber.Ctx) error {
 
 	var user models.User
 	id := ctx.Params("id")
@@ -59,7 +59,7 @@ func (c *UserController) getOne(ctx *fiber.Ctx) error {
 	})
 }
 
-func (c *UserController) getAll(ctx *fiber.Ctx) error {
+func (c *User) getAll(ctx *fiber.Ctx) error {
 
 	var user models.User
 	var userList models.UserList
@@ -73,7 +73,7 @@ func (c *UserController) getAll(ctx *fiber.Ctx) error {
 	})
 }
 
-func (c *UserController) updateOne(ctx *fiber.Ctx) error {
+func (c *User) updateOne(ctx *fiber.Ctx) error {
 
 	var user models.User
 	err := json.Unmarshal(ctx.Body(), &user)
@@ -105,7 +105,7 @@ func (c *UserController) updateOne(ctx *fiber.Ctx) error {
 	})
 }
 
-func (c *UserController) deleteOne(ctx *fiber.Ctx) error {
+func (c *User) deleteOne(ctx *fiber.Ctx) error {
 
 	var user models.User
 

@@ -24,3 +24,4 @@ rest.http
 .env.base64
 .env
 cmd/api/.env
+cavedata

@@ -30,8 +30,8 @@ RUN cd cmd/api \
     && go build -gcflags "all=-N -l" -o ../../api
 
 RUN git clone https://github.com/onos9/cave-landing.git web
-RUN git clone https://github.com/onos9/cave-web.git admin \
-    && cd admin \
+RUN git clone https://github.com/onos9/cave-web.git portal \
+    && cd portal \
     && npm install \
     && npm run build
 
@@ -49,7 +49,7 @@ ENTRYPOINT ["./api"]
 ################################
 FROM nginx:alpine AS nginx
 COPY docker/nginx/default.conf /etc/nginx/conf.d
-COPY --from=builder /app/admin/build/ /var/www/html/admin
+COPY --from=builder /app/portal/build/ /var/www/html/portal
 COPY --from=builder /app/web/ /var/www/html/web
 
 ################################

@@ -1,41 +1,40 @@
 package utils
 
 import (
-	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"bytes"
+	"errors"
+	"html/template"
+	"io/ioutil"
+	"path"
+	"runtime"
 )
 
-// Base serves as a base model for other models
-type Base struct {
-	ID        primitive.ObjectID `bson:"id" json:"-"`
-	CreatedAt *time.Time         `json:"created_at"`
-	UpdatedAt *time.Time         `json:"update_at"`
-	DeletedAt *time.Time         `json:"-" bson:"deleted_at,omitempty"`
-	Doc       string             `bson:"-" json:"-"`
+func ParseHtml(f string) (string, error) {
+	bs, err := ioutil.ReadFile(f)
+	if err != nil {
+		return "", err
+	}
+
+	return string(bs), nil
 }
 
-// GetID returns Id of the model
-func (base *Base) GetID() primitive.ObjectID {
-	return base.ID
-}
+func ParseTemplate(m map[string]interface{}) (string, error) {
+	_, filename, _, ok := runtime.Caller(1)
+	if !ok {
+		return "", errors.New("can not get filename")
+	}
 
-// SetID sets Id of the model
-func (base *Base) SetID(id primitive.ObjectID) {
-	base.ID = id
-}
+	dir := path.Dir(filename)
+	filePath := dir + "/templates/" + m["filename"].(string)
+	t, err := template.ParseFiles(filePath)
+	if err != nil {
+		return "", err
+	}
 
-// SetCreatedAt sets field createdAt, should only be used in mongodb
-func (base *Base) SetCreatedAt(t *time.Time) {
-	base.CreatedAt = t
-}
+	buf := new(bytes.Buffer)
+	if err = t.Execute(buf, m); err != nil {
+		return "", err
+	}
 
-// SetUpdatedAt sets field UpdatedAt
-func (base *Base) SetUpdatedAt(t *time.Time) {
-	base.UpdatedAt = t
-}
-
-// SetDeletedAt sets field DeletedAt
-func (base *Base) SetDeletedAt(t *time.Time) {
-	base.DeletedAt = t
+	return buf.String(), nil
 }

@@ -3,16 +3,16 @@ package controller
 import (
 	"net/http"
 
-	"github.com/cave/pkg/zoho"
+	"github.com/cave/pkg/mailer"
 	"github.com/gofiber/fiber/v2"
 )
 
 var (
-	mailer *MailerController
+	mail *Mailer
 )
 
 // CandidateController is an anonymous struct for candidate controller
-type MailerController struct {
+type Mailer struct {
 	Code      string `json:"code"`
 	From      string `json:"from"`
 	To        string `json:"to"`
@@ -21,7 +21,7 @@ type MailerController struct {
 	AskReceip string `json:"askReceip"`
 }
 
-func (c *MailerController) send(ctx *fiber.Ctx) error {
+func (c *Mailer) send(ctx *fiber.Ctx) error {
 
 	var mail fiber.Map
 
@@ -29,33 +29,33 @@ func (c *MailerController) send(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(err)
 	}
 
-	m := new(zoho.Mailer)
+	m := new(mailer.Mail)
 	resp, err := m.SendMail(mail)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error)
 	}
-	
-	return ctx.Status(http.StatusCreated).JSON(Resp{
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
 		"respons": resp,
 	})
 }
 
-func (c *MailerController) zohoCode(ctx *fiber.Ctx) error {
+func (c *Mailer) zohoCode(ctx *fiber.Ctx) error {
 
-	m := new(zoho.Mailer)
+	m := new(mailer.Mail)
 	cfg := m.GetMailConfig()
 	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
 		"credentials": cfg,
 	})
 }
 
-func (c *MailerController) token(ctx *fiber.Ctx) error {
+func (c *Mailer) token(ctx *fiber.Ctx) error {
 
 	if err := ctx.BodyParser(&c); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
 	}
 
-	m := new(zoho.Mailer)
+	m := new(mailer.Mail)
 	token, err := m.RequestTokens(c.Code)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error())

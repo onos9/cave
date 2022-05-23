@@ -2,28 +2,32 @@ package controller
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"time"
 
 	"github.com/cave/pkg/auth"
+	"github.com/cave/pkg/database"
+	"github.com/cave/pkg/mailer"
 	"github.com/cave/pkg/models"
 	"github.com/cave/pkg/utils"
-	"github.com/cave/pkg/zoho"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-var userAuth *AuthController
+var userAuth *Auth
 
-// AuthController is an anonymous struct for user controller
-type AuthController struct {
+// Auth is an anonymous struct for user controller
+type Auth struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-func (c *AuthController) signup(ctx *fiber.Ctx) error {
+func (c *Auth) signup(ctx *fiber.Ctx) error {
 	var user models.User
+	rdb := database.RedisClient(0)
+	defer rdb.Close()
 
 	if err := ctx.BodyParser(&c); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err)
@@ -35,6 +39,7 @@ func (c *AuthController) signup(ctx *fiber.Ctx) error {
 	user.Email = c.Email
 	user.EnrollProgress = 0
 	user.Role = "prospective"
+	user.Wallet = 0
 
 	//Save User To DB
 	if err := user.Create(); err != nil {
@@ -44,19 +49,28 @@ func (c *AuthController) signup(ctx *fiber.Ctx) error {
 		})
 	}
 
-	vt, err := auth.IssueVerificationToken(user)
+	rand.Seed(time.Now().UnixNano())
+	code := fmt.Sprintf("%06d", rand.Intn(999999))
+
+	err := rdb.Set(ctx.Context(), code, user.ID.Hex(), 0).Err()
 	if err != nil {
-		return ctx.Status(http.StatusForbidden).JSON(err.Error())
+		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
 	}
 
 	mail := fiber.Map{
 		"fromAddress": "admin@adullam.ng",
 		"toAddress":   c.Email,
-		"subject":     "Activate Your Adullam Account",
-		"content":     fmt.Sprintf("http://localhost:3000/#/sign-in/%s", vt),
+		"subject":     "Adullam|Signup",
+		"content": fiber.Map{
+			"filename": "signup.html",
+			"paymentCode": "11-" + code,
+		},
 	}
 
-	m := new(zoho.Mailer)
+	m := new(mailer.Mail)
 	_, err = m.SendMail(mail)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
@@ -70,11 +84,10 @@ func (c *AuthController) signup(ctx *fiber.Ctx) error {
 		"emailed": true,
 		"success": true,
 	})
-
 }
 
 // Login user
-func (c *AuthController) signin(ctx *fiber.Ctx) error {
+func (c *Auth) signin(ctx *fiber.Ctx) error {
 	if err := ctx.BodyParser(&c); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
 	}
@@ -108,11 +121,11 @@ func (c *AuthController) signin(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusForbidden).JSON(err.Error())
 	}
 
-	// m := new(zoho.Mailer)
-	// cred, err := m.GetCredential()
-	// if err != nil {
-	// 	return ctx.Status(http.StatusBadRequest).JSON(err.Error())
-	// }
+	m := new(mailer.Mail)
+	cred, err := m.GetCredential()
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
+	}
 
 	cookie := fiber.Cookie{
 		Name:     "token",
@@ -130,7 +143,7 @@ func (c *AuthController) signin(ctx *fiber.Ctx) error {
 	roles := []string{"admin", "prospective", "guest"}
 
 	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
-		// "mail":        cred,
+		"mail":        cred,
 		"accessToken": at,
 		"user":        user,
 		"roles":       roles,
@@ -138,7 +151,7 @@ func (c *AuthController) signin(ctx *fiber.Ctx) error {
 	})
 }
 
-func (c *AuthController) signout(ctx *fiber.Ctx) error {
+func (c *Auth) signout(ctx *fiber.Ctx) error {
 	cookie := fiber.Cookie{
 		Name:     "token",
 		Value:    "",
@@ -154,7 +167,7 @@ func (c *AuthController) signout(ctx *fiber.Ctx) error {
 	})
 }
 
-func (c *AuthController) token(ctx *fiber.Ctx) error {
+func (c *Auth) token(ctx *fiber.Ctx) error {
 	var user models.User
 
 	token := ctx.Cookies("token")
@@ -178,14 +191,14 @@ func (c *AuthController) token(ctx *fiber.Ctx) error {
 
 	roles := []string{"admin", "prospective", "guest"}
 
-	// m := new(zoho.Mailer)
-	// cred, err := m.GetCredential()
-	// if err != nil {
-	// 	return ctx.Status(http.StatusBadRequest).JSON(err.Error())
-	// }
+	m := new(mailer.Mail)
+	cred, err := m.GetCredential()
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
+	}
 
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{
-		// "mail":        cred,
+		"mail":        cred,
 		"accessToken": t,
 		"user":        user,
 		"roles":       roles,
@@ -193,7 +206,7 @@ func (c *AuthController) token(ctx *fiber.Ctx) error {
 	})
 }
 
-func (c *AuthController) verify(ctx *fiber.Ctx) error {
+func (c *Auth) verify(ctx *fiber.Ctx) error {
 	var user models.User
 
 	token := ctx.Params("token")

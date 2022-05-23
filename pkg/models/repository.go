@@ -2,8 +2,11 @@ package models
 
 import (
 	"context"
+	"log"
+	"os"
 
 	"github.com/cave/pkg/database"
+	"github.com/cave/pkg/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -15,20 +18,35 @@ var (
 
 // SetRepoDB global db handler
 func SetRepoDB(dbi *database.DB) {
-
 	db = dbi.MongoDB
 
-	SetIndex("users", "email")
+	err := SetIndex("users", "email")
+	if err != nil {
+		log.Panic(err.Error())
+	}
+
+	// Hash Password
+	password := os.Getenv("ADMIN_PASS")
+	hashedPass, _ := utils.EncryptPassword(password)
+	user := User{
+		Email:        os.Getenv("ADMIN_EMAIL"),
+		PasswordHash: []byte(hashedPass),
+		Role:         "admin",
+		IsVerified:   false,
+	}
+
+	//Save User To DB
+	if err := user.Create(); err != nil {
+		e := err.(mongo.WriteException)
+		if c := e.WriteErrors[0].Code; c != 11000 {
+			log.Panic(err.Error())
+		}
+	}
 }
 
 func SetIndex(doc, field string) error {
 
 	coll := db.Collection(doc)
-	count, err := coll.CountDocuments(context.Background(), bson.M{})
-	if err != nil && count == 0 {
-		return err
-	}
-
 	opt := options.Index()
 	opt.SetUnique(true)
 
