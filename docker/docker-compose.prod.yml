@@ -29,7 +29,7 @@ services:
         container_name: mongo
         restart: unless-stopped
         volumes: 
-            - ../cavedata/dbdata:/data/db
+            - ../../cavedata/dbdata:/data/db
         networks:
             - net
     
@@ -68,9 +68,9 @@ services:
             - mongodb
             - redis
         volumes:
-            - ../cavedata/api:/cave/api
-            - ../cavedata/api/portal:/var/www/html/portal
-            - ../cavedata/go-modules:/go/pkg/mod  
+            - ../../cavedata/api:/cave/api
+            - ../../cavedata/api/portal:/var/www/html/portal
+            - ../../cavedata/go-modules:/go/pkg/mod  
         networks:
             - net
 
