@@ -73,6 +73,6 @@ services:
             - ../../cavedata/go-modules:/go/pkg/mod  
         networks:
             - net
-
+        
 networks:
     net:
