@@ -43,7 +43,7 @@ services:
             ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
         networks:
             - net
-    
+
     php:
         container_name: php
         image: php
