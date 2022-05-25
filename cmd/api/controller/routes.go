@@ -43,6 +43,7 @@ func SetupRoutes(app *fiber.App, db *database.DB) {
 		})
 	})
 
+
 	hook := v1.Group("/webhook")
 	hook.Post("/mail", webhook.payment)
 
