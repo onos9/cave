@@ -178,6 +178,7 @@ func (c *Auth) token(ctx *fiber.Ctx) error {
 		})
 	}
 
+
 	user.Role = claims["role"].(string)
 	err = user.FetchByID(claims["userID"].(string))
 	if err != nil {
