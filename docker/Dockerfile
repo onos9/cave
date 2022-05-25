@@ -32,7 +32,7 @@ RUN cd cmd/api \
 RUN git clone https://github.com/onos9/cave-landing.git web
 RUN git clone https://github.com/onos9/cave-web.git portal \
     && cd portal \
-    && npm install \
+    && npm install --legacy-peer-deps \
     && npm run build
 
 # ENTRYPOINT ["./api"]
