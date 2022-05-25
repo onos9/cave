@@ -24,7 +24,11 @@ func (c *Webhook) payment(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusOK).JSON(err)
 	}
 
-	err := wallet.ProcessPayment(m)
+	if _, ok := m["html"]; !ok {
+		return ctx.Status(http.StatusOK).JSON(ok)
+	}
+
+	err := wallet.ProcessPayment(m, &user)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
 	}
@@ -39,7 +43,7 @@ func (c *Webhook) payment(ctx *fiber.Ctx) error {
 		"toAddress":   user.Email,
 		"subject":     "Adullam",
 		"content": fiber.Map{
-			"filename":    "payment.html",
+			"filename":     "payment.html",
 			"redirect_uri": m["redirect_uri"].(string) + "/" + vt,
 		},
 	}

@@ -52,7 +52,8 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 	rand.Seed(time.Now().UnixNano())
 	code := fmt.Sprintf("%06d", rand.Intn(999999))
 
-	err := rdb.Set(ctx.Context(), code, user.ID.Hex(), 0).Err()
+	userID := user.Id.Hex()
+	err := rdb.Set(ctx.Context(), code, userID, 0).Err()
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"success": false,
@@ -65,8 +66,8 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 		"toAddress":   c.Email,
 		"subject":     "Adullam|Signup",
 		"content": fiber.Map{
-			"filename": "signup.html",
-			"paymentCode": "11-" + code,
+			"filename":    "signup.html",
+			"paymentCode": "10-" + code,
 		},
 	}
 
@@ -121,11 +122,11 @@ func (c *Auth) signin(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusForbidden).JSON(err.Error())
 	}
 
-	m := new(mailer.Mail)
-	cred, err := m.GetCredential()
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
-	}
+	// m := new(mailer.Mail)
+	// cred, err := m.GetCredential()
+	// if err != nil {
+	// 	return ctx.Status(http.StatusBadRequest).JSON(err.Error())
+	// }
 
 	cookie := fiber.Cookie{
 		Name:     "token",
@@ -143,7 +144,6 @@ func (c *Auth) signin(ctx *fiber.Ctx) error {
 	roles := []string{"admin", "prospective", "guest"}
 
 	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
-		"mail":        cred,
 		"accessToken": at,
 		"user":        user,
 		"roles":       roles,
@@ -191,14 +191,13 @@ func (c *Auth) token(ctx *fiber.Ctx) error {
 
 	roles := []string{"admin", "prospective", "guest"}
 
-	m := new(mailer.Mail)
-	cred, err := m.GetCredential()
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
-	}
+	// m := new(mailer.Mail)
+	// cred, err := m.GetCredential()
+	// if err != nil {
+	// 	return ctx.Status(http.StatusBadRequest).JSON(err.Error())
+	// }
 
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{
-		"mail":        cred,
 		"accessToken": t,
 		"user":        user,
 		"roles":       roles,
@@ -229,9 +228,36 @@ func (c *Auth) verify(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusForbidden).JSON(err.Error())
 	}
 
-	return ctx.JSON(fiber.Map{
-		"accessToken": nil,
-		"login":       false,
-		"isVerified":  true,
+		at, err := auth.IssueAccessToken(user)
+	if err != nil {
+		return ctx.Status(http.StatusForbidden).JSON(err.Error())
+	}
+
+	rt, err := auth.IssueRefreshToken(user)
+	if err != nil {
+		return ctx.Status(http.StatusForbidden).JSON(err.Error())
+	}
+
+	cookie := fiber.Cookie{
+		Name:     "token",
+		Value:    rt,
+		Expires:  time.Now().Add((24 * time.Hour) * 14),
+		HTTPOnly: true,
+		Secure:   false,
+		Domain:   "localhost",
+		SameSite: "Lax",
+		Path:     "/",
+	}
+
+	ctx.Cookie(&cookie)
+
+	roles := []string{"admin", "prospective", "guest"}
+
+	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
+		"accessToken": at,
+		"user":        user,
+		"roles":       roles,
+		"login":       true,
+		"isVerified":  user.IsVerified,
 	})
 }

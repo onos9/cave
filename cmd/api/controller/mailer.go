@@ -23,10 +23,17 @@ type Mailer struct {
 
 func (c *Mailer) send(ctx *fiber.Ctx) error {
 
-	var mail fiber.Map
+	var ml fiber.Map
 
-	if err := ctx.BodyParser(&mail); err != nil {
+	if err := ctx.BodyParser(&ml); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err)
+	}
+
+	mail := fiber.Map{
+		"fromAddress": "admin@adullam.ng",
+		"toAddress":   ml["toAddress"],
+		"subject":     ml["subject"],
+		"content":     ml,
 	}
 
 	m := new(mailer.Mail)

@@ -11,7 +11,6 @@ import (
 	"github.com/cave/pkg/database"
 	"github.com/cave/pkg/mailer"
 	"github.com/cave/pkg/models"
-	"github.com/cave/pkg/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -24,17 +23,11 @@ const TUITION_FEE = 1000
 
 var ctx = context.Background()
 
-func ProcessPayment(m fiber.Map) error {
-	user := models.User{}
+func ProcessPayment(m fiber.Map, user *models.User) error {
 	rdb := database.RedisClient(0)
 	defer rdb.Close()
 
-	html, err := utils.ParseHtml("index.html")
-	if err != nil {
-		return err
-	}
-
-	//html = m["html"].(string)
+	html := m["html"].(string)
 	t, err := getTransaction(html)
 	if err != nil {
 		return err
@@ -90,7 +83,7 @@ func ProcessPayment(m fiber.Map) error {
 	return nil
 }
 
-func processIncompletePayment(user models.User, paid int) error {
+func processIncompletePayment(user *models.User, paid int) error {
 	balance := math.Abs(math.Inf(user.Wallet))
 	mail := fiber.Map{
 		"fromAddress": "admin@adullam.ng",
@@ -98,9 +91,9 @@ func processIncompletePayment(user models.User, paid int) error {
 		"subject":     "Adullam|Payment Confirmation",
 		"content": fiber.Map{
 			"filename": "repay.html",
-			"balance": balance,
-			"due":     APPLICATION_FEE,
-			"paid":    paid,
+			"balance":  balance,
+			"due":      APPLICATION_FEE,
+			"paid":     paid,
 		},
 	}
 
