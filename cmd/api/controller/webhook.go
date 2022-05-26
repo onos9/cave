@@ -45,7 +45,7 @@ func (c *Webhook) payment(ctx *fiber.Ctx) error {
 	u.Path = vt
 
 	mail := fiber.Map{
-		"fromAddress": "admin@adullam.ng",
+		"fromAddress": "support@adullam.ng",
 		"toAddress":   user.Email,
 		"subject":     "Payment Confirmation",
 		"content": fiber.Map{

@@ -86,7 +86,7 @@ func ProcessPayment(m fiber.Map, user *models.User) (string, error) {
 func processIncompletePayment(user *models.User, paid int) error {
 	balance := math.Abs(math.Inf(user.Wallet))
 	mail := fiber.Map{
-		"fromAddress": "admin@adullam.ng",
+		"fromAddress": "support@adullam.ng",
 		"toAddress":   user.Email,
 		"subject":     "Adullam|Payment Confirmation",
 		"content": fiber.Map{

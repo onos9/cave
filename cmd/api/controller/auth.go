@@ -63,7 +63,7 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 	}
 
 	mail := fiber.Map{
-		"fromAddress": "admin@adullam.ng",
+		"fromAddress": "support@adullam.ng",
 		"toAddress":   c.Email,
 		"subject":     "Adullam|Signup",
 		"content": fiber.Map{
