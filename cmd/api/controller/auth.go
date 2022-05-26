@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/cave/pkg/auth"
@@ -128,7 +129,7 @@ func (c *Auth) signin(ctx *fiber.Ctx) error {
 		Expires:  time.Now().Add((24 * time.Hour) * 14),
 		HTTPOnly: true,
 		Secure:   false,
-		Domain:   "localhost",
+		Domain:   os.Getenv("APP_HOST"),
 		SameSite: "Lax",
 		Path:     "/",
 	}
