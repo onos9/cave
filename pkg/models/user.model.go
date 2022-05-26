@@ -87,11 +87,11 @@ type Qualification struct {
 
 // background is a model for backgrounds table
 type Background struct {
-	BornAgain        bool   `bson:"bornAgain,omitempty" json:"bornAgain,string,omitempty"`
+	BornAgain        string   `bson:"bornAgain,omitempty" json:"bornAgain,omitempty"`
 	SalvationBrief   string `bson:"briefSalvation,omitempty" json:"briefSalvation,omitempty"`
 	GodsWorkings     string `bson:"godsWorkings,omitempty" json:"godsWorkings"`
 	GodsCall         string `bson:"godsCall,omitempty" json:"godsCall"`
-	IntoMinistry     bool   `bson:"intoMinistry,omitempty" json:"intoMinistry,string"`
+	IntoMinistry     string   `bson:"intoMinistry,omitempty" json:"intoMinistry"`
 	SpiritualGifts   string `bson:"SpiritualGifts,omitempty" json:"spiritualGifts"`
 	Reason           string `bson:"reason,omitempty" json:"reason"`
 	ChurchName       string `bson:"churchName,omitempty" json:"churchName"`
@@ -100,24 +100,24 @@ type Background struct {
 	PastorEmail      string `bson:"pastorEmail,omitempty" json:"pastorEmail"`
 	PastorPhone      string `bson:"pastorPhone,omitempty" json:"pastorPhone"`
 	ChurchInvolved   string `bson:"churchInvolve,omitempty" json:"churchInvolve"`
-	WaterBaptism     bool   `bson:"waterBaptism,omitempty" json:"waterBaptism,string"`
+	WaterBaptism     string   `bson:"waterBaptism,omitempty" json:"waterBaptism"`
 	BaptismDate      string `bson:"baptismDate,omitempty" json:"baptismDate"`
-	HolyGhostBaptism bool   `bson:"holyghostBaptism,omitempty" json:"holyghostBaptism,string"`
+	HolyGhostBaptism string   `bson:"holyghostBaptism,omitempty" json:"holyghostBaptism"`
 }
 
 // Health is a model for Healths table
 type Health struct {
-	Disability             bool   `bson:"disability,omitempty" json:"disability,string,omitempty"`
-	Nervousillness         bool   `bson:"nervous,omitempty" json:"nervous,string,omitempty"`
-	Anorexia               bool   `bson:"anorexic,omitempty" json:"anorexic,string,omitempty"`
-	Diabetese              bool   `bson:"diabetic,omitempty" json:"diabetic,string,omitempty"`
-	Epilepsy               bool   `bson:"epileptic,omitempty" json:"epileptic,string,omitempty"`
-	StomachUlcers          bool   `bson:"stomachUlcer,omitempty" json:"stomachUlcer,string,omitempty"`
-	SpecialDiet            bool   `bson:"specilaDiet,omitempty" json:"specialDiet,string,omitempty"`
-	LearningDisability     bool   `bson:"learningDisability,omitempty" json:"learningDisability,string,omitempty"`
-	UsedIllDrug            bool   `bson:"illegalDrugs,omitempty" json:"illegalDrug,string,omitempty"`
-	DrugAddiction          bool   `bson:"drugAddiction,omitempty" json:"drugAddiction,string,omitempty"`
-	HadSurgery             bool   `bson:"surgery,omitempty" json:"surgery,string,omitempty"`
+	Disability             string   `bson:"disability,omitempty" json:"disability,omitempty"`
+	Nervousillness         string   `bson:"nervous,omitempty" json:"nervous,omitempty"`
+	Anorexia               string   `bson:"anorexic,omitempty" json:"anorexic,omitempty"`
+	Diabetese              string   `bson:"diabetic,omitempty" json:"diabetic,omitempty"`
+	Epilepsy               string   `bson:"epileptic,omitempty" json:"epileptic,omitempty"`
+	StomachUlcers          string   `bson:"stomachUlcer,omitempty" json:"stomachUlcer,omitempty"`
+	SpecialDiet            string   `bson:"specilaDiet,omitempty" json:"specialDiet,omitempty"`
+	LearningDisability     string   `bson:"learningDisability,omitempty" json:"learningDisability,omitempty"`
+	UsedIllDrug            string   `bson:"illegalDrugs,omitempty" json:"illegalDrug,omitempty"`
+	DrugAddiction          string   `bson:"drugAddiction,omitempty" json:"drugAddiction,omitempty"`
+	HadSurgery             string   `bson:"surgery,omitempty" json:"surgery,omitempty"`
 	HealthIssueDescription string `bson:"healthIssues,omitempty" json:"healthIssues"`
 }
 
