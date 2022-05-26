@@ -130,8 +130,6 @@ func (c *Auth) signin(ctx *fiber.Ctx) error {
 		HTTPOnly: true,
 		Secure:   false,
 		Domain:   os.Getenv("APP_HOST"),
-		SameSite: "Lax",
-		Path:     "/",
 	}
 
 	ctx.Cookie(&cookie)
@@ -149,6 +147,7 @@ func (c *Auth) signin(ctx *fiber.Ctx) error {
 func (c *Auth) signout(ctx *fiber.Ctx) error {
 	cookie := fiber.Cookie{
 		Name:     "token",
+		Domain:   os.Getenv("APP_HOST"),
 		Value:    "",
 		Expires:  time.Now().Add(-time.Hour),
 		HTTPOnly: true,
