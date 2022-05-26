@@ -21,6 +21,8 @@ services:
         container_name: redis
         image: "redis:alpine"
         restart: unless-stopped
+        volumes: 
+            - ../../cavedata/redis_data:/data
         networks:
             - net
 

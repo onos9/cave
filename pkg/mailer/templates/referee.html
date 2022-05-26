@@ -274,7 +274,7 @@
                             valign="top"
                             align="center"
                           >
-                            Daniel Oluwaseyi has listed you as a reference on an
+                            {{.name}} has listed you as a reference on an
                             application to Remnant Christian Network Theological
                             Seminary - Adullam.
                           </td>
@@ -321,10 +321,14 @@
                             valign="top"
                             align="center"
                           >
-                            Download the reference form attached to this email,
-                            fill it appropriately and attached to the student’s
-                            application database using the link below. Put link
-                            here.
+                            Click the link below to download the reference form,
+                            fill it appropriately and upload it
+                            <a
+                              href={{.upload_link}}
+                              target="_blank"
+                              style="color: #bb1eff; text-decoration: underline"
+                              >here</a
+                            >
                           </td>
                         </tr>
                         </tr>
@@ -356,7 +360,7 @@
                             align="center"
                           >
                             <a
-                              href="https://www.adullam.ng"
+                              href={{.download_link}}
                               target="_blank"
                               style="color: #bb1eff; text-decoration: underline"
                               >Download</a

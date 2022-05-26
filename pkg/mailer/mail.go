@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 
@@ -34,12 +33,10 @@ func (m *Mail) SendMail(mail fiber.Map) (fiber.Map, error) {
 	u.Path = resource
 	urlStr := u.String()
 
-	tpl, err := utils.ParseTemplate(mail["content"].(fiber.Map))
+	tpl, err := utils.ParseTemplate(mail["content"].(map[string]interface{}))
 	if err != nil {
 		return fiber.Map{}, err
 	}
-
-	log.Println(tpl)
 
 	mail["content"] = tpl
 

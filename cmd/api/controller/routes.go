@@ -36,13 +36,12 @@ func SetupRoutes(app *fiber.App, db *database.DB) {
 	v1.Use("/docs", swagger.HandlerDefault)
 
 	v1.Get("/", func(c *fiber.Ctx) error {
-		url := c.BaseURL()
+		baseUrl := c.BaseURL()
 		return c.JSON(fiber.Map{
 			"message": "Welcome to Cave API v1",
-			"url":     url + "/api/v1",
+			"url":     baseUrl,
 		})
 	})
-
 
 	hook := v1.Group("/webhook")
 	hook.Post("/mail", webhook.payment)
@@ -66,6 +65,7 @@ func SetupRoutes(app *fiber.App, db *database.DB) {
 	// Mail Routes
 	m := v1.Group("/mail")
 	m.Post("/", middlewares.RequireLoggedIn(), mail.send)
+	m.Put("/", mail.send)
 	m.Get("/", middlewares.RequireLoggedIn(), mail.zohoCode)
 	m.Post("/token", middlewares.RequireLoggedIn(), mail.token)
 
@@ -73,4 +73,9 @@ func SetupRoutes(app *fiber.App, db *database.DB) {
 	// m.Get("/:id", middlewares.RequireLoggedIn(), mail.getOne)
 	// m.Post("/:id", middlewares.RequireLoggedIn(), mail.updateOne)
 	// m.Delete("/:id", middlewares.RequireLoggedIn(), mail.deleteOne)
+
+	// Auth Group
+	downloads := v1.Group("/file")
+	downloads.Get("/download/:filename", file.download)
+	downloads.Post("/upload", file.upload)
 }

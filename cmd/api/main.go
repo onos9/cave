@@ -32,6 +32,7 @@ func main() {
 	// Setup fiber api
 	app := fiber.New(fiber.Config{
 		IdleTimeout: idleTimeout,
+		BodyLimit: 1000 * 1024 * 1024, // limit to 500MB
 	})
 
 	// Set Up Middlewares

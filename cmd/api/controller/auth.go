@@ -122,12 +122,6 @@ func (c *Auth) signin(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusForbidden).JSON(err.Error())
 	}
 
-	// m := new(mailer.Mail)
-	// cred, err := m.GetCredential()
-	// if err != nil {
-	// 	return ctx.Status(http.StatusBadRequest).JSON(err.Error())
-	// }
-
 	cookie := fiber.Cookie{
 		Name:     "token",
 		Value:    rt,
@@ -178,7 +172,6 @@ func (c *Auth) token(ctx *fiber.Ctx) error {
 		})
 	}
 
-
 	user.Role = claims["role"].(string)
 	err = user.FetchByID(claims["userID"].(string))
 	if err != nil {
@@ -192,12 +185,6 @@ func (c *Auth) token(ctx *fiber.Ctx) error {
 
 	roles := []string{"admin", "prospective", "guest"}
 
-	// m := new(mailer.Mail)
-	// cred, err := m.GetCredential()
-	// if err != nil {
-	// 	return ctx.Status(http.StatusBadRequest).JSON(err.Error())
-	// }
-
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{
 		"accessToken": t,
 		"user":        user,
@@ -209,6 +196,7 @@ func (c *Auth) token(ctx *fiber.Ctx) error {
 func (c *Auth) verify(ctx *fiber.Ctx) error {
 	var user models.User
 
+	userId := ctx.Query("userId")
 	token := ctx.Params("token")
 	claims, err := auth.ParseToken(token)
 	if err != nil {
@@ -229,7 +217,7 @@ func (c *Auth) verify(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusForbidden).JSON(err.Error())
 	}
 
-		at, err := auth.IssueAccessToken(user)
+	at, err := auth.IssueAccessToken(user)
 	if err != nil {
 		return ctx.Status(http.StatusForbidden).JSON(err.Error())
 	}
@@ -257,6 +245,7 @@ func (c *Auth) verify(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
 		"accessToken": at,
 		"user":        user,
+		"userId":      userId,
 		"roles":       roles,
 		"login":       true,
 		"isVerified":  user.IsVerified,

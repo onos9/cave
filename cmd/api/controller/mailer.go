@@ -14,36 +14,35 @@ var (
 // CandidateController is an anonymous struct for candidate controller
 type Mailer struct {
 	Code      string `json:"code"`
-	From      string `json:"from"`
-	To        string `json:"to"`
+	From      string `json:"fromAddress"`
+	To        string `json:"toAddress"`
 	Subject   string `json:"subject"`
-	Body      string `json:"body"`
+	Content   string `json:"content"`
 	AskReceip string `json:"askReceip"`
 }
 
 func (c *Mailer) send(ctx *fiber.Ctx) error {
 
-	var ml fiber.Map
+	ml := fiber.Map{}
 
 	if err := ctx.BodyParser(&ml); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err)
 	}
 
-	mail := fiber.Map{
-		"fromAddress": "admin@adullam.ng",
-		"toAddress":   ml["toAddress"],
-		"subject":     ml["subject"],
-		"content":     ml,
-	}
-
 	m := new(mailer.Mail)
-	resp, err := m.SendMail(mail)
+	resp, err := m.SendMail(ml)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error)
+	}	
+	
+	cred, err := m.GetCredential()
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
 	}
 
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{
-		"respons": resp,
+		"respons":     resp,
+		"credentials": cred,
 	})
 }
 

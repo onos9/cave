@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"net/url"
 
 	"github.com/cave/pkg/auth"
 	"github.com/cave/pkg/mailer"
@@ -28,7 +29,7 @@ func (c *Webhook) payment(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusOK).JSON(ok)
 	}
 
-	err := wallet.ProcessPayment(m, &user)
+	id, err := wallet.ProcessPayment(m, &user)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
 	}
@@ -38,23 +39,29 @@ func (c *Webhook) payment(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusForbidden).JSON(err.Error())
 	}
 
+	data := new(url.Values)
+	data.Set("userId", id)
+	u, _ := url.ParseRequestURI(m["redirect_uri"].(string))
+	u.Path = vt
+
 	mail := fiber.Map{
 		"fromAddress": "admin@adullam.ng",
 		"toAddress":   user.Email,
-		"subject":     "Adullam",
+		"subject":     "Payment Confirmation",
 		"content": fiber.Map{
 			"filename":     "payment.html",
-			"redirect_uri": m["redirect_uri"].(string) + "/" + vt,
+			"redirect_uri": u.String() + "?" + data.Encode(),
 		},
 	}
 
 	mailer := new(mailer.Mail)
-	_, err = mailer.SendMail(mail)
+	resp, err := mailer.SendMail(mail)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
 	}
 
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{
 		"success": true,
+		"data":    resp,
 	})
 }
