@@ -33,7 +33,7 @@ func (m *Mail) SendMail(mail fiber.Map) (fiber.Map, error) {
 	u.Path = resource
 	urlStr := u.String()
 
-	tpl, err := utils.ParseTemplate(mail["content"].(map[string]interface{}))
+	tpl, err := utils.ParseTemplate(mail["content"])
 	if err != nil {
 		return fiber.Map{}, err
 	}

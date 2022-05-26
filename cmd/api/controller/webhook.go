@@ -48,7 +48,7 @@ func (c *Webhook) payment(ctx *fiber.Ctx) error {
 		"fromAddress": "support@adullam.ng",
 		"toAddress":   user.Email,
 		"subject":     "Payment Confirmation",
-		"content": fiber.Map{
+		"content": map[string]interface{}{
 			"filename":     "payment.html",
 			"redirect_uri": u.String() + "?" + data.Encode(),
 		},

@@ -16,7 +16,7 @@ func (m *Mail) getNewToken() (string, error) {
 	defer rdb.Close()
 
 	at, err := rdb.Get(ctx, "accessToken").Result()
-	if err == nil || at != "" {
+	if err == nil && at != "" {
 		m.AccessToken = at
 		return at, nil
 	}

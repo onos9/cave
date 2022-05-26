@@ -18,14 +18,15 @@ func ParseHtml(f string) (string, error) {
 	return string(bs), nil
 }
 
-func ParseTemplate(m map[string]interface{}) (string, error) {
+func ParseTemplate(m interface{}) (string, error) {
 	_, filename, _, ok := runtime.Caller(1)
 	if !ok {
 		return "", errors.New("can not get filename")
 	}
-
+	
+	data := m.(map[string]interface{})
 	dir := path.Dir(filename)
-	filePath := dir + "/templates/" + m["filename"].(string)
+	filePath := dir + "/templates/" + data["filename"].(string)
 	t, err := template.ParseFiles(filePath)
 	if err != nil {
 		return "", err

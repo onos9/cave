@@ -63,10 +63,10 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 	}
 
 	mail := fiber.Map{
-		"fromAddress": "support@adullam.ng",
+		"fromAddress": os.Getenv("EMAIL_FROM"),
 		"toAddress":   c.Email,
 		"subject":     "Adullam|Signup",
-		"content": fiber.Map{
+		"content": map[string]interface{}{
 			"filename":    "signup.html",
 			"paymentCode": "10-" + code,
 		},

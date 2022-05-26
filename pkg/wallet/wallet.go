@@ -89,7 +89,7 @@ func processIncompletePayment(user *models.User, paid int) error {
 		"fromAddress": "support@adullam.ng",
 		"toAddress":   user.Email,
 		"subject":     "Adullam|Payment Confirmation",
-		"content": fiber.Map{
+		"content": map[string]interface{}{
 			"filename": "repay.html",
 			"balance":  balance,
 			"due":      APPLICATION_FEE,
