@@ -59,7 +59,8 @@ type User struct {
 	Courses         StudentCourseList `bson:"courses,omitempty" json:"courses,omitempty"`
 }
 
-// Bio is a model for Bios table
+
+//Bio is a model for Bios table
 type BioData struct {
 	FirstName   string `bson:"firstName,omitempty" json:"firstName"`
 	LastName    string `bson:"lastName,omitempty" json:"lastName"`
