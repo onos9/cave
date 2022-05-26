@@ -42,6 +42,7 @@ RUN git clone https://github.com/onos9/cave-web.git portal \
 ################################
 FROM scratch AS api
 COPY --from=builder /app/api ./api
+COPY --from=builder /app/cmd/api/templates /templates
 ENTRYPOINT ["./api"]
 
 ################################

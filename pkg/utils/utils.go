@@ -5,8 +5,7 @@ import (
 	"errors"
 	"html/template"
 	"io/ioutil"
-	"path"
-	"runtime"
+	"os"
 )
 
 func ParseHtml(f string) (string, error) {
@@ -19,13 +18,14 @@ func ParseHtml(f string) (string, error) {
 }
 
 func ParseTemplate(m interface{}) (string, error) {
-	_, filename, _, ok := runtime.Caller(1)
-	if !ok {
-		return "", errors.New("can not get filename")
-	}
-	
+
 	data := m.(map[string]interface{})
-	dir := path.Dir(filename)
+
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", errors.New("ParseTemplate(): can't do os.Getwd")
+	}
+
 	filePath := dir + "/templates/" + data["filename"].(string)
 	t, err := template.ParseFiles(filePath)
 	if err != nil {
