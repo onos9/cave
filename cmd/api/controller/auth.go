@@ -249,7 +249,6 @@ func (c *Auth) verify(ctx *fiber.Ctx) error {
 		SameSite: "Lax",
 		Path:     "/",
 	}
-
 	ctx.Cookie(&cookie)
 
 	roles := []string{"admin", "prospective", "guest"}
