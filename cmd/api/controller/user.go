@@ -100,8 +100,17 @@ func (c *User) updateOne(ctx *fiber.Ctx) error {
 		})
 	}
 
+	err = user.FetchByID(ctx.Params("id"))
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{
 		"success": true,
+		"user":    user,
 	})
 }
 
