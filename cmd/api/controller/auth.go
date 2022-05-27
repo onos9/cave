@@ -69,6 +69,7 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 		"content": map[string]interface{}{
 			"filename":    "signup.html",
 			"paymentCode": "10-" + code,
+			"payment_url": os.Getenv("FINANCIAL"),
 		},
 	}
 
