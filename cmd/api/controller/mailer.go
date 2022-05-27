@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 
+	"github.com/cave/pkg/database"
 	"github.com/cave/pkg/mailer"
 	"github.com/gofiber/fiber/v2"
 )
@@ -33,8 +34,8 @@ func (c *Mailer) send(ctx *fiber.Ctx) error {
 	resp, err := m.SendMail(ml)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error)
-	}	
-	
+	}
+
 	cred, err := m.GetCredential()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
@@ -57,12 +58,25 @@ func (c *Mailer) zohoCode(ctx *fiber.Ctx) error {
 
 func (c *Mailer) token(ctx *fiber.Ctx) error {
 
+	rdb := database.RedisClient(0)
+	defer rdb.Close()
+
 	if err := ctx.BodyParser(&c); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
 	}
 
 	m := new(mailer.Mail)
-	token, err := m.RequestTokens(c.Code)
+	_, err := m.RequestTokens(c.Code)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
+	}
+
+	rt, err := rdb.Get(ctx.UserContext(), "zohoRefreshToken").Result()
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
+	}
+
+	token, err := rdb.Get(ctx.UserContext(), "accessToken").Result()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
 	}
@@ -73,7 +87,8 @@ func (c *Mailer) token(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
-		"token": token,
-		"mail":  cred,
+		"zohoRefreshToken": rt,
+		"accessToken":      token,
+		"mail":             cred,
 	})
 }

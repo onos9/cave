@@ -1,6 +1,7 @@
 package mailer
 
 import (
+	"errors"
 	"net/http"
 	"net/url"
 	"strings"
@@ -23,7 +24,7 @@ func (m *Mail) getNewToken() (string, error) {
 
 	rt, err := rdb.Get(ctx, "zohoRefreshToken").Result()
 	if err != nil {
-		return "", err
+		return "", errors.New("zohoRefreshToken: " + err.Error())
 	}
 
 	apiUrl := "https://accounts.zoho.com"

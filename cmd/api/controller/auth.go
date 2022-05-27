@@ -54,7 +54,7 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 	code := fmt.Sprintf("%06d", rand.Intn(999999))
 
 	userID := user.Id.Hex()
-	err := rdb.Set(ctx.Context(), code, userID, 0).Err()
+	err := rdb.Set(ctx.UserContext(), code, userID, 0).Err()
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"success": false,
@@ -72,7 +72,7 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 		},
 	}
 
-	id, err := rdb.Get(ctx.Context(), code).Result()
+	id, err := rdb.Get(ctx.UserContext(), code).Result()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"emailed": false,
