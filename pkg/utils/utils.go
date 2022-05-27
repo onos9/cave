@@ -20,7 +20,6 @@ func ParseHtml(f string) (string, error) {
 func ParseTemplate(m interface{}) (string, error) {
 
 	data := m.(map[string]interface{})
-
 	dir, err := os.Getwd()
 	if err != nil {
 		return "", errors.New("ParseTemplate(): can't do os.Getwd")
