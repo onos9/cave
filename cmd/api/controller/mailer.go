@@ -66,9 +66,12 @@ func (c *Mailer) token(ctx *fiber.Ctx) error {
 	}
 
 	m := new(mailer.Mail)
-	_, err := m.RequestTokens(c.Code)
+	resp, err := m.RequestTokens(c.Code)
 	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+			"data": resp,
+		})
 	}
 
 	rt, err := rdb.Get(ctx.UserContext(), "zohoRefreshToken").Result()
