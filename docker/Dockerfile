@@ -14,7 +14,7 @@ WORKDIR /app
 # System dependencies
 RUN apk update && apk upgrade \
     && apk add --no-cache \
-    git nodejs npm
+    git nodejs npm ca-certificates
 
 COPY go.* /app/
 
@@ -35,15 +35,16 @@ RUN git clone https://github.com/onos9/cave-web.git portal \
     && npm install --legacy-peer-deps \
     && npm run build
 
-COPY cmd/api/templates templates
-ENTRYPOINT ["./api"]
+# COPY cmd/api/templates templates
+# ENTRYPOINT ["./api"]
 
 ################################
 # STEP 3 build a small image
 ################################
 FROM scratch AS api
 COPY --from=builder /app/api ./api
-COPY --from=builder /app/cmd/api/templates /templates
+COPY --from=builder /app/cmd/api/templates /
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 ENTRYPOINT ["./api"]
 
 ################################
