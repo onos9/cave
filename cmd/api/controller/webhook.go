@@ -39,10 +39,10 @@ func (c *Webhook) payment(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusForbidden).JSON(err.Error())
 	}
 
-	data := new(url.Values)
+	data := url.Values{}
 	data.Set("userId", id)
 	u, _ := url.ParseRequestURI(m["redirect_uri"].(string))
-	u.Path = vt
+	urlStr := u.String() + "/#/sign-in/"
 
 	mail := fiber.Map{
 		"fromAddress": "support@adullam.ng",
@@ -50,7 +50,7 @@ func (c *Webhook) payment(ctx *fiber.Ctx) error {
 		"subject":     "Payment Confirmation",
 		"content": map[string]interface{}{
 			"filename":     "payment.html",
-			"redirect_uri": u.String() + "?" + data.Encode(),
+			"redirect_uri": urlStr + vt + "?" + data.Encode(),
 		},
 	}
 
