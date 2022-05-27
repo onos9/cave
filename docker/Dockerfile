@@ -35,6 +35,7 @@ RUN git clone https://github.com/onos9/cave-web.git portal \
     && npm install --legacy-peer-deps \
     && npm run build
 
+# COPY cmd/api/templates templates
 # ENTRYPOINT ["./api"]
 
 ################################
