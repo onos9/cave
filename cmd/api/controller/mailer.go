@@ -88,7 +88,7 @@ func (c *Mailer) token(ctx *fiber.Ctx) error {
 
 	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
 		"zohoRefreshToken": rt,
-		"accessToken":      token,
+		"zohoAccessToken":  token,
 		"mail":             cred,
 	})
 }
