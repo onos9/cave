@@ -27,30 +27,23 @@ func ProcessPayment(m fiber.Map, user *models.User) (string, error) {
 	rdb := database.RedisClient(0)
 	defer rdb.Close()
 
-	html := m["html"].(string)
-	t, err := getTransaction(html)
-	if err != nil {
-		return "", err
-	}
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("An error occurred:", err)
+		}
+	}()
 
-	if _, ok := t["Narration"]; !ok {
-		return "", fmt.Errorf("error: Narration not found")
-	}
-
-	naration := t["Narration"]
+	naration := m["TransactionNarration"].(string)
 	reg := regexp.MustCompile("[0-9]+")
 	code := reg.FindAllString(naration, -1)[1]
 	paymentType := reg.FindAllString(naration, -1)[0]
+	user.UserID = naration
 
-	if _, ok := t["Amount"]; !ok {
-		return "", fmt.Errorf("error: Amount not found")
-	}
-
-	amount := t["Amount"]
+	amount := m["TransactionAmount"].(string)
 	a := strings.Replace(amount, ",", "", -1)
 	a = strings.Split(a, ".")[0]
 
-	amt, err := strconv.Atoi(a)
+	amt, err := strconv.ParseFloat(a, 64)
 	if err != nil {
 		return "", err
 	}
@@ -83,8 +76,8 @@ func ProcessPayment(m fiber.Map, user *models.User) (string, error) {
 	return code, nil
 }
 
-func processIncompletePayment(user *models.User, paid int) error {
-	balance := math.Abs(math.Inf(user.Wallet))
+func processIncompletePayment(user *models.User, paid float64) error {
+	balance := math.Abs(user.Wallet)
 	mail := fiber.Map{
 		"fromAddress": "support@adullam.ng",
 		"toAddress":   user.Email,
@@ -93,7 +86,8 @@ func processIncompletePayment(user *models.User, paid int) error {
 			"filename": "repay.html",
 			"balance":  balance,
 			"due":      APPLICATION_FEE,
-			"paid":     paid,
+			"paid":     paid / DOLLER_RATE,
+			"userId":   user.UserID,
 		},
 	}
 

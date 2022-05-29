@@ -25,3 +25,4 @@ rest.http
 .env
 cmd/api/.env
 cavedata
+index.html

@@ -25,13 +25,16 @@ func (c *Webhook) payment(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusOK).JSON(err)
 	}
 
-	if _, ok := m["html"]; !ok {
-		return ctx.Status(http.StatusOK).JSON(ok)
-	}
-
 	id, err := wallet.ProcessPayment(m, &user)
-	if err != nil {
+	if err != nil && id == "" {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
+	}
+	if id == "" {
+		naration := m["TransactionNarration"].(string)
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   "Invalid payment code: \"" + naration + "\"",
+		})
 	}
 
 	vt, err := auth.IssueVerificationToken(user)
