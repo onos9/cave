@@ -29,7 +29,7 @@ func ProcessPayment(m fiber.Map, user *models.User) (string, error) {
 
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Println("An error occurred:", err)
+			fmt.Println(err)
 		}
 	}()
 
