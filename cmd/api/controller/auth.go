@@ -170,7 +170,6 @@ func (c *Auth) signout(ctx *fiber.Ctx) error {
 	return ctx.JSON(fiber.Map{
 		"accessToken": nil,
 		"login":       false,
-		"message":       "signing out, Buy!",
 	})
 }
 
