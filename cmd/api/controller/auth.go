@@ -177,6 +177,7 @@ func (c *Auth) token(ctx *fiber.Ctx) error {
 	var user models.User
 
 	token := ctx.Cookies("token")
+
 	claims, err := auth.ParseToken(token)
 	if err != nil {
 		return ctx.Status(http.StatusOK).JSON(fiber.Map{
