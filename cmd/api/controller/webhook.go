@@ -25,11 +25,12 @@ func (c *Webhook) payment(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusOK).JSON(err)
 	}
 
-	id, err := wallet.ProcessPayment(m, &user)
-	if err != nil && id == "" {
+	err := wallet.ProcessPayment(m, &user)
+	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
 	}
-	if id == "" {
+	
+	if user.UserID == "" {
 		naration := m["TransactionNarration"].(string)
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"success": false,
@@ -43,7 +44,7 @@ func (c *Webhook) payment(ctx *fiber.Ctx) error {
 	}
 
 	data := url.Values{}
-	data.Set("userId", id)
+	data.Set("userId", user.UserID)
 	u, _ := url.ParseRequestURI(m["redirect_uri"].(string))
 	urlStr := u.String() + "/#/sign-in/"
 

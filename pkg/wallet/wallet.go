@@ -23,7 +23,7 @@ const TUITION_FEE = 1000
 
 var ctx = context.Background()
 
-func ProcessPayment(m fiber.Map, user *models.User) (string, error) {
+func ProcessPayment(m fiber.Map, user *models.User) (error) {
 	rdb := database.RedisClient(0)
 	defer rdb.Close()
 
@@ -35,9 +35,9 @@ func ProcessPayment(m fiber.Map, user *models.User) (string, error) {
 
 	naration := m["TransactionNarration"].(string)
 	reg := regexp.MustCompile("[0-9]+")
-	code := reg.FindAllString(naration, -1)[1]
-	paymentType := reg.FindAllString(naration, -1)[0]
-	user.UserID = naration
+	code := reg.FindAllString(naration, -1)
+	paymentType := code[0]
+	user.UserID = code[1]
 
 	amount := m["TransactionAmount"].(string)
 	a := strings.Replace(amount, ",", "", -1)
@@ -45,16 +45,16 @@ func ProcessPayment(m fiber.Map, user *models.User) (string, error) {
 
 	amt, err := strconv.ParseFloat(a, 64)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	id, err := rdb.Get(ctx, code).Result()
+	id, err := rdb.Get(ctx, user.UserID).Result()
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	if err := user.FetchByID(id); err != nil {
-		return "", err
+		return err
 	}
 
 	wallet := user.Wallet + (amt / DOLLER_RATE)
@@ -69,11 +69,11 @@ func ProcessPayment(m fiber.Map, user *models.User) (string, error) {
 		user.Wallet = wallet
 		err = processIncompletePayment(user, amt)
 		if err != nil {
-			return "", err
+			return err
 		}
 	}
 
-	return code, nil
+	return nil
 }
 
 func processIncompletePayment(user *models.User, paid float64) error {
