@@ -78,6 +78,7 @@ func (c *File) download(ctx *fiber.Ctx) error {
 	return nil
 }
 
+
 func (c *File) upload(ctx *fiber.Ctx) error {
 
 	// Parse the multipart form:
