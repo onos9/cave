@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 
@@ -33,6 +34,10 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 	if err := ctx.BodyParser(&c); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err)
 	}
+	
+	rand.Seed(time.Now().UnixNano())
+	code := fmt.Sprintf("%06d", rand.Intn(999999))
+	userID := user.Id.Hex()
 
 	// Hash Password
 	hashedPass, _ := utils.EncryptPassword(c.Password)
@@ -41,6 +46,7 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 	user.EnrollProgress = 0
 	user.Role = "prospective"
 	user.Wallet = 0
+	user.UserID = userID
 
 	//Save User To DB
 	if err := user.Create(); err != nil {
@@ -50,10 +56,6 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 		})
 	}
 
-	rand.Seed(time.Now().UnixNano())
-	code := fmt.Sprintf("%06d", rand.Intn(999999))
-
-	userID := user.Id.Hex()
 	err := rdb.Set(ctx.UserContext(), code, userID, 0).Err()
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
@@ -62,14 +64,34 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 		})
 	}
 
+	// mail := fiber.Map{
+	// 	"fromAddress": os.Getenv("EMAIL_FROM"),
+	// 	"toAddress":   c.Email,
+	// 	"subject":     "Adullam|Signup",
+	// 	"content": map[string]interface{}{
+	// 		"filename":    "signup.html",
+	// 		"paymentCode": "10-" + code,
+	// 		"payment_url": os.Getenv("FINANCIAL"),
+	// 	},
+	// }
+
+	vt, err := auth.IssueVerificationToken(user)
+	if err != nil {
+		return ctx.Status(http.StatusForbidden).JSON(err.Error())
+	}
+
+	data := url.Values{}
+	data.Set("userId", user.UserID)
+	u, _ := url.ParseRequestURI(`https://portal.adullam.ng`)
+	urlStr := u.String() + "/#/sign-in/"
+
 	mail := fiber.Map{
-		"fromAddress": os.Getenv("EMAIL_FROM"),
-		"toAddress":   c.Email,
-		"subject":     "Adullam|Signup",
+		"fromAddress": "support@adullam.ng",
+		"toAddress":   user.Email,
+		"subject":     "Payment Confirmation",
 		"content": map[string]interface{}{
-			"filename":    "signup.html",
-			"paymentCode": "10-" + code,
-			"payment_url": os.Getenv("FINANCIAL"),
+			"filename":     "payment.html",
+			"redirect_uri": urlStr + vt + "?" + data.Encode(),
 		},
 	}
 
@@ -170,7 +192,7 @@ func (c *Auth) signout(ctx *fiber.Ctx) error {
 	return ctx.JSON(fiber.Map{
 		"accessToken": nil,
 		"login":       false,
-		"message":       "signing out, Buy!",
+		"message":     "signing out, Buy!",
 	})
 }
 
