@@ -23,6 +23,7 @@ type Config struct {
 	JWTIssuer        string        `env:"JWT_ISSUER"`
 	Host             string        `env:"APP_HOST"`
 	Port             string        `env:"APP_PORT"`
+	Webroot          string        `env:"WEBROOT"`
 }
 
 // IsProd Checks if env is production
@@ -37,10 +38,10 @@ func LoadConfig() {
 		log.Println(err)
 	}
 
-	if env := os.Getenv("ENV"); env=="prod" {
+	if env := os.Getenv("ENV"); env == "prod" {
 		return
 	}
-	
+
 	environmentPath := filepath.Join(currentPath, ".env")
 	if err := godotenv.Load(environmentPath); err != nil {
 		log.Fatal("Error loading .env file")
@@ -50,6 +51,7 @@ func LoadConfig() {
 
 // GetConfig gets all config for the application
 func GetConfig() Config {
+
 	return Config{
 		Env:      os.Getenv("ENV"),
 		Mongo:    GetMongoDBConfig(),
@@ -61,5 +63,6 @@ func GetConfig() Config {
 		JWTIssuer:        os.Getenv("JWT_ISSUER"),
 		Host:             os.Getenv("APP_HOST"),
 		Port:             os.Getenv("APP_PORT"),
+		Webroot:          os.Getenv("WEBROOT"),
 	}
 }

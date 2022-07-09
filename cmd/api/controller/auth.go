@@ -8,12 +8,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/cave/config"
 	"github.com/cave/pkg/auth"
-	"github.com/cave/pkg/database"
-	"github.com/cave/pkg/mailer"
+	"github.com/cave/pkg/mail"
 	"github.com/cave/pkg/models"
 	"github.com/cave/pkg/utils"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -26,15 +27,60 @@ type Auth struct {
 	Password string `json:"password"`
 }
 
+func (c *Auth) tempSignup(ctx *fiber.Ctx) error {
+	var user models.User
+
+	if err := ctx.BodyParser(&c); err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(err)
+	}
+
+	// Hash Password
+	hashedPass, _ := utils.EncryptPassword(c.Password)
+	user.PasswordHash = []byte(hashedPass)
+	user.Email = c.Email
+
+	//Save User To DB
+	err := user.Create()
+	e := err.(mongo.WriteException)
+	if code := e.WriteErrors[0].Code; code == 11000 {
+		_ = user.FetchByEmail()
+		passwordIsCorrect := utils.VerifyPassword(user.PasswordHash, c.Password)
+		if !passwordIsCorrect {
+			return ctx.Status(http.StatusForbidden).JSON(Resp{
+				"message": "Incorrect Password",
+			})
+		}
+		err = nil
+	}
+
+	if err != nil {
+		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+
+	t, err := auth.IssueAccessToken(user)
+	if err != nil {
+		return ctx.Status(http.StatusForbidden).JSON(err.Error())
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"accessToken": t,
+		"user":        user,
+		"login":       true,
+	})
+}
+
 func (c *Auth) signup(ctx *fiber.Ctx) error {
 	var user models.User
-	rdb := database.RedisClient(0)
+	rdb := config.RedisClient(0)
 	defer rdb.Close()
 
 	if err := ctx.BodyParser(&c); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err)
 	}
-	
+
 	rand.Seed(time.Now().UnixNano())
 	code := fmt.Sprintf("%06d", rand.Intn(999999))
 	userID := user.Id.Hex()
@@ -80,18 +126,18 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusForbidden).JSON(err.Error())
 	}
 
-	data := url.Values{}
-	data.Set("userId", user.UserID)
+	query := url.Values{}
+	query.Set("userId", user.UserID)
 	u, _ := url.ParseRequestURI(`https://portal.adullam.ng`)
 	urlStr := u.String() + "/#/sign-in/"
 
-	mail := fiber.Map{
+	data := fiber.Map{
 		"fromAddress": "support@adullam.ng",
 		"toAddress":   user.Email,
 		"subject":     "Payment Confirmation",
 		"content": map[string]interface{}{
 			"filename":     "payment.html",
-			"redirect_uri": urlStr + vt + "?" + data.Encode(),
+			"redirect_uri": urlStr + vt + "?" + query.Encode(),
 		},
 	}
 
@@ -104,8 +150,8 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 		})
 	}
 
-	m := new(mailer.Mail)
-	_, err = m.SendMail(mail)
+	m := mail.Mail{}
+	_, err = m.SendMail(data)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"ID":      id,

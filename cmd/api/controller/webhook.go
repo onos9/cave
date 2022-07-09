@@ -5,7 +5,7 @@ import (
 	"net/url"
 
 	"github.com/cave/pkg/auth"
-	"github.com/cave/pkg/mailer"
+	"github.com/cave/pkg/mail"
 	"github.com/cave/pkg/models"
 	"github.com/cave/pkg/wallet"
 	"github.com/gofiber/fiber/v2"
@@ -43,23 +43,23 @@ func (c *Webhook) payment(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusForbidden).JSON(err.Error())
 	}
 
-	data := url.Values{}
-	data.Set("userId", user.UserID)
+	query := url.Values{}
+	query.Set("userId", user.UserID)
 	u, _ := url.ParseRequestURI(m["redirect_uri"].(string))
 	urlStr := u.String() + "/#/sign-in/"
 
-	mail := fiber.Map{
+	data := fiber.Map{
 		"fromAddress": "support@adullam.ng",
 		"toAddress":   user.Email,
 		"subject":     "Payment Confirmation",
 		"content": map[string]interface{}{
 			"filename":     "payment.html",
-			"redirect_uri": urlStr + vt + "?" + data.Encode(),
+			"redirect_uri": urlStr + vt + "?" + query.Encode(),
 		},
 	}
 
-	mailer := new(mailer.Mail)
-	resp, err := mailer.SendMail(mail)
+	mail := new(mail.Mail)
+	resp, err := mail.SendMail(data)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
 	}

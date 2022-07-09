@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/cave/pkg/database"
+	"github.com/cave/config"
 	"github.com/cave/pkg/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -17,7 +17,7 @@ var (
 )
 
 // SetRepoDB global db handler
-func SetRepoDB(dbi *database.DB) {
+func SetRepoDB(dbi *config.DB) {
 	db = dbi.MongoDB
 
 	err := SetIndex("users", "email")

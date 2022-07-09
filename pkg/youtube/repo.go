@@ -3,7 +3,7 @@ package youtube
 import (
 	"context"
 
-	"github.com/cave/pkg/database"
+	"github.com/cave/config"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -37,7 +37,7 @@ var (
 )
 
 // SetRepoDB global db instances
-func SetRepoDB(dbi *database.DB) {
+func SetRepoDB(dbi *config.DB) {
 
 	db = dbi.MongoDB
 

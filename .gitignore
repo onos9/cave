@@ -23,6 +23,7 @@ google_client_id.json
 rest.http
 .env.base64
 .env
+.prod.env
 cmd/api/.env
 cavedata
 index.html

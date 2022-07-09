@@ -1,4 +1,4 @@
-package database
+package config
 
 import (
 	"context"
@@ -7,8 +7,6 @@ import (
 	"strings"
 	"time"
 
-	// Configs
-	cfg "github.com/cave/config"
 	"github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -30,7 +28,7 @@ func NewDBConnection() *DB {
 
 // ConnectMongo Returns the Mongo DB Instance
 func connectMongo() (*mongo.Database, *mongo.Client) {
-	opts := options.Client().ApplyURI(cfg.GetConfig().Mongo.URI)
+	opts := options.Client().ApplyURI(GetConfig().Mongo.URI)
 	client, err := mongo.NewClient(opts)
 	if err != nil {
 		fmt.Println(strings.Repeat("!", 40))
@@ -44,7 +42,7 @@ func connectMongo() (*mongo.Database, *mongo.Client) {
 	defer cancel()
 
 	err = client.Connect(ctx)
-	mongo := client.Database(cfg.GetConfig().Mongo.MongoDBName)
+	mongo := client.Database(GetConfig().Mongo.MongoDBName)
 	if err != nil {
 		fmt.Println(strings.Repeat("!", 40))
 		fmt.Println("☹️  Could Not Establish Mongo DB Connection")
@@ -63,7 +61,7 @@ func connectMongo() (*mongo.Database, *mongo.Client) {
 // ConnectRedis returns the Redis Instance
 func RedisClient(dbn int) *redis.Client {
 	client := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%s", cfg.GetConfig().Redis.HOST, cfg.GetConfig().Redis.PORT),
+		Addr:     fmt.Sprintf("%s:%s", GetConfig().Redis.HOST, GetConfig().Redis.PORT),
 		Password: "",  // no password set
 		DB:       dbn, // database number
 	})

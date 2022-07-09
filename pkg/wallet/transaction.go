@@ -7,7 +7,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func getTransaction(text string) (map[string]string, error) {
+func GetTransaction(text string) (map[string]string, error) {
 	var temp string
 	var istd bool
 	var isVal bool

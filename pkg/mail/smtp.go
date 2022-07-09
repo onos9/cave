@@ -2,7 +2,7 @@
  * send email
  *
  */
-package smtp
+package mail
 
 import (
 	"crypto/tls"

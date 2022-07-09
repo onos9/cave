@@ -3,17 +3,17 @@ package controller
 import (
 	"net/http"
 
-	"github.com/cave/pkg/database"
-	"github.com/cave/pkg/mailer"
+	"github.com/cave/config"
+	"github.com/cave/pkg/mail"
 	"github.com/gofiber/fiber/v2"
 )
 
 var (
-	mail *Mailer
+	email *Mail
 )
 
 // CandidateController is an anonymous struct for candidate controller
-type Mailer struct {
+type Mail struct {
 	Code      string `json:"code"`
 	From      string `json:"fromAddress"`
 	To        string `json:"toAddress"`
@@ -22,7 +22,7 @@ type Mailer struct {
 	AskReceip string `json:"askReceip"`
 }
 
-func (c *Mailer) send(ctx *fiber.Ctx) error {
+func (c *Mail) send(ctx *fiber.Ctx) error {
 
 	ml := fiber.Map{}
 
@@ -30,7 +30,7 @@ func (c *Mailer) send(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(err)
 	}
 
-	m := new(mailer.Mail)
+	m := new(mail.Mail)
 	resp, err := m.SendMail(ml)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error)
@@ -47,25 +47,25 @@ func (c *Mailer) send(ctx *fiber.Ctx) error {
 	})
 }
 
-func (c *Mailer) zohoCode(ctx *fiber.Ctx) error {
+func (c *Mail) zohoCode(ctx *fiber.Ctx) error {
 
-	m := new(mailer.Mail)
+	m := new(mail.Mail)
 	cfg := m.GetMailConfig()
 	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
 		"credentials": cfg,
 	})
 }
 
-func (c *Mailer) token(ctx *fiber.Ctx) error {
+func (c *Mail) token(ctx *fiber.Ctx) error {
 
-	rdb := database.RedisClient(0)
+	rdb := config.RedisClient(0)
 	defer rdb.Close()
 
 	if err := ctx.BodyParser(&c); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err.Error())
 	}
 
-	m := new(mailer.Mail)
+	m := new(mail.Mail)
 	resp, err := m.RequestTokens(c.Code)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{

@@ -9,7 +9,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/cave/pkg/database"
+	"github.com/cave/config"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -139,7 +139,7 @@ func (c *File) upload(ctx *fiber.Ctx) error {
 		}
 
 		userId := ctx.Query("userId")
-		rdb := database.RedisClient(0)
+		rdb := config.RedisClient(0)
 		defer rdb.Close()
 
 		id, err := rdb.Get(ctx.Context(), userId).Result()

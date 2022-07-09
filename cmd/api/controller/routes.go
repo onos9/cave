@@ -3,7 +3,7 @@ package controller
 import (
 	// Middlewares
 
-	"github.com/cave/pkg/database"
+	"github.com/cave/config"
 	"github.com/cave/pkg/middlewares"
 	"github.com/cave/pkg/models"
 
@@ -13,25 +13,15 @@ import (
 
 type Resp map[string]interface{}
 
-// SetupRoutes setups router
-func SetupRoutes(app *fiber.App, db *database.DB) {
+// SetupRoutes setups r
+func SetupRoutes(r *fiber.App, db *config.DB) {
 	models.SetRepoDB(db)
+	cfg := config.GetConfig()
 
-	// dirname, err := os.UserHomeDir()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// dir := os.Getenv("WEBROOT")
-	// webroot := fmt.Sprintf("%s%s", dirname, dir)
+	r.Static("/", cfg.Webroot)
+	r.Static("/static/*", cfg.Webroot+"/index.html")
 
-	// // serve Single Page application on "/web" route
-	// // assume static file at dist folder
-	// app.Static("/", webroot)
-
-	// // serve the 'index.html', if there ids no matching routes.
-	// app.Static("*", webroot + "/index.html")
-
-	api := app.Group("/api")
+	api := r.Group("/api")
 	v1 := api.Group("/v1")
 	v1.Use("/docs", swagger.HandlerDefault)
 
@@ -50,6 +40,7 @@ func SetupRoutes(app *fiber.App, db *database.DB) {
 	auth := v1.Group("/auth")
 	auth.Get("/", userAuth.token)
 	auth.Post("/", userAuth.signin)
+	auth.Post("/temp", userAuth.tempSignup)
 	auth.Post("/:token", userAuth.verify)
 	auth.Put("/", userAuth.signup)
 	auth.Delete("/", userAuth.signout)
@@ -64,18 +55,26 @@ func SetupRoutes(app *fiber.App, db *database.DB) {
 
 	// Mail Routes
 	m := v1.Group("/mail")
-	m.Post("/", middlewares.RequireLoggedIn(), mail.send)
-	m.Put("/", mail.send)
-	m.Get("/", middlewares.RequireLoggedIn(), mail.zohoCode)
-	m.Post("/token", middlewares.RequireLoggedIn(), mail.token)
+	m.Post("/", middlewares.RequireLoggedIn(), email.send)
+	m.Put("/", email.send)
+	m.Get("/", middlewares.RequireLoggedIn(), email.zohoCode)
+	m.Post("/token", middlewares.RequireLoggedIn(), email.token)
 
-	// m.Get("/", middlewares.RequireLoggedIn(), mail.getAll)
-	// m.Get("/:id", middlewares.RequireLoggedIn(), mail.getOne)
-	// m.Post("/:id", middlewares.RequireLoggedIn(), mail.updateOne)
-	// m.Delete("/:id", middlewares.RequireLoggedIn(), mail.deleteOne)
+	// m.Get("/", middlewares.RequireLoggedIn(), email.getAll)
+	// m.Get("/:id", middlewares.RequireLoggedIn(), email.getOne)
+	// m.Post("/:id", middlewares.RequireLoggedIn(), email.updateOne)
+	// m.Delete("/:id", middlewares.RequireLoggedIn(), email.deleteOne)
 
-	// Auth Group
+	// Downloads Group
 	downloads := v1.Group("/file")
 	downloads.Get("/download/:filename", file.download)
 	downloads.Post("/upload", file.upload)
+
+	// LogBook Routes
+	lb := v1.Group("/logbook")
+	lb.Post("/", middlewares.RequireLoggedIn(), logBook.create)
+	lb.Get("/", middlewares.RequireLoggedIn(), logBook.getAll)
+	lb.Get("/:id", middlewares.RequireLoggedIn(), logBook.getOne)
+	lb.Patch("/:id", middlewares.RequireLoggedIn(), logBook.updateOne)
+	lb.Delete("/:id", middlewares.RequireLoggedIn(), logBook.deleteOne)
 }

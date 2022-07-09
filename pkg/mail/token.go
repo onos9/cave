@@ -1,4 +1,4 @@
-package mailer
+package mail
 
 import (
 	"errors"
@@ -8,12 +8,11 @@ import (
 	"time"
 
 	"github.com/cave/config"
-	"github.com/cave/pkg/database"
 )
 
 func (m *Mail) getNewToken() (string, error) {
 	cfg := config.GetMailConfig()
-	rdb := database.RedisClient(0)
+	rdb := config.RedisClient(0)
 	defer rdb.Close()
 
 	at, err := rdb.Get(ctx, "accessToken").Result()
@@ -61,7 +60,7 @@ func (m *Mail) getNewToken() (string, error) {
 func (m *Mail) RequestTokens(code string) (string, error) {
 	cfg := config.GetMailConfig()
 
-	rdb := database.RedisClient(0)
+	rdb := config.RedisClient(0)
 	defer rdb.Close()
 
 	err := rdb.Set(ctx, "zoho_code", code, 0).Err()
