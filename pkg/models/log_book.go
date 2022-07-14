@@ -23,7 +23,7 @@ type LogBook struct {
 	FullName       string        `bson:"fullName,omitempty" json:"fullName,omitempty"`
 	MatricNumber   string        `bson:"matricNumber,omitempty" json:"matricNumber,omitempty"`
 	Converts       string        `bson:"converts,omitempty" json:"converts"`
-	Lacation       string        `bson:"lacation,omitempty" json:"lacation,omitempty"`
+	Location       string        `bson:"location,omitempty" json:"location,omitempty"`
 	PrayerLocation string        `bson:"prayerLocation,omitempty" json:"prayerLocation,omitempty"`
 	PrayerWalk     []interface{} `bson:"prayerWalk,omitempty" json:"prayerWalk,omitempty"`
 	ConvertInfo    []interface{} `bson:"convertInfo,omitempty" json:"convertInfo"`
