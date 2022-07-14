@@ -14,7 +14,6 @@ import (
 	"github.com/cave/pkg/models"
 	"github.com/cave/pkg/utils"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -25,51 +24,7 @@ var userAuth *Auth
 type Auth struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
-}
-
-func (c *Auth) tempSignup(ctx *fiber.Ctx) error {
-	var user models.User
-
-	if err := ctx.BodyParser(&c); err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(err)
-	}
-
-	// Hash Password
-	hashedPass, _ := utils.EncryptPassword(c.Password)
-	user.PasswordHash = []byte(hashedPass)
-	user.Email = c.Email
-
-	//Save User To DB
-	err := user.Create()
-	e := err.(mongo.WriteException)
-	if code := e.WriteErrors[0].Code; code == 11000 {
-		_ = user.FetchByEmail()
-		passwordIsCorrect := utils.VerifyPassword(user.PasswordHash, c.Password)
-		if !passwordIsCorrect {
-			return ctx.Status(http.StatusForbidden).JSON(Resp{
-				"message": "Incorrect Password",
-			})
-		}
-		err = nil
-	}
-
-	if err != nil {
-		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"success": false,
-			"error":   err.Error(),
-		})
-	}
-
-	t, err := auth.IssueAccessToken(user)
-	if err != nil {
-		return ctx.Status(http.StatusForbidden).JSON(err.Error())
-	}
-
-	return ctx.Status(http.StatusOK).JSON(fiber.Map{
-		"accessToken": t,
-		"user":        user,
-		"login":       true,
-	})
+	FullName string `json:"fullName"`
 }
 
 func (c *Auth) signup(ctx *fiber.Ctx) error {

@@ -19,16 +19,16 @@ type LogBook struct {
 	utils.Base
 	Id primitive.ObjectID `json:"id" bson:"_id"`
 
-	PrayerTime    string `bson:"prayerTime,omitempty" json:"prayerTime"`
-	Passages      string `bson:"passages,omitempty" json:"passages,omitempty"`
-	TotalChapters string `bson:"totalChapters,omitempty" json:"totalChapters,omitempty"`
-	Book          string `bson:"book,omitempty" json:"book,omitempty"`
-	TotalPages    string `bson:"totalPages,omitempty" json:"totalPages,omitempty"`
-	FastStart     string `bson:"fastStart,omitempty" json:"fastStart,omitempty"`
-	FastEnd       string `bson:"fastEnd,omitempty" json:"fastEnd,omitempty"`
-	Lacation      string `bson:"lacation,omitempty" json:"lacation,omitempty"`
-	Territory     string `bson:"territory,omitempty" json:"territory,omitempty"`
-	Report        string `bson:"report,omitempty" json:"report,omitempty"`
+	Email          string        `bson:"email,omitempty" json:"email,omitempty"`
+	FullName       string        `bson:"fullName,omitempty" json:"fullName,omitempty"`
+	MatricNumber   string        `bson:"matricNumber,omitempty" json:"matricNumber,omitempty"`
+	Converts       string        `bson:"converts,omitempty" json:"converts"`
+	Lacation       string        `bson:"lacation,omitempty" json:"lacation,omitempty"`
+	PrayerLocation string        `bson:"prayerLocation,omitempty" json:"prayerLocation,omitempty"`
+	PrayerWalk     []interface{} `bson:"prayerWalk,omitempty" json:"prayerWalk,omitempty"`
+	ConvertInfo    []interface{} `bson:"convertInfo,omitempty" json:"convertInfo"`
+	BibleRead      []interface{} `bson:"bibleRead,omitempty" json:"bibleRead"`
+	Exercise       []interface{} `bson:"exercise,omitempty" json:"exercise"`
 }
 
 // LogBookList defines array of logBook objects
@@ -60,6 +60,15 @@ func (m *LogBook) FetchByID(id string) error {
 	}
 
 	err = db.Collection(logBookCol).FindOne(context.TODO(), bson.M{"_id": oid}).Decode(&m)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// FetchByEmail fetches User by email
+func (m *LogBook) FetchByEmail() error {
+	err := db.Collection(logBookCol).FindOne(context.TODO(), bson.M{"email": m.Email}).Decode(&m)
 	if err != nil {
 		return err
 	}

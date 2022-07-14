@@ -6,11 +6,12 @@ import (
 
 	"github.com/cave/pkg/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-var logBook *LogBook
+var practicum *LogBook
 
 // LogBook is an anonymous struct for logBook controller
 type LogBook struct{}
@@ -23,15 +24,42 @@ func (c *LogBook) create(ctx *fiber.Ctx) error {
 	}
 
 	//Save LogBook To DB
-	if err := logBook.Create(); err != nil {
+	err := logBook.Create()
+	if err == nil {
+		_ = logBook.FetchByEmail()
+	}
+
+	if err != nil {
+		e := err.(mongo.WriteException)
+		if c := e.WriteErrors[0].Code; c == 11000 {
+			_ = logBook.FetchByEmail()
+		}
+		err = nil
+	}
+	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(Resp{
-			"message": "LogBook Not Registered",
+			"message": "LogBook Not Found",
 			"error":   err.Error(),
 		})
 	}
-
 	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
-		"success": true,
+		"login":   true,
+		"logBook": logBook,
+	})
+
+}
+
+func (c *LogBook) getByEmail(ctx *fiber.Ctx) error {
+	var logBook models.LogBook
+
+	logBook.Email = ctx.Params("email")
+	err := logBook.FetchByEmail()
+	if err != nil {
+		return ctx.Status(http.StatusForbidden).JSON(err)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"logBook": logBook,
 	})
 
 }
@@ -47,7 +75,7 @@ func (c *LogBook) getOne(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{
-		"id": logBook,
+		"logBook": logBook,
 	})
 }
 
@@ -82,6 +110,14 @@ func (c *LogBook) updateOne(ctx *fiber.Ctx) error {
 			"success": false,
 			"error":   err.Error(),
 		})
+	}
+
+	if len(logBook.Exercise) > 0 {
+		pw := logBook.Exercise[0]
+		logBook.Exercise = nil
+		_ = logBook.FetchByID(ctx.Params("id"))
+		all := append([]interface{}{pw}, logBook.Exercise...)
+		logBook.Exercise = all
 	}
 
 	err = logBook.UpdateOne()
