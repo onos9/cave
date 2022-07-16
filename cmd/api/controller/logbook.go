@@ -103,6 +103,7 @@ func (c *LogBook) updateOne(ctx *fiber.Ctx) error {
 			"error":   err.Error(),
 		})
 	}
+	temp := logBook
 
 	logBook.Id, err = primitive.ObjectIDFromHex(ctx.Params("id"))
 	if err != nil {
@@ -112,12 +113,30 @@ func (c *LogBook) updateOne(ctx *fiber.Ctx) error {
 		})
 	}
 
-	if len(logBook.Exercise) > 0 {
-		pw := logBook.Exercise[0]
+	
+
+	if len(temp.Evangelism) > 0 {
+		t := temp.Evangelism[0]
+		logBook.Evangelism = nil
+		_ = logBook.FetchByID(ctx.Params("id"))
+		all := append([]interface{}{t}, logBook.Evangelism...)
+		logBook.Evangelism = all
+	}
+
+	if len(temp.Exercise) > 0 {
+		t := logBook.Exercise[0]
 		logBook.Exercise = nil
 		_ = logBook.FetchByID(ctx.Params("id"))
-		all := append([]interface{}{pw}, logBook.Exercise...)
+		all := append([]interface{}{t}, logBook.Exercise...)
 		logBook.Exercise = all
+	}
+
+	if len(temp.Prayer) > 0 {
+		t := logBook.Prayer[0]
+		logBook.Prayer = nil
+		_ = logBook.FetchByID(ctx.Params("id"))
+		all := append([]interface{}{t}, logBook.Prayer...)
+		logBook.Prayer = all
 	}
 
 	err = logBook.UpdateOne()

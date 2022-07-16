@@ -17,18 +17,34 @@ const (
 // LogBook struct for users table
 type LogBook struct {
 	utils.Base
-	Id primitive.ObjectID `json:"id" bson:"_id"`
+	Id           primitive.ObjectID `json:"id" bson:"_id"`
+	Email        string             `bson:"email,omitempty" json:"email,omitempty"`
+	FullName     string             `bson:"fullName,omitempty" json:"fullName,omitempty"`
+	MatricNumber string             `bson:"matricNumber,omitempty" json:"matricNumber,omitempty"`
+	Prayer       []interface{}      `bson:"prayer,omitempty" json:"prayer,omitempty"`
+	Evangelism   []interface{}      `bson:"evangelism,omitempty" json:"evangelism"`
+	Exercise     []interface{}      `bson:"exercise,omitempty" json:"exercise"`
+}
 
-	Email          string        `bson:"email,omitempty" json:"email,omitempty"`
-	FullName       string        `bson:"fullName,omitempty" json:"fullName,omitempty"`
-	MatricNumber   string        `bson:"matricNumber,omitempty" json:"matricNumber,omitempty"`
-	Converts       string        `bson:"converts,omitempty" json:"converts"`
-	Location       string        `bson:"location,omitempty" json:"location,omitempty"`
-	PrayerLocation string        `bson:"prayerLocation,omitempty" json:"prayerLocation,omitempty"`
-	PrayerWalk     []interface{} `bson:"prayerWalk,omitempty" json:"prayerWalk,omitempty"`
-	ConvertInfo    []interface{} `bson:"convertInfo,omitempty" json:"convertInfo"`
-	BibleRead      []interface{} `bson:"bibleRead,omitempty" json:"bibleRead"`
-	Exercise       []interface{} `bson:"exercise,omitempty" json:"exercise"`
+type Evangelism struct {
+	Converts    string        `bson:"converts,omitempty" json:"converts"`
+	Location    string        `bson:"location,omitempty" json:"location,omitempty"`
+	Date        string        `bson:"date,omitempty" json:"date,omitempty"`
+	ConvertInfo []interface{} `bson:"convertInfo,omitempty" json:"convertInfo"`
+}
+
+type Prayer struct {
+	Location    string `bson:"location,omitempty" json:"location,omitempty"`
+	Date        string `bson:"date,omitempty" json:"date,omitempty"`
+	Description string `bson:"description,omitempty" json:"description,omitempty"`
+}
+
+type Exercise struct {
+	Day        string `bson:"location,omitempty" json:"location,omitempty"`
+	Author     string `bson:"prayerLocation,omitempty" json:"prayerLocation,omitempty"`
+	BookTitle  string `bson:"prayerWalk,omitempty" json:"prayerWalk,omitempty"`
+	PrayerTime string `bson:"convertInfo,omitempty" json:"convertInfo"`
+	NoPages    string `bson:"bibleRead,omitempty" json:"bibleRead"`
 }
 
 // LogBookList defines array of logBook objects
