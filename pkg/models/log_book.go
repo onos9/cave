@@ -17,13 +17,14 @@ const (
 // LogBook struct for users table
 type LogBook struct {
 	utils.Base
-	Id           primitive.ObjectID `json:"id" bson:"_id"`
-	Email        string             `bson:"email,omitempty" json:"email,omitempty"`
-	FullName     string             `bson:"fullName,omitempty" json:"fullName,omitempty"`
-	MatricNumber string             `bson:"matricNumber,omitempty" json:"matricNumber,omitempty"`
-	Prayer       []interface{}      `bson:"prayer,omitempty" json:"prayer,omitempty"`
-	Evangelism   []interface{}      `bson:"evangelism,omitempty" json:"evangelism"`
-	Exercise     []interface{}      `bson:"exercise,omitempty" json:"exercise"`
+	Id            primitive.ObjectID `json:"id" bson:"_id"`
+	Email         string             `bson:"email,omitempty" json:"email,omitempty"`
+	FullName      string             `bson:"fullName,omitempty" json:"fullName,omitempty"`
+	MatricNumber  string             `bson:"matricNumber,omitempty" json:"matricNumber,omitempty"`
+	ProgramOption string             `bson:"programOption,omitempty" json:"programOption,omitempty"`
+	Prayer        []interface{}      `bson:"prayer,omitempty" json:"prayer,omitempty"`
+	Evangelism    []interface{}      `bson:"evangelism,omitempty" json:"evangelism"`
+	Exercise      []interface{}      `bson:"exercise,omitempty" json:"exercise"`
 }
 
 type Evangelism struct {
