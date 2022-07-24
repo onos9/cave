@@ -42,6 +42,7 @@ type Prayer struct {
 	Description string `bson:"description,omitempty" json:"description,omitempty"`
 }
 
+
 type Exercise struct {
 	Chapters     string `bson:"chapters,omitempty" json:"chapters,omitempty"`
 	EndChapter   string `bson:"endChapter,omitempty" json:"endChapter,omitempty"`
