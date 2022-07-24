@@ -56,6 +56,23 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 		})
 	}
 
+	////////////////////////////////////////////////////////////////
+	//
+	// REDIS IS GIVEN THE FOLLOWING ERROR ON THE SERVER "READONLY You can't write against a read only replica."
+	// RESOLVE THIS ERROR BEFOR ENABLING THE FOLLOWING REDIS CODE
+	//
+	// POSIBLE SOLUTIONS:
+	//
+	// Because the master-slave replication cluster was configured before, the configuration was changed disorderly
+	// There are two solutions:
+	// 1. Open the configuration file corresponding to the redis service, 
+	// 	  and change the value of the attribute slave read-only to no, so that it can be written.
+	// 2. Open the client mode through the redis cli command, and enter the slave of no one command
+	//
+	// https://programmerah.com/error-readonly-you-cant-write-against-a-read-only-replica-43956/
+	//
+	/////////////////////////////////////////////////////////////////
+
 	// err := rdb.Set(ctx.UserContext(), code, user.Id.Hex(), 0).Err()
 	// if err != nil {
 	// 	return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
@@ -63,7 +80,6 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 	// 		"error":   err.Error(),
 	// 	})
 	// }
-
 
 	// mail := fiber.Map{
 	// 	"fromAddress": os.Getenv("EMAIL_FROM"),
