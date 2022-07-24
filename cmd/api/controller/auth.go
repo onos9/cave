@@ -56,15 +56,15 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 		})
 	}
 
-	err := rdb.Set(ctx.UserContext(), code, user.Id.Hex(), 0).Err()
-	if err != nil {
-		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"success": false,
-			"error":   err.Error(),
-		})
-	}
+	// err := rdb.Set(ctx.UserContext(), code, user.Id.Hex(), 0).Err()
+	// if err != nil {
+	// 	return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
+	// 		"success": false,
+	// 		"error":   err.Error(),
+	// 	})
+	// }
 
-	
+
 	// mail := fiber.Map{
 	// 	"fromAddress": os.Getenv("EMAIL_FROM"),
 	// 	"toAddress":   c.Email,
