@@ -24,11 +24,13 @@ type Course struct {
 	About               string                 `bson:"about,omitempty" json:"about"`
 	ProgressionBehavior string                 `bson:"progressionBehavior,omitempty" json:"progressionBehavior"`
 	ProgressionLimit    int                    `bson:"progressionLimit,omitempty" json:"progressionLimit"`
+	CourseType          string                 `bson:"courseType,omitempty" json:"courseType"`
 	Certificates        CertificateList        `bson:"certificates,omitempty" json:"certificates"`
 	Authors             CourseAuthorList       `bson:"authors,omitempty" json:"authors"`
 	EvaluationCriteria  EvaluationCriteriaList `bson:"evaluationCriteria,omitempty" json:"evaluationCriteria"`
 	Levels              LevelList              `bson:"levels,omitempty" json:"levels"`
 	Students            StudentCourseList      `bson:"students,omitempty" json:"students"`
+	LogBook         []LogBook                 `bson:"practiceID,omitempty" json:"practiceID"`
 }
 
 // CourseList defines array of course objects

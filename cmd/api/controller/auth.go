@@ -38,16 +38,15 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 
 	rand.Seed(time.Now().UnixNano())
 	code := fmt.Sprintf("%06d", rand.Intn(999999))
-	userID := user.Id.Hex()
 
 	// Hash Password
 	hashedPass, _ := utils.EncryptPassword(c.Password)
 	user.PasswordHash = []byte(hashedPass)
 	user.Email = c.Email
 	user.EnrollProgress = 0
-	user.Role = "prospective"
 	user.Wallet = 0
-	user.UserID = userID
+	user.UserID = code
+	user.FullName = c.FullName
 
 	//Save User To DB
 	if err := user.Create(); err != nil {
@@ -57,7 +56,7 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 		})
 	}
 
-	err := rdb.Set(ctx.UserContext(), code, userID, 0).Err()
+	err := rdb.Set(ctx.UserContext(), code, user.Id.Hex(), 0).Err()
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"success": false,
@@ -75,6 +74,38 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 	// 		"payment_url": os.Getenv("FINANCIAL"),
 	// 	},
 	// }
+
+	if t := ctx.Params("type"); t == "logbook" {
+		at, err := auth.IssueAccessToken(user)
+		if err != nil {
+			return ctx.Status(http.StatusForbidden).JSON(err.Error())
+		}
+
+		rt, err := auth.IssueRefreshToken(user)
+		if err != nil {
+			return ctx.Status(http.StatusForbidden).JSON(err.Error())
+		}
+
+		cookie := fiber.Cookie{
+			Name:     "token",
+			Value:    rt,
+			Expires:  time.Now().Add((24 * time.Hour) * 14),
+			HTTPOnly: true,
+			Secure:   false,
+			Domain:   os.Getenv("APP_HOST"),
+		}
+
+		ctx.Cookie(&cookie)
+
+		roles := []string{"admin", "prospective", "guest", "student"}
+
+		return ctx.Status(http.StatusCreated).JSON(fiber.Map{
+			"accessToken": at,
+			"user":        user,
+			"roles":       roles,
+			"login":       true,
+		})
+	}
 
 	vt, err := auth.IssueVerificationToken(user)
 	if err != nil {

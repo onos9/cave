@@ -26,6 +26,7 @@ type User struct {
 	*Terms         `bson:"terms,omitempty" json:"terms"`
 	RefereeList    []*Referee `bson:"referees,omitempty" json:"referees"`
 
+	MatricNumber           string     `bson:"matricNumber,omitempty" json:"matricNumber,omitempty"`
 	UserID                 string     `bson:"userID,omitempty" json:"userID"`
 	Email                  string     `bson:"email,omitempty" json:"email,omitempty"`
 	Password               string     `bson:"-" json:"password,omitempty"`
@@ -146,7 +147,7 @@ func (m *User) Create() error {
 	t := time.Now()
 	m.CreatedAt = &t
 	m.Id = primitive.NewObjectID()
-
+	m.ID = m.Id
 	result, err := db.Collection(userCol).InsertOne(context.TODO(), &m)
 	if err != nil {
 		return err

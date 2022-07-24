@@ -17,21 +17,23 @@ const (
 // LogBook struct for users table
 type LogBook struct {
 	utils.Base
-	Id            primitive.ObjectID `json:"id" bson:"_id"`
-	Email         string             `bson:"email,omitempty" json:"email,omitempty"`
-	FullName      string             `bson:"fullName,omitempty" json:"fullName,omitempty"`
-	MatricNumber  string             `bson:"matricNumber,omitempty" json:"matricNumber,omitempty"`
-	ProgramOption string             `bson:"programOption,omitempty" json:"programOption,omitempty"`
-	Prayer        []interface{}      `bson:"prayer,omitempty" json:"prayer,omitempty"`
-	Evangelism    []interface{}      `bson:"evangelism,omitempty" json:"evangelism"`
-	Exercise      []interface{}      `bson:"exercise,omitempty" json:"exercise"`
+	Id         primitive.ObjectID `json:"id" bson:"_id"`
+	CourseCode string             `bson:"courseCode,omitempty" json:"courseCode,omitempty"`
+	CourseName string             `bson:"courseName,omitempty" json:"courseName,omitempty"`
+	Group      string             `bson:"group,omitempty" json:"group,omitempty"`
+	UserID     string             `bson:"userID,omitempty" json:"userID,omitempty"`
+	Status     string             `bson:"status,omitempty" json:"status,omitempty"`
+	Prayer     []*Prayer          `bson:"prayer,omitempty" json:"prayer,omitempty"`
+	Evangelism []*Evangelism      `bson:"evangelism,omitempty" json:"evangelism,omitempty"`
+	Exercise   []*Exercise        `bson:"exercise,omitempty" json:"exercise,omitempty"`
 }
 
 type Evangelism struct {
-	Converts    string        `bson:"converts,omitempty" json:"converts"`
-	Location    string        `bson:"location,omitempty" json:"location,omitempty"`
-	Date        string        `bson:"date,omitempty" json:"date,omitempty"`
-	ConvertInfo []interface{} `bson:"convertInfo,omitempty" json:"convertInfo"`
+	Converts    string                   `bson:"converts,omitempty" json:"converts"`
+	Location    string                   `bson:"location,omitempty" json:"location,omitempty"`
+	Date        string                   `bson:"date,omitempty" json:"date,omitempty"`
+	Testimonies string                   `bson:"testimonies,omitempty" json:"testimonies,omitempty"`
+	ConvertInfo []map[string]string `bson:"convertInfo,omitempty" json:"convertInfo"`
 }
 
 type Prayer struct {
@@ -41,11 +43,14 @@ type Prayer struct {
 }
 
 type Exercise struct {
-	Day        string `bson:"location,omitempty" json:"location,omitempty"`
-	Author     string `bson:"prayerLocation,omitempty" json:"prayerLocation,omitempty"`
-	BookTitle  string `bson:"prayerWalk,omitempty" json:"prayerWalk,omitempty"`
-	PrayerTime string `bson:"convertInfo,omitempty" json:"convertInfo"`
-	NoPages    string `bson:"bibleRead,omitempty" json:"bibleRead"`
+	Chapters     string `bson:"chapters,omitempty" json:"chapters,omitempty"`
+	EndChapter   string `bson:"endChapter,omitempty" json:"endChapter,omitempty"`
+	StartChapter string `bson:"startChapter,omitempty" json:"startChapter,omitempty"`
+	Day          string `bson:"day,omitempty" json:"day,omitempty"`
+	Author       string `bson:"author,omitempty" json:"author,omitempty"`
+	BookTitle    string `bson:"bookTitle,omitempty" json:"bookTitle,omitempty"`
+	PrayerTime   string `bson:"prayerTime,omitempty" json:"prayerTime"`
+	NoPages      string `bson:"noPages,omitempty" json:"noPages"`
 }
 
 // LogBookList defines array of logBook objects
@@ -83,10 +88,13 @@ func (m *LogBook) FetchByID(id string) error {
 	return nil
 }
 
-// FetchByEmail fetches User by email
-func (m *LogBook) FetchByEmail() error {
-	err := db.Collection(logBookCol).FindOne(context.TODO(), bson.M{"email": m.Email}).Decode(&m)
+// FetchByEmail fetches LogBook by userID
+func (m *LogBook) FetchByUserId(ul *LogBookList) error {
+	cursor, err := db.Collection(logBookCol).Find(context.TODO(), bson.M{"userID": m.UserID})
 	if err != nil {
+		return err
+	}
+	if err = cursor.All(context.TODO(), ul); err != nil {
 		return err
 	}
 	return nil

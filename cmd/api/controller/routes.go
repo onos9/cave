@@ -39,9 +39,9 @@ func SetupRoutes(r *fiber.App, db *config.DB) {
 	// Auth Group
 	auth := v1.Group("/auth")
 	auth.Get("/", userAuth.token)
-	auth.Post("/", userAuth.signin)
+	auth.Post("/", userAuth.signin).Name("signin")
 	auth.Post("/:token", userAuth.verify)
-	auth.Put("/", userAuth.signup)
+	auth.Put("/:type", userAuth.signup)
 	auth.Delete("/", userAuth.signout)
 
 	// User Group
@@ -71,10 +71,10 @@ func SetupRoutes(r *fiber.App, db *config.DB) {
 
 	// LogBook Routes
 	lb := v1.Group("/logbook")
-	lb.Post("/", practicum.create)
-	lb.Get("/", practicum.getAll)
-	lb.Get("/:email", practicum.getByEmail)
-	lb.Get("/:id", practicum.getOne)
-	lb.Patch("/:id", practicum.updateOne)
-	lb.Delete("/:id", practicum.deleteOne)
+	lb.Post("/", middlewares.RequireLoggedIn(), logBook.create)
+	lb.Get("/", middlewares.RequireLoggedIn(), logBook.getAll)
+	lb.Get("/:id", middlewares.RequireLoggedIn(), logBook.getOne)
+	lb.Get("user/:userId", middlewares.RequireLoggedIn(), logBook.getOneByUserId)
+	lb.Patch("/:id", middlewares.RequireLoggedIn(), logBook.updateOne)
+	lb.Delete("/:id", middlewares.RequireLoggedIn(), logBook.deleteOne)
 }

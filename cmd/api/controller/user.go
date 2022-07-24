@@ -76,7 +76,8 @@ func (c *User) getAll(ctx *fiber.Ctx) error {
 func (c *User) updateOne(ctx *fiber.Ctx) error {
 
 	var user models.User
-	err := json.Unmarshal(ctx.Body(), &user)
+	body := ctx.Body()
+	err := json.Unmarshal(body, &user)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"success": false,

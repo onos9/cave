@@ -25,11 +25,6 @@ func SetRepoDB(dbi *config.DB) {
 		log.Panic(err.Error())
 	}
 
-	err = SetIndex("logbooks", "email")
-	if err != nil {
-		log.Panic(err.Error())
-	}
-
 	// Hash Password
 	password := os.Getenv("ADMIN_PASS")
 	hashedPass, _ := utils.EncryptPassword(password)
