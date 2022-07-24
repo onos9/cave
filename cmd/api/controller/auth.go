@@ -64,6 +64,7 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 		})
 	}
 
+	
 	// mail := fiber.Map{
 	// 	"fromAddress": os.Getenv("EMAIL_FROM"),
 	// 	"toAddress":   c.Email,
