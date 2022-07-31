@@ -29,10 +29,10 @@ type LogBook struct {
 }
 
 type Evangelism struct {
-	Converts    string                   `bson:"converts,omitempty" json:"converts"`
-	Location    string                   `bson:"location,omitempty" json:"location,omitempty"`
-	Date        string                   `bson:"date,omitempty" json:"date,omitempty"`
-	Testimonies string                   `bson:"testimonies,omitempty" json:"testimonies,omitempty"`
+	Converts    string              `bson:"converts,omitempty" json:"converts"`
+	Location    string              `bson:"location,omitempty" json:"location,omitempty"`
+	Date        string              `bson:"date,omitempty" json:"date,omitempty"`
+	Testimonies string              `bson:"testimonies,omitempty" json:"testimonies,omitempty"`
 	ConvertInfo []map[string]string `bson:"convertInfo,omitempty" json:"convertInfo"`
 }
 
@@ -41,7 +41,6 @@ type Prayer struct {
 	Date        string `bson:"date,omitempty" json:"date,omitempty"`
 	Description string `bson:"description,omitempty" json:"description,omitempty"`
 }
-
 
 type Exercise struct {
 	Chapters     string `bson:"chapters,omitempty" json:"chapters,omitempty"`
@@ -129,9 +128,34 @@ func (m *LogBook) UpdateOne() error {
 		return err
 	}
 
-	filter := bson.M{"_id": m.Id}
+	// filter := bson.M{"_id": m.Id}
 	update := bson.D{{Key: "$set", Value: val}}
-	_, err = db.Collection(logBookCol).UpdateOne(context.TODO(), filter, update)
+	_, err = db.Collection(logBookCol).UpdateByID(context.TODO(), m.Id, update)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// UpdateManyWhere: updates many logBooks where field and value matches
+func (m *LogBook) UpdateManyWhere(field, value string) error {
+	t := time.Now()
+	m.UpdatedAt = &t
+
+	bm, err := bson.Marshal(m)
+	if err != nil {
+		return err
+	}
+
+	var val bson.M
+	err = bson.Unmarshal(bm, &val)
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{field: value}
+	update := bson.D{{Key: "$set", Value: val}}
+	_, err = db.Collection(logBookCol).UpdateMany(context.TODO(), filter, update)
 	if err != nil {
 		return err
 	}
