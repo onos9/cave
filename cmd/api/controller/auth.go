@@ -25,6 +25,7 @@ type Auth struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	FullName string `json:"fullName"`
+	Role     string `json:"role"`
 }
 
 func (c *Auth) signup(ctx *fiber.Ctx) error {
@@ -43,6 +44,7 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 	hashedPass, _ := utils.EncryptPassword(c.Password)
 	user.PasswordHash = []byte(hashedPass)
 	user.Email = c.Email
+	user.Role = c.Role
 	user.EnrollProgress = 0
 	user.Wallet = 0
 	user.UserID = code
@@ -65,7 +67,7 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 	//
 	// Because the master-slave replication cluster was configured before, the configuration was changed disorderly
 	// There are two solutions:
-	// 1. Open the configuration file corresponding to the redis service, 
+	// 1. Open the configuration file corresponding to the redis service,
 	// 	  and change the value of the attribute slave read-only to no, so that it can be written.
 	// 2. Open the client mode through the redis cli command, and enter the slave of no one command
 	//
