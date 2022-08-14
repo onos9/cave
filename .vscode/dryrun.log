@@ -1,0 +1,6 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory `/Users/user/beznet/cave'
+cd web; \
+	if [ -d build ]; then rm -rf build; fi
+make: Leaving directory `/Users/user/beznet/cave'
+ 

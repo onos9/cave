@@ -120,6 +120,7 @@ func (c *LogBook) updateOne(ctx *fiber.Ctx) error {
 	}
 
 	logBook.Id = Id
+	logBook.Status = temp.Status
 	err = logBook.UpdateOne()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
@@ -131,6 +132,39 @@ func (c *LogBook) updateOne(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{
 		"success": true,
 		"logBook": logBook,
+	})
+}
+
+func (c *LogBook) updateMany(ctx *fiber.Ctx) error {
+
+	var logBook models.LogBook
+	if err := ctx.BodyParser(&logBook); err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(err)
+	}
+
+	var status string
+	if logBook.Status == "Open" {
+		status = "Closed"
+	} else {
+		status = "Open"
+	}
+
+	err := logBook.UpdateManyWhere("status", status)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	var logBookList models.LogBookList
+	err = logBook.FetchAll(&logBookList)
+	if err != nil {
+		return ctx.Status(http.StatusForbidden).JSON(err)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"list": logBookList,
 	})
 }
 

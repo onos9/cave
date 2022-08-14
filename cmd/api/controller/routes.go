@@ -76,5 +76,6 @@ func SetupRoutes(r *fiber.App, db *config.DB) {
 	lb.Get("/:id", middlewares.RequireLoggedIn(), logBook.getOne)
 	lb.Get("user/:userId", middlewares.RequireLoggedIn(), logBook.getOneByUserId)
 	lb.Patch("/:id", middlewares.RequireLoggedIn(), logBook.updateOne)
+	lb.Post("/updates", middlewares.RequireLoggedIn(), logBook.updateMany)
 	lb.Delete("/:id", middlewares.RequireLoggedIn(), logBook.deleteOne)
 }
