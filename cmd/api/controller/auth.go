@@ -5,7 +5,6 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
-	"os"
 	"time"
 
 	"github.com/cave/config"
@@ -111,7 +110,6 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 			Expires:  time.Now().Add((24 * time.Hour) * 14),
 			HTTPOnly: true,
 			Secure:   false,
-			Domain:   os.Getenv("APP_HOST"),
 		}
 
 		ctx.Cookie(&cookie)
@@ -214,7 +212,6 @@ func (c *Auth) signin(ctx *fiber.Ctx) error {
 		Expires:  time.Now().Add((24 * time.Hour) * 14),
 		HTTPOnly: true,
 		Secure:   false,
-		Domain:   os.Getenv("APP_HOST"),
 	}
 
 	ctx.Cookie(&cookie)
@@ -232,7 +229,6 @@ func (c *Auth) signin(ctx *fiber.Ctx) error {
 func (c *Auth) signout(ctx *fiber.Ctx) error {
 	cookie := fiber.Cookie{
 		Name:     "token",
-		Domain:   os.Getenv("APP_HOST"),
 		Value:    "",
 		Expires:  time.Now().Add(-time.Hour),
 		HTTPOnly: true,
@@ -319,9 +315,6 @@ func (c *Auth) verify(ctx *fiber.Ctx) error {
 		Expires:  time.Now().Add((24 * time.Hour) * 14),
 		HTTPOnly: true,
 		Secure:   false,
-		Domain:   "localhost",
-		SameSite: "Lax",
-		Path:     "/",
 	}
 	ctx.Cookie(&cookie)
 
