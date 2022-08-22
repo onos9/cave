@@ -6,11 +6,8 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
- 
-make: *** No rule to make target `all'.  Stop.
 
-
-# Make data base, printed on Sun Aug 14 08:54:44 2022
+# Make data base, printed on Sun Aug 14 14:07:34 2022
 
 # Variables
 
@@ -45,19 +42,25 @@ VSCODE_CWD = /
 # environment
 GOPROXY = https://proxy.golang.org,direct
 # environment
-PATH = /usr/local/go/bin:/usr/bin:/bin:/usr/sbin:/sbin
+PATH = /usr/local/go/bin:/Users/user/.nvm/versions/node/v16.14.0/bin:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/Users/user/Library/Android/sdk/emulator:/Users/user/Library/Android/sdk/platform-tools:/Users/user/Library/Android/sdk/tools:/Users/user/Library/Android/sdk/tools/bin:/Users/user/flutter/bin:/usr/local/go:/Users/user/go:/Users/user/go/bin
+# environment
+LSCOLORS = Gxfxcxdxbxegedabagacad
 # environment
 GOPATH = /Users/user/go
 # environment
-LaunchInstanceID = 1A6A9A37-EBEE-4982-A548-EFD5210C91E3
+NVM_BIN = /Users/user/.nvm/versions/node/v16.14.0/bin
 # environment
 ELECTRON_RUN_AS_NODE = 1
+# environment
+ANDROID_HOME = /Users/user/Library/Android/sdk
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
 SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.0yVjDNnS7H/Listeners
 # automatic
 %F = $(notdir $%)
+# environment
+GOBIN = /Users/user/go/bin
 # makefile (from `Makefile', line 5)
 NETWORK = bridge
 # environment
@@ -71,11 +74,15 @@ HOME = /Users/user
 # default
 MAKEFILEPATH := /Applications/Xcode.app/Contents/Developer/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/user/Library/Application Support/Code/CachedData/3b889b090b5ad5793f524b5d1d39fda662b96a2a
+VSCODE_CODE_CACHE_PATH = /Users/user/Library/Application Support/Code/CachedData/6d9b74a70ca9c7733b29f0456fd8195364076dda
 # environment
 LOGNAME = user
 # environment
 APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+# environment
+NVM_CD_FLAGS = -q
+# environment
+ZSH = /Users/user/.oh-my-zsh
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # automatic
@@ -96,6 +103,10 @@ MAKE_VERSION := 3.81
 USER = user
 # makefile
 .DEFAULT_GOAL := clean
+# environment
+GOROOT = /usr/local/go
+# environment
+LESS = -R
 # automatic
 %D = $(patsubst %/,%,$(dir $%))
 # default
@@ -107,7 +118,7 @@ TMPDIR = /var/folders/tz/clm_x6l97qzfzdjyft8v24rc0000gn/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/user/Library/Application Support/Code/1.69.2-main.sock
+VSCODE_IPC_HOOK = /Users/user/Library/Application Support/Code/1.70.1-main.sock
 # environment
 MallocNanoZone = 0
 # makefile
@@ -117,7 +128,9 @@ MFLAGS = -Rrqp
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.17842204.17842210
+NVM_DIR = /Users/user/.nvm
+# environment
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.19434115.19434121
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # automatic
@@ -127,16 +140,15 @@ APP_NAME = cave
 # environment
 __CF_USER_TEXT_ENCODING = 0x1F5:0x0:0x0
 # environment
- 
 COMMAND_MODE = unix2003
 # default
 MAKEFILES := 
 # automatic
 <F = $(notdir $<)
 # environment
-LC_ALL = C
+PAGER = less
 # environment
-SECURITYSESSIONID = 186a4
+LC_ALL = C
 # automatic
 ^F = $(notdir $^)
 # default
@@ -150,9 +162,9 @@ MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-VSCODE_PID = 398
+VSCODE_PID = 14283
 # variable set hash-table stats:
-# Load=68/1024=7%, Rehash=0, Collisions=2/92=2%
+# Load=76/1024=7%, Rehash=0, Collisions=2/100=2%
 
 # Pattern-specific Variable Values
 
@@ -231,7 +243,6 @@ static: clean
 
 # Not a target:
 .DEFAULT:
- 
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -273,6 +284,8 @@ clean:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Sun Aug 14 08:54:44 2022
+# Finished Make data base on Sun Aug 14 14:07:34 2022
 
  
+make: *** No rule to make target `all'.  Stop.
+
