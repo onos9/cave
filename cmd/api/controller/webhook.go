@@ -46,7 +46,7 @@ func (c *Webhook) payment(ctx *fiber.Ctx) error {
 	query := url.Values{}
 	query.Set("userId", user.UserID)
 	u, _ := url.ParseRequestURI(m["redirect_uri"].(string))
-	urlStr := u.String() + "/#/sign-in/"
+	urlStr := u.String() + "/sign-in/"
 
 	data := fiber.Map{
 		"fromAddress": "support@adullam.ng",

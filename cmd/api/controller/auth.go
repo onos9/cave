@@ -133,7 +133,7 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 	query := url.Values{}
 	query.Set("reg_tk", vt)
 	u, _ := url.ParseRequestURI(os.Getenv("APP_HOST"))
-	urlStr := u.String() + "/#/platform/sign-in/register"
+	urlStr := u.String() + "/platform/sign-in/register"
 
 	data := fiber.Map{
 		"fromAddress": "support@adullam.ng",
