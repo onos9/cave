@@ -18,9 +18,6 @@ func SetupRoutes(r *fiber.App, db *config.DB) {
 	models.SetRepoDB(db)
 	cfg := config.GetConfig()
 
-	r.Static("/", cfg.Webroot)
-	r.Static("/static/*", cfg.Webroot+"/index.html")
-
 	api := r.Group("/api")
 	v1 := api.Group("/v1")
 	v1.Use("/docs", swagger.HandlerDefault)
@@ -78,4 +75,7 @@ func SetupRoutes(r *fiber.App, db *config.DB) {
 	lb.Patch("/:id", middlewares.RequireLoggedIn(), logBook.updateOne)
 	lb.Post("/updates", middlewares.RequireLoggedIn(), logBook.updateMany)
 	lb.Delete("/:id", middlewares.RequireLoggedIn(), logBook.deleteOne)
+
+	r.Static("/*", cfg.Webroot)
+	r.Static("/static/*", cfg.Webroot+"/index.html")
 }
