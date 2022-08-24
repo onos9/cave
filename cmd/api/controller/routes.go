@@ -76,6 +76,6 @@ func SetupRoutes(r *fiber.App, db *config.DB) {
 	lb.Post("/updates", middlewares.RequireLoggedIn(), logBook.updateMany)
 	lb.Delete("/:id", middlewares.RequireLoggedIn(), logBook.deleteOne)
 
-	r.Static("/*", cfg.Webroot)
-	r.Static("/static/*", cfg.Webroot+"/index.html")
+	r.Static("/", cfg.Webroot)
+	r.Static("*", cfg.Webroot+"/index.html")
 }
