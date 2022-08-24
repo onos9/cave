@@ -3,14 +3,12 @@ package api
 import (
 	"fmt"
 	"log"
-	"net/http"
 	"time"
 
 	"github.com/cave/cmd/api/controller"
 	cfg "github.com/cave/config"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/swaggo/swag/example/basic/docs"
@@ -31,13 +29,11 @@ func Init(db *cfg.DB) *ApiServer {
 		BodyLimit:   1000 * 1024 * 1024, // limit to 500MB
 	})
 
-	s.Use(filesystem.New(filesystem.Config{
-		Root:   http.Dir(config.Webroot),
-		Browse: false, 
-		Index:        "./",
-		NotFoundFile: "index.html",
-		MaxAge:       3600,
-	}))
+	// s.Use(filesystem.New(filesystem.Config{
+	// 	Root:   http.Dir(config.Webroot),
+	// 	Browse: false,
+	// 	Index:  "./",
+	// }))
 
 	// Set Up Middlewares
 	s.Use(logger.New())  // Default Log Middleware
