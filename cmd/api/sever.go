@@ -34,7 +34,7 @@ func Init(db *cfg.DB) *ApiServer {
 	s.Use(filesystem.New(filesystem.Config{
 		Root:   http.Dir(config.Webroot),
 		Browse: false, 
-		Index:        "index.html",
+		Index:        "./",
 		NotFoundFile: "index.html",
 		MaxAge:       3600,
 	}))
