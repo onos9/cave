@@ -144,21 +144,19 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 		},
 	}
 
-	id, err := rdb.Get(ctx.UserContext(), code).Result()
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"emailed": false,
-			"success": true,
-			"error":   err.Error(),
-		})
-	}
+	// id, err := rdb.Get(ctx.UserContext(), code).Result()
+	// if err != nil {
+	// 	return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
+	// 		"emailed": false,
+	// 		"success": true,
+	// 		"error":   err.Error(),
+	// 	})
+	// }
 
 	m := mail.Mail{}
 	_, err = m.SendMail(data)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"ID":      id,
-			"userId":  code,
 			"emailed": false,
 			"success": true,
 			"error":   err.Error(),
