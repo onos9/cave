@@ -160,7 +160,7 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"emailed": false,
 			"success": true,
-			"error":   err,
+			"error":   err.Error(),
 		})
 	}
 
