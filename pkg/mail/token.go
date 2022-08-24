@@ -23,7 +23,7 @@ func (m *Mail) getNewToken() (string, error) {
 
 	rt, err := rdb.Get(ctx, "zohoRefreshToken").Result()
 	if err != nil {
-		return "", errors.New("zohoRefreshToken: " + err.Error())
+		return "", errors.New("getNewToken(): rdb.Get: zohoRefreshToken: " + err.Error())
 	}
 
 	apiUrl := "https://accounts.zoho.com"
@@ -51,7 +51,7 @@ func (m *Mail) getNewToken() (string, error) {
 	expireTime := time.Duration(m.ExpiresIn) * time.Second
 	err = rdb.Set(ctx, "accessToken", m.AccessToken, expireTime).Err()
 	if err != nil {
-		return "", err
+		return "", errors.New("getNewToken(): rdb.Set: accessToken: " + err.Error())
 	}
 
 	return m.AccessToken, nil
@@ -65,7 +65,7 @@ func (m *Mail) RequestTokens(code string) (string, error) {
 
 	err := rdb.Set(ctx, "zoho_code", code, 0).Err()
 	if err != nil {
-		return "", err
+		return "", errors.New("RequestTokens(): rdb.Set: zoho_code: " + err.Error())
 	}
 
 	apiUrl := "https://accounts.zoho.com"
@@ -92,13 +92,13 @@ func (m *Mail) RequestTokens(code string) (string, error) {
 
 	err = rdb.Set(ctx, "zohoRefreshToken", m.RefreshToken, 0).Err()
 	if err != nil {
-		return "", err
+		return "", errors.New("RequestTokens(): rdb.Set: zohoRefreshToken: " + err.Error())
 	}
 
 	expireTime := time.Duration(m.ExpiresIn) * time.Second
 	err = rdb.Set(ctx, "accessToken", m.AccessToken, expireTime).Err()
 	if err != nil {
-		return "", err
+		return "", errors.New("RequestTokens(): rdb.Set: accessToken: " + err.Error())
 	}
 
 	return m.AccessToken, nil
