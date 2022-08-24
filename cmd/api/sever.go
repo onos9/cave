@@ -31,7 +31,13 @@ func Init(db *cfg.DB) *ApiServer {
 		BodyLimit:   1000 * 1024 * 1024, // limit to 500MB
 	})
 
-	s.Use(filesystem.New(filesystem.Config{Root: http.Dir(config.Webroot), Browse: false, Index: "./"}))
+	s.Use(filesystem.New(filesystem.Config{
+		Root:   http.Dir(config.Webroot),
+		Browse: false, 
+		Index:        "index.html",
+		NotFoundFile: "index.html",
+		MaxAge:       3600,
+	}))
 
 	// Set Up Middlewares
 	s.Use(logger.New())  // Default Log Middleware
