@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
 
 	"github.com/cave/config"
@@ -130,9 +131,9 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 	}
 
 	query := url.Values{}
-	query.Set("userId", user.UserID)
-	u, _ := url.ParseRequestURI(`https://admin.adullam.ng`)
-	urlStr := u.String() + "/#/sign-in/"
+	query.Set("reg_tk", vt)
+	u, _ := url.ParseRequestURI(os.Getenv("APP_HOST"))
+	urlStr := u.String() + "/#/platform/sign-in/register"
 
 	data := fiber.Map{
 		"fromAddress": "support@adullam.ng",
@@ -140,7 +141,7 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 		"subject":     "Payment Confirmation",
 		"content": map[string]interface{}{
 			"filename":     "payment.html",
-			"redirect_uri": urlStr + vt + "?" + query.Encode(),
+			"redirect_uri": urlStr + "?" + query.Encode(),
 		},
 	}
 
