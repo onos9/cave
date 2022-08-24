@@ -35,8 +35,6 @@ func Init(db *cfg.DB) *ApiServer {
 		Root:   http.Dir(config.Webroot),
 		Browse: false, 
 		Index:        "./",
-		NotFoundFile: "index.html",
-		MaxAge:       3600,
 	}))
 
 	// Set Up Middlewares
