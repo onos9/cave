@@ -24,6 +24,7 @@ type Mail struct {
 
 var ctx = context.Background()
 
+
 func (m *Mail) SendMail(mail fiber.Map) (fiber.Map, error) {
 	cfg := config.GetMailConfig()
 	apiUrl := "https://mail.zoho.com"
