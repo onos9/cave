@@ -16,10 +16,9 @@ type Resp map[string]interface{}
 // SetupRoutes setups r
 func SetupRoutes(r *fiber.App, db *config.DB) {
 	models.SetRepoDB(db)
-	cfg := config.GetConfig()
+	// cfg := config.GetConfig()
 
-	r.Static("/", cfg.Webroot)
-	r.Static("*", cfg.Webroot+"/index.html")
+	// r.Static("/", cfg.Webroot)
 	// r.Static("/static/*", cfg.Webroot+"/index.html")
 
 	api := r.Group("/api")
