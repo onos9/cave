@@ -19,7 +19,8 @@ func SetupRoutes(r *fiber.App, db *config.DB) {
 	cfg := config.GetConfig()
 
 	r.Static("/", cfg.Webroot)
-	r.Static("/static/*", cfg.Webroot+"/index.html")
+	r.Static("*", cfg.Webroot+"/index.html")
+	// r.Static("/static/*", cfg.Webroot+"/index.html")
 
 	api := r.Group("/api")
 	v1 := api.Group("/v1")
