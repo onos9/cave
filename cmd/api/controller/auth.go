@@ -131,7 +131,7 @@ func (c *Auth) signup(ctx *fiber.Ctx) error {
 
 	query := url.Values{}
 	query.Set("userId", user.UserID)
-	u, _ := url.ParseRequestURI(`https://portal.adullam.ng`)
+	u, _ := url.ParseRequestURI(`https://admin.adullam.ng`)
 	urlStr := u.String() + "/#/sign-in/"
 
 	data := fiber.Map{
