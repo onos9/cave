@@ -93,12 +93,14 @@ type Background struct {
 	GodsCall         string `bson:"godsCall,omitempty" json:"godsCall"`
 	IntoMinistry     string `bson:"intoMinistry,omitempty" json:"intoMinistry"`
 	SpiritualGifts   string `bson:"SpiritualGifts,omitempty" json:"spiritualGifts"`
+	
 	Reason           string `bson:"reason,omitempty" json:"reason"`
 	ChurchName       string `bson:"churchName,omitempty" json:"churchName"`
 	ChurchAddress    string `bson:"churchAdress,omitempty" json:"churchAddress"`
 	PastorName       string `bson:"pastorName,omitempty" json:"pastorName"`
 	PastorEmail      string `bson:"pastorEmail,omitempty" json:"pastorEmail"`
 	PastorPhone      string `bson:"pastorPhone,omitempty" json:"pastorPhone"`
+	
 	ChurchInvolved   string `bson:"churchInvolve,omitempty" json:"churchInvolve"`
 	WaterBaptism     string `bson:"waterBaptism,omitempty" json:"waterBaptism"`
 	BaptismDate      string `bson:"baptismDate,omitempty" json:"baptismDate"`
