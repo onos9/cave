@@ -225,6 +225,7 @@ func (c *Auth) signin(ctx *fiber.Ctx) error {
 	})
 }
 
+
 func (c *Auth) signout(ctx *fiber.Ctx) error {
 	cookie := fiber.Cookie{
 		Name:     "token",
