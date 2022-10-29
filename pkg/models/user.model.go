@@ -53,6 +53,7 @@ type User struct {
 	Status                 string     `bson:"status,omitempty" json:"status"`
 	Program                string     `bson:"program,omitempty" json:"program"`
 	ProgramOption          string     `bson:"programOption,omitempty" json:"programOption"`
+	ScholarshipReason      string     `bson:"scholReason,omitempty" json:"scholReason"`
 	Wallet                 float64    `bson:"wallet,omitempty" json:"wallet"`
 
 	TimeZone        *time.Time        `bson:"timeZone,omitempty" json:"timeZone,omitempty"`
@@ -60,7 +61,7 @@ type User struct {
 	Courses         StudentCourseList `bson:"courses,omitempty" json:"courses,omitempty"`
 }
 
-//Bio is a model for Bios table
+// Bio is a model for Bios table
 type BioData struct {
 	FirstName   string `bson:"firstName,omitempty" json:"firstName"`
 	LastName    string `bson:"lastName,omitempty" json:"lastName"`
@@ -87,20 +88,20 @@ type Qualification struct {
 
 // background is a model for backgrounds table
 type Background struct {
-	BornAgain        string `bson:"bornAgain,omitempty" json:"bornAgain,omitempty"`
-	SalvationBrief   string `bson:"briefSalvation,omitempty" json:"briefSalvation,omitempty"`
-	GodsWorkings     string `bson:"godsWorkings,omitempty" json:"godsWorkings"`
-	GodsCall         string `bson:"godsCall,omitempty" json:"godsCall"`
-	IntoMinistry     string `bson:"intoMinistry,omitempty" json:"intoMinistry"`
-	SpiritualGifts   string `bson:"SpiritualGifts,omitempty" json:"spiritualGifts"`
-	
-	Reason           string `bson:"reason,omitempty" json:"reason"`
-	ChurchName       string `bson:"churchName,omitempty" json:"churchName"`
-	ChurchAddress    string `bson:"churchAdress,omitempty" json:"churchAddress"`
-	PastorName       string `bson:"pastorName,omitempty" json:"pastorName"`
-	PastorEmail      string `bson:"pastorEmail,omitempty" json:"pastorEmail"`
-	PastorPhone      string `bson:"pastorPhone,omitempty" json:"pastorPhone"`
-	
+	BornAgain      string `bson:"bornAgain,omitempty" json:"bornAgain,omitempty"`
+	SalvationBrief string `bson:"briefSalvation,omitempty" json:"briefSalvation,omitempty"`
+	GodsWorkings   string `bson:"godsWorkings,omitempty" json:"godsWorkings"`
+	GodsCall       string `bson:"godsCall,omitempty" json:"godsCall"`
+	IntoMinistry   string `bson:"intoMinistry,omitempty" json:"intoMinistry"`
+	SpiritualGifts string `bson:"SpiritualGifts,omitempty" json:"spiritualGifts"`
+
+	Reason        string `bson:"reason,omitempty" json:"reason"`
+	ChurchName    string `bson:"churchName,omitempty" json:"churchName"`
+	ChurchAddress string `bson:"churchAdress,omitempty" json:"churchAddress"`
+	PastorName    string `bson:"pastorName,omitempty" json:"pastorName"`
+	PastorEmail   string `bson:"pastorEmail,omitempty" json:"pastorEmail"`
+	PastorPhone   string `bson:"pastorPhone,omitempty" json:"pastorPhone"`
+
 	ChurchInvolved   string `bson:"churchInvolve,omitempty" json:"churchInvolve"`
 	WaterBaptism     string `bson:"waterBaptism,omitempty" json:"waterBaptism"`
 	BaptismDate      string `bson:"baptismDate,omitempty" json:"baptismDate"`
